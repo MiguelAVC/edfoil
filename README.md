@@ -1,5 +1,7 @@
 # TBlade-Designer
 
+Repository for the future TBlade-Designer software for tidal turbine blade structural modelling. To run the application follow the next steps depending on your OS. For now this is a .py file but a .exe will be delivered eventually.
+
 ## Install on Windows
 
 Follow the next steps:
@@ -20,12 +22,12 @@ python -m venv .venv
 .venv\Scripts\activate
 ```
 
-```
+```python
 pip install -r requirements.txt
 ```
 
 5. Run main.py
 
-```
+```python
 python main.py
 ```
