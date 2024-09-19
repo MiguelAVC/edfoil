@@ -1,1 +1,31 @@
 # TBlade-Designer
+
+## Install on Windows
+
+Follow the next steps:
+
+1. Clone the repository.
+
+2. Install python version 3.12.2 (or 3.12) in your computer.
+
+3. Create a python virtual environment inside the root directory. This can be done in the terminal with the following:
+
+```
+python -m venv .venv
+```
+
+4. Install all the required dependencies with the following commands:
+
+```
+.venv\Scripts\activate
+```
+
+```
+pip install -r requirements.txt
+```
+
+5. Run main.py
+
+```
+python main.py
+```
