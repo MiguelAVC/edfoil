@@ -15,30 +15,31 @@ def importData(filepath):
     with open(filepath, 'r') as file:
         data = json.load(file)
         
-    # Convert all keys to integers and lists of lists to tuples of tuples
-    data = {int(outer_key): {int(inner_key): tuple(tuple(item) for 
-            item in value) for inner_key, value in inner_dict.items()} for
-            outer_key, inner_dict in data.items()}
+    # Convert most keys to integers and lists of lists to tuples of tuples
+    data = {int(section):{side:{int(ply):{int(curve):tuple(tuple(point) for
+            point in value_3) for curve, value_3 in value_2.items()} for
+            ply, value_2 in value_1.items()} for side, value_1 in 
+            value_0.items()} for section, value_0 in data.items()}
     
     return data
 
-def generateSkinSketches(data, prefix):
+def generateSkinSketches(data):
     m = mdb.models['Model-1']
     
-    for i in data.keys():
-        s = m.ConstrainedSketch(name = 'skin_' + prefix + '_' + str(i),
-                                sheetSize = 2000)
-        
-        s1 = s.Spline(points = data[i][1], constrainPoints = False)
-        s2 = s.Spline(points = data[i][2], constrainPoints = False)
-        s3 = s.Line(point1=data[i][3][0], point2=data[i][3][1])
-        s4 = s.Line(point1=data[i][4][0], point2=data[i][4][1])
+    for sec in data.keys():
+        for side in data[sec].keys():
+            for ply in data[sec][side].keys():
+                sketch_name = 'skin_{0}_{1}_{2}'.format(str(sec),side,str(ply))
+                s = m.ConstrainedSketch(name = sketch_name,
+                                        sheetSize = 2000)
+                c = data[sec][side][ply]
+                s1 = s.Spline(points = c[1], constrainPoints = False)
+                s2 = s.Spline(points = c[2], constrainPoints = False)
+                s3 = s.Line(point1=c[3][0], point2=c[3][1])
+                s4 = s.Line(point1=c[4][0], point2=c[4][1])
 
 # %% Example
 
 if __name__ == '__main__':
-    bot = importData('exports/bot.json')
-    top = importData('exports/top.json')
-    
-    generateSkinSketches(bot, 'bot')
-    generateSkinSketches(top, 'top')
+    blade = importData('exports/blade.json')
+    generateSkinSketches(blade)
