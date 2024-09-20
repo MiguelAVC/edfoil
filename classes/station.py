@@ -42,13 +42,21 @@ class Station:
                           'twist_angle':np.radians(twist_angle),
                           'offset':(x_offset,y_offset,z_offset),
                           'multiplier':(x_multiplier,y_multiplier,z_multiplier),
-                          'mirror':(x_mirror,y_mirror)
+                          'mirror':(x_mirror,y_mirror),
                           }
         
         twist_angle_rad = np.radians(twist_angle)
         coordinates = np.genfromtxt(path)
         self.airfoil = path.split('\\')[-1][:-4]
-
+        
+        # Define if it is a circle
+        tolerance:float = 1e-1
+        centre = np.mean(coordinates, axis=0)
+        distance_to_centre = np.linalg.norm(coordinates-centre,axis=1)
+        radius = np.mean(distance_to_centre)
+        self.parameters['isCircle'] = bool(np.all(np.abs(distance_to_centre - radius) < tolerance))
+        
+        
         x_original = coordinates[:,0]
         y_original = coordinates[:,1]
         
@@ -81,8 +89,8 @@ class Station:
         coordinates_station = np.column_stack((x_offset,y_offset))
         
         self.xy = coordinates_station
-
-    def plot(self, name):
+        
+    def plot(self, name) -> None:
         fig, ax = plt.subplots(figsize=(10,6))
 
         x = self.xy[:,0]
@@ -121,6 +129,6 @@ if __name__ == '__main__':
                   z_offset=1500,
                   y_multiplier=1.55,
                   y_mirror=True,
-                  path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'))
+                  path=os.path.join(os.getcwd(),'airfoils','NACA63416.txt'))
     
     sta.plot('Final')

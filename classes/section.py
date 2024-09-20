@@ -121,7 +121,7 @@ class Section:
             fig.savefig('skin.png',dpi=800)
         plt.close(fig)
         
-        if circle:
+        if station.parameters['isCircle']:
             idx_olp_sta = {x:idx_LE[x] for x in range(n_plies+1)}
             overlap_line = chord_line
             self.indexes['idx_olp_sta'] = idx_olp_sta
@@ -174,7 +174,7 @@ class Section:
             fig.savefig('bottom_skin.png',dpi=800)
         plt.close(fig)
         
-        if circle:
+        if station.parameters['isCircle']:
             idx_te_bot = {x:0 for x in range(n_plies+1)}
             te_line = lineConstructor(p0 = (splines[0]['x'](0),
                                             splines[0]['y'](0)),
@@ -245,7 +245,7 @@ class Section:
         self.indexes['idx_te_bot'] = idx_te_bot
         
         # Individual TE trim for plies
-        if circle:
+        if station.parameters['isCircle']:
             self.indexes['idx_ply_cut_bot'] = {}
             
         else:
@@ -347,7 +347,7 @@ class Section:
             plt.close(fig)
                 
         # Trailing edge cut
-        if circle:
+        if station.parameters['isCircle']:
             idx_te_top = {x:None for x in range(n_plies+1)}
         
         else:
