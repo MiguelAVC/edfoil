@@ -1,6 +1,6 @@
 from ui_mainwindow import Ui_MainWindow
-from PySide6.QtWidgets import (QStatusBar, QMainWindow, QFileDialog, 
-                               QMessageBox, QLabel, QProgressBar)
+from PySide6.QtWidgets import (QMainWindow, QFileDialog, QMessageBox, 
+                               QLabel, QProgressBar)
 from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
                               QValueAxis, QScatterSeries, QAreaSeries)
 from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
@@ -17,7 +17,7 @@ import numpy as np
 from scipy.interpolate import splev
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, app):
+    def __init__(self, app) -> None:
         super().__init__()
         self.app = app
         
@@ -30,13 +30,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle('TDesigner')
         
         # Messagebar
-        self.timer_msg = QTimer(self)
+        self.timer_msg = QTimer(parent=self)
         self.timer_msg.setSingleShot(True)
         
         # Project start
         self.db = db()
         self.edits = {}
-        self.handle_msgbar('New database created.')
+        self.handle_msgbar(message='New database created.')
         
         # Tab switching
         self.home_page_button.clicked.connect(self.switch_to_homePage)
@@ -57,20 +57,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.changedir_button.clicked.connect(self.change_work_directory)
         
         # ---------------------------------------------------------------------
-        # Page 0
+        # Page 0 (Home)
         
         self.loadproject_button.clicked.connect(self.load_db)
         self.newproject_button.clicked.connect(self.new_db)
         
         # ---------------------------------------------------------------------
-        # Page 1
+        # Page 1 (Airfoil Creator)
         
         self.airfoil_chart = self.graph_template('Airfoil Plot')
         self.airfoil_chartview.setChart(self.airfoil_chart)
         self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
         
         # ---------------------------------------------------------------------
-        # Page 2
+        # Page 2 (Station Generator)
         
         # Timer for debouncing text input changes
         self.timer_station = QTimer()
@@ -83,6 +83,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.db.airfoils[i[:-4]] = np.genfromtxt(f'./airfoils/{i}')
             self.paths_airfoils[i[:-4]] = f'./airfoils/{i}'
         self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
+        
         # Upload additional airfoils
         self.station_uploadairfoil_button.clicked.connect(self.upload_airfoil_file)
         
@@ -107,7 +108,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_savestation_button.clicked.connect(self.save_station)
         
         # ---------------------------------------------------------------------
-        # Page 3
+        # Page 3 (Blade Parameters)
         
         # Charts
         self.blade_olpsta_chart = self.graph_template('Skin Overlap Start Interpolation')
@@ -129,7 +130,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.blade_saveparams_button.clicked.connect(self.save_bladeparams)
         
         # ---------------------------------------------------------------------
-        # Page 4
+        # Page 4 (Skin)
         
         # Calculations
         self.timer_skin = QTimer()
@@ -472,7 +473,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             y_mirror = self.station_mirrory_input.isChecked()
             
             # Calculate new values
-            airfoil_selected = self.station_listairfoils_box.currentText()
+            airfoil_selected:str = self.station_listairfoils_box.currentText()
             data = Station(chord=chord_length,
                            twist_angle=twist_angle,
                            x_offset=x_offset,
@@ -490,9 +491,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for i in data.xy:
                 self.airfoil_series.append(float(i[0]),float(i[1]))
             
+            # Draw scatter points TE and LE
+            scatter_series = QScatterSeries()
+            if airfoil_selected == 'circle':
+                scatter_series.append(float(data.xy[0][0]), float(data.xy[0][1]))
+            idx_LE:int = int(len(data.xy)/2)
+            scatter_series.append(float(data.xy[idx_LE][0]), float(data.xy[idx_LE][1]))
+            scatter_series.setMarkerShape(QScatterSeries.MarkerShapeRectangle)
+            scatter_series.setMarkerSize(10)
+            
             # Update axes to fit new data
             self.station_chart.removeAllSeries()
             self.station_chart.addSeries(self.airfoil_series)
+            self.station_chart.addSeries(scatter_series)
             self.station_chart.createDefaultAxes()
             self.station_chart.zoom(0.9)
             
@@ -528,7 +539,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 station = self.db.stations[self.skin_liststations.currentText()] if self.skin_liststations.currentText() != '' else None
                 n_plies = int(self.skin_nplies_input.text()) if self.skin_nplies_input.text() else 1
                 ply_thk = float(self.skin_plythickness_input.text()) if self.skin_plythickness_input.text() else 1
-                olp_tgt = float(self.skin_overlaptarget_input.text()) if self.skin_overlaptarget_input.text() else 10
+                olp_tgt = float(self.skin_overlaptarget_input.text())*station.parameters['chord'] if self.skin_overlaptarget_input.text() else 10
                 te_thkn = float(self.skin_tethickness_input.text()) if self.skin_tethickness_input.text() else n_plies*ply_thk
                 saveFig = self.skin_savefig_input.isChecked()
                 isCrcle = self.skin_circle_input.isChecked()
@@ -541,7 +552,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             saveFig = saveFig,
                             circle = isCrcle,
                             )
-                
+                print('section generated')
                 # Plots
                 plies = list(data.t['t_plies_bot'].keys())
                 ply = data.t['t_plies_bot'][1]
@@ -569,8 +580,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # Temporary save
                 self.edits['__section__'] = data
                 
-            except ValueError:
-                self.handle_msgbar('Skin section: Wrong input')
+            # except ValueError:
+            #     self.handle_msgbar('Skin section: Wrong input')
             
             except NameError:
                 print('Skin section: Error - Station might be a circle.')
@@ -591,11 +602,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def exportSections(self):
         if len(self.abaqus_sectionsList.selectedItems()) > 0:
             items = self.abaqus_sectionsList.selectedItems()
-            for i in items:
-                name = i.text()
-                skinBot(section=self.db.sections[name], name=name)
-                skinTop(section=self.db.sections[name], name=name)
-            self.handle_msgbar(f'Section "{name}" exported succesfully.')
+            dict_sections = {int(sec.text()[4:]):skinSection(self.db.sections[sec.text()]) for sec in items}
+            filename = f'{self.abaqus_expFileName_input.text()}'
+            skinPart(sections=dict_sections, filename=filename)
+            
+            self.handle_msgbar(f'File "{filename}.json" exported succesfully.')
         else:
             self.handle_msgbar('No sections selected.')
     

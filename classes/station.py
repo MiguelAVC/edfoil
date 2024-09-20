@@ -102,48 +102,6 @@ class Station:
         plt.tight_layout()
         plt.show()
 
-#%% Example
-
-# chord = 1334
-# twist_angle = 24.3
-# x_offset = -474.26
-# y_offset = 255
-# z_offset = 1500
-# x_multiplier = 1
-# y_multiplier = 1.55
-# z_multiplier = 1
-# path = os.path.join(os.getcwd(),'airfoils')
-
-
-# files = os.listdir(path)
-# twist_angle_rad = np.radians(twist_angle)
-# # airfoils = [x for x in files]
-# coordinates = np.genfromtxt(os.path.join(path,'NACA63430.txt'))
-# airfoil_name = 'NACA63430'
-
-# x_original = coordinates[:,0]
-# y_original = coordinates[:,1]
-
-# # Scaling
-# x_scaled = x_original * chord * x_multiplier
-# y_scaled = - y_original * chord * y_multiplier
-
-# # Rotating
-# xy_rotated = np.column_stack((x_scaled,y_scaled))
-# xy_rotated = np.array(xy_rotated)
-
-# rotation_matrix = [[np.cos(twist_angle_rad), -np.sin(twist_angle_rad)],
-#                    [np.sin(twist_angle_rad), np.cos(twist_angle_rad)]]
-
-# xy_rotated = np.dot(xy_rotated,rotation_matrix)
-
-# # Offsetting
-# x_offset = xy_rotated[:,0] + x_offset
-# y_offset = xy_rotated[:,1] + y_offset
-
-# coordinates_station = np.column_stack((x_offset,y_offset))
-
-
 # %%
 
 if __name__ == '__main__':

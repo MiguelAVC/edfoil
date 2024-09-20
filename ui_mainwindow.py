@@ -805,9 +805,6 @@ class Ui_MainWindow(object):
 "	background-color:rgb(35, 46, 47);\n"
 "	color:white;\n"
 "}\n"
-"QCheckBox{\n"
-"	background-color:white;\n"
-"}\n"
 "\n"
 "QLineEdit{\n"
 "	background-color:white;\n"
@@ -1598,6 +1595,33 @@ class Ui_MainWindow(object):
         self.gridLayout_3 = QGridLayout(self.abaqus_page)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.gridLayout_3.setVerticalSpacing(15)
+        self.abaqus_expFileName_input = QLineEdit(self.abaqus_page)
+        self.abaqus_expFileName_input.setObjectName(u"abaqus_expFileName_input")
+        self.abaqus_expFileName_input.setMaximumSize(QSize(200, 16777215))
+        self.abaqus_expFileName_input.setStyleSheet(u"QLineEdit{\n"
+"	border: 2px solid rgb(35, 46, 47);\n"
+"	padding-top: 0.1em;\n"
+"	padding-bottom: 0.1em;\n"
+"	padding-left:0.5em;\n"
+"	border-radius:5px;\n"
+"}")
+
+        self.gridLayout_3.addWidget(self.abaqus_expFileName_input, 3, 1, 1, 1)
+
+        self.horizontalSpacer_27 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout_3.addItem(self.horizontalSpacer_27, 0, 4, 4, 1)
+
+        self.label_46 = QLabel(self.abaqus_page)
+        self.label_46.setObjectName(u"label_46")
+
+        self.gridLayout_3.addWidget(self.label_46, 3, 0, 1, 1)
+
+        self.label_47 = QLabel(self.abaqus_page)
+        self.label_47.setObjectName(u"label_47")
+
+        self.gridLayout_3.addWidget(self.label_47, 3, 2, 1, 1)
+
         self.abaqus_export_button = QPushButton(self.abaqus_page)
         self.abaqus_export_button.setObjectName(u"abaqus_export_button")
         self.abaqus_export_button.setStyleSheet(u"QPushButton{\n"
@@ -1614,20 +1638,7 @@ class Ui_MainWindow(object):
 "	font: 700;\n"
 "}")
 
-        self.gridLayout_3.addWidget(self.abaqus_export_button, 3, 1, 1, 1)
-
-        self.horizontalSpacer_27 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_3.addItem(self.horizontalSpacer_27, 0, 2, 4, 1)
-
-        self.horizontalSpacer_28 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_3.addItem(self.horizontalSpacer_28, 3, 0, 1, 1)
-
-        self.label_45 = QLabel(self.abaqus_page)
-        self.label_45.setObjectName(u"label_45")
-
-        self.gridLayout_3.addWidget(self.label_45, 1, 0, 1, 2)
+        self.gridLayout_3.addWidget(self.abaqus_export_button, 3, 3, 1, 1)
 
         self.label_42 = QLabel(self.abaqus_page)
         self.label_42.setObjectName(u"label_42")
@@ -1639,13 +1650,26 @@ class Ui_MainWindow(object):
 "	padding:0.25em 1em;\n"
 "}")
 
-        self.gridLayout_3.addWidget(self.label_42, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.label_42, 0, 0, 1, 3)
 
         self.abaqus_sectionsList = QListWidget(self.abaqus_page)
         self.abaqus_sectionsList.setObjectName(u"abaqus_sectionsList")
+        self.abaqus_sectionsList.setStyleSheet(u"QListWidget{\n"
+"	border: 2px solid rgb(35, 46, 47);\n"
+"	padding-top:1em;\n"
+"	padding-bottom: 1em;\n"
+"	padding-left:1em;\n"
+"	border-radius:10px;\n"
+"}")
         self.abaqus_sectionsList.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked|QAbstractItemView.EditTrigger.EditKeyPressed|QAbstractItemView.EditTrigger.SelectedClicked)
+        self.abaqus_sectionsList.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
 
-        self.gridLayout_3.addWidget(self.abaqus_sectionsList, 2, 0, 1, 2)
+        self.gridLayout_3.addWidget(self.abaqus_sectionsList, 2, 0, 1, 4)
+
+        self.label_45 = QLabel(self.abaqus_page)
+        self.label_45.setObjectName(u"label_45")
+
+        self.gridLayout_3.addWidget(self.label_45, 1, 0, 1, 4)
 
         self.stackedWidget.addWidget(self.abaqus_page)
 
@@ -1733,6 +1757,7 @@ class Ui_MainWindow(object):
         self.label_36.setBuddy(self.skin_savefig_input)
         self.label_31.setBuddy(self.skin_nplies_input)
         self.label_44.setBuddy(self.skin_circle_input)
+        self.label_46.setBuddy(self.abaqus_expFileName_input)
 #endif // QT_CONFIG(shortcut)
         QWidget.setTabOrder(self.home_page_button, self.airfoil_page_button)
         QWidget.setTabOrder(self.airfoil_page_button, self.station_page_button)
@@ -1849,14 +1874,14 @@ class Ui_MainWindow(object):
         self.station_resetzoom_button.setText(QCoreApplication.translate("MainWindow", u"Reset", None))
         self.station_xy_current.setText("")
         self.label_22.setText(QCoreApplication.translate("MainWindow", u"Offset y:", None))
-        self.station_mirrory_input.setText("")
+        self.station_mirrory_input.setText(QCoreApplication.translate("MainWindow", u"True", None))
         self.label_24.setText(QCoreApplication.translate("MainWindow", u"Multiplier x:", None))
         self.label_25.setText(QCoreApplication.translate("MainWindow", u"Multiplier y:", None))
         self.label_21.setText(QCoreApplication.translate("MainWindow", u"Offset x:", None))
         self.label_20.setText(QCoreApplication.translate("MainWindow", u"Twist angle:", None))
         self.label_19.setText(QCoreApplication.translate("MainWindow", u"Chord length:", None))
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"Offset z:", None))
-        self.station_mirrorx_input.setText("")
+        self.station_mirrorx_input.setText(QCoreApplication.translate("MainWindow", u"True", None))
         self.label_28.setText(QCoreApplication.translate("MainWindow", u"Mirror y:", None))
         self.label_27.setText(QCoreApplication.translate("MainWindow", u"Mirror x:", None))
         self.label_26.setText(QCoreApplication.translate("MainWindow", u"Multiplier z:", None))
@@ -1908,9 +1933,12 @@ class Ui_MainWindow(object):
         self.skin_saveSection_button.setText(QCoreApplication.translate("MainWindow", u"Save Section", None))
         self.skin_delSection_button.setText(QCoreApplication.translate("MainWindow", u"Delete Section", None))
         self.label_43.setText(QCoreApplication.translate("MainWindow", u"Spar Page: Coming Soon", None))
+        self.abaqus_expFileName_input.setText(QCoreApplication.translate("MainWindow", u"skin", None))
+        self.label_46.setText(QCoreApplication.translate("MainWindow", u"Export file name:", None))
+        self.label_47.setText(QCoreApplication.translate("MainWindow", u".json", None))
         self.abaqus_export_button.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
-        self.label_45.setText(QCoreApplication.translate("MainWindow", u"Select the sections to be exported as .json files:", None))
         self.label_42.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
+        self.label_45.setText(QCoreApplication.translate("MainWindow", u"Select the sections to be exported as .json files:", None))
         self.def_msgbar.setText(QCoreApplication.translate("MainWindow", u"Ready.", None))
         self.msgbar.setText("")
         self.progressBar.setFormat(QCoreApplication.translate("MainWindow", u"%p%", None))

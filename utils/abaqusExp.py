@@ -5,7 +5,7 @@ import json
 from classes.section import Section
 
 # Bot Sketches
-def skinBot(section:Section, name:str) -> dict:
+def skinBot(section:Section) -> dict:
 
     bot = {}
 
@@ -33,7 +33,7 @@ def skinBot(section:Section, name:str) -> dict:
     return bot
 
 # Top Sketches
-def skinTop(section:Section, name:str) -> dict:
+def skinTop(section:Section) -> dict:
 
     top = {}
 
@@ -62,22 +62,18 @@ def skinTop(section:Section, name:str) -> dict:
 
 # Section
 
-def skinSection(top:dict={}, bot:dict={}) -> dict:
+def skinSection(section:Section) -> dict:
     
-    sec = {'top':top, 'bot':bot}
+    sec = {'top':skinTop(section=section), 'bot':skinBot(section=section)}
     return sec
 
 # Skin Part
 
-def skinPart(*args, sections:list, name:str='skin') -> None:
-    
-    skin = {}
-    for i in range(len(args)):
-        skin[sections[i]] = args[i]
+def skinPart(sections:dict, filename:str='skin') -> None:
     
     # Save to a JSON file
-    with open(f'exports/{name}.json', 'w') as file:
-        json.dump(skin, file, indent=4)
+    with open(f'exports/{filename}.json', 'w') as file:
+        json.dump(sections, file, indent=4)
 
 # %% Example
 

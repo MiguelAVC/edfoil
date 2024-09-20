@@ -105,7 +105,7 @@ Line{
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources.qrc">:/images/fastablade-white.png</pixmap>
+          <pixmap>:/images/fastablade-white.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -735,7 +735,7 @@ QPushButton:hover{
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="resources.qrc">:/images/fastablade.png</pixmap>
+                 <pixmap>:/images/fastablade.png</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -1482,9 +1482,6 @@ QLineEdit{
 	background-color:rgb(35, 46, 47);
 	color:white;
 }
-QCheckBox{
-	background-color:white;
-}
 
 QLineEdit{
 	background-color:white;
@@ -1515,7 +1512,7 @@ QLineEdit{
                  <item row="9" column="2">
                   <widget class="QCheckBox" name="station_mirrory_input">
                    <property name="text">
-                    <string/>
+                    <string>True</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1652,7 +1649,7 @@ QLineEdit{
                  <item row="8" column="2">
                   <widget class="QCheckBox" name="station_mirrorx_input">
                    <property name="text">
-                    <string/>
+                    <string>True</string>
                    </property>
                   </widget>
                  </item>
@@ -2946,6 +2943,58 @@ QPushButton:hover{
                <number>15</number>
               </property>
               <item row="3" column="1">
+               <widget class="QLineEdit" name="abaqus_expFileName_input">
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QLineEdit{
+	border: 2px solid rgb(35, 46, 47);
+	padding-top: 0.1em;
+	padding-bottom: 0.1em;
+	padding-left:0.5em;
+	border-radius:5px;
+}</string>
+                </property>
+                <property name="text">
+                 <string>skin</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4" rowspan="4">
+               <spacer name="horizontalSpacer_27">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_46">
+                <property name="text">
+                 <string>Export file name:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>abaqus_expFileName_input</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QLabel" name="label_47">
+                <property name="text">
+                 <string>.json</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3">
                <widget class="QPushButton" name="abaqus_export_button">
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
@@ -2967,40 +3016,7 @@ QPushButton:hover{
                 </property>
                </widget>
               </item>
-              <item row="0" column="2" rowspan="4">
-               <spacer name="horizontalSpacer_27">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="3" column="0">
-               <spacer name="horizontalSpacer_28">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="1" column="0" colspan="2">
-               <widget class="QLabel" name="label_45">
-                <property name="text">
-                 <string>Select the sections to be exported as .json files:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
+              <item row="0" column="0" colspan="3">
                <widget class="QLabel" name="label_42">
                 <property name="styleSheet">
                  <string notr="true">QLabel{
@@ -3016,10 +3032,29 @@ QPushButton:hover{
                 </property>
                </widget>
               </item>
-              <item row="2" column="0" colspan="2">
+              <item row="2" column="0" colspan="4">
                <widget class="QListWidget" name="abaqus_sectionsList">
+                <property name="styleSheet">
+                 <string notr="true">QListWidget{
+	border: 2px solid rgb(35, 46, 47);
+	padding-top:1em;
+	padding-bottom: 1em;
+	padding-left:1em;
+	border-radius:10px;
+}</string>
+                </property>
                 <property name="editTriggers">
                  <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="4">
+               <widget class="QLabel" name="label_45">
+                <property name="text">
+                 <string>Select the sections to be exported as .json files:</string>
                 </property>
                </widget>
               </item>
