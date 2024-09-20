@@ -5,7 +5,7 @@ import json
 from classes.section import Section
 
 # Bot Sketches
-def skinBot(section:Section, name:str):
+def skinBot(section:Section, name:str) -> dict:
 
     bot = {}
 
@@ -30,12 +30,10 @@ def skinBot(section:Section, name:str):
         bot[i] = {1:xy1, 2:xy2,
                   3:[xy1[0]] + [xy2[0]], 4:[xy1[-1]] + [xy2[-1]]}
         
-    # Save to a JSON file
-    with open(f'exports/{name}_bot.json', 'w') as file:
-        json.dump(bot, file, indent=4)
+    return bot
 
 # Top Sketches
-def skinTop(section:Section, name:str):
+def skinTop(section:Section, name:str) -> dict:
 
     top = {}
 
@@ -60,13 +58,37 @@ def skinTop(section:Section, name:str):
         top[i] = {1:xy1, 2:xy2,
                   3:[xy1[0]] + [xy2[0]], 4:[xy1[-1]] + [xy2[-1]]}
         
+    return top
+
+# Section
+
+def skinSection(top:dict={}, bot:dict={}) -> dict:
+    
+    sec = {'top':top, 'bot':bot}
+    return sec
+
+# Skin Part
+
+def skinPart(*args, sections:list, name:str='skin') -> None:
+    
+    skin = {}
+    for i in range(len(args)):
+        skin[sections[i]] = args[i]
+    
     # Save to a JSON file
-    with open(f'exports/{name}_top.json', 'w') as file:
-        json.dump(top, file, indent=4)
+    with open(f'exports/{name}.json', 'w') as file:
+        json.dump(skin, file, indent=4)
 
 # %% Example
 
 if __name__ == '__main__':
     
-    skinBot(section=db)
-    skinTop(section=db)
+    with open('./exports/bot.json','r') as file:
+        bot = json.load(file)
+    with open('./exports/top.json', 'r') as file:
+        top = json.load(file)
+        
+    sec_2000 = skinSection(top,bot)
+    sec_3000 = skinSection(top,bot)
+    
+    skinPart(sec_2000,sec_3000,sections=[2000,3000])
