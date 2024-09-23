@@ -494,8 +494,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     ### SKIN METHODS
     
-    def update_stabox(self, page):
-        if page == 4:
+    def update_stabox(self):
+        if self.stackedWidget.currentIndex() == 4:
             names_stations = list(self.db.stations.keys())
             self.skin_liststations.clear()
             self.skin_liststations.addItems(names_stations)
