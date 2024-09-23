@@ -28,7 +28,7 @@ def generateSkinSketches(data, model='Model-1'):
     
     # tuple for wire coordinates
     n_plies = len(data[data.keys()[0]]['top'].keys())
-    points = {node:{ply:()} for ply in range(n_plies) for node in range(4)}
+    points = {node:{ply+1:()} for ply in range(n_plies) for node in range(4)}
     
     for sec in sorted(data.keys()):
         for side in data[sec].keys():
@@ -78,7 +78,7 @@ def createSkinPart(data, points, model='Model-1'):
                                       sketchPlaneSide = SIDE1, 
                                       sketchOrientation = RIGHT, 
                                       origin = (0.0,0.0,float(section)))
-                
+
                 # open planar sketch
                 s = m.ConstrainedSketch(name        = '__profile__',
                                         sheetSize   = 2000,
