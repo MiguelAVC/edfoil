@@ -23,13 +23,14 @@ def importData(filepath):
     
     return data
 
-def generateSkinSketches(data):
-    m = mdb.models['Model-1']
+def generateSkinSketches(data, model='Model-1'):
+    m = mdb.models[model]
     
     # tuple for wire coordinates
-    points = {x:() for x in range(4)}
+    n_plies = len(data[data.keys()[0]]['top'].keys())
+    points = {node:{ply:()} for ply in range(n_plies) for node in range(4)}
     
-    for sec in data.keys():
+    for sec in sorted(data.keys()):
         for side in data[sec].keys():
             for ply in data[sec][side].keys():
                 sketch_name = 'skin_{0}_{1}_{2}'.format(str(sec),side,str(ply))
@@ -41,10 +42,10 @@ def generateSkinSketches(data):
                 s3 = s.Line(point1=c[3][0], point2=c[3][1])
                 s4 = s.Line(point1=c[4][0], point2=c[4][1])
                 
-                points[0] += (c[3][0] + (sec,),)
-                points[1] += (c[3][1] + (sec,),)
-                points[2] += (c[4][0] + (sec,),)
-                points[3] += (c[4][1] + (sec,),)
+                points[0][ply] += (c[3][0] + (sec,),)
+                points[1][ply] += (c[3][1] + (sec,),)
+                points[2][ply] += (c[4][0] + (sec,),)
+                points[3][ply] += (c[4][1] + (sec,),)
     
     return points
 
@@ -54,12 +55,12 @@ def createSkinPart(data, model='Model-1'):
     
     sections = list(data.keys())
     sides = list(data[sections[0]].keys())
-    plies = list(data[sections[0][sides[0]]].keys())
+    plies = list(data[sections[0]][sides[0]].keys())
     
     for side in sides:
         for ply in plies:
             # Part name
-            part_name = 'Skin_{side}_{ply}'.format(side,str(ply))
+            part_name = 'Skin_{0}_{1}'.format(side,str(ply))
             
             # Create part
             p = m.Part(name=part_name, dimensionality=THREE_D, type=DEFORMABLE_BODY)
@@ -100,7 +101,7 @@ def createSkinPart(data, model='Model-1'):
                 
                 del m.sketches['__profile__']
                 
-
+    # Draw wires
 
 # %% Example
 
