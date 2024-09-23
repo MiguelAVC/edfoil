@@ -12,22 +12,22 @@ Follow the next steps:
 
 3. Create a python virtual environment inside the root directory. This can be done in the terminal with the following:
 
-```
+```bat
 python -m venv .venv
 ```
 
 4. Install all the required dependencies with the following commands:
 
-```
+```bat
 .venv\Scripts\activate
 ```
 
-```python
+```bat
 pip install -r requirements.txt
 ```
 
 5. Run main.py
 
-```python
+```bat
 python main.py
 ```
