@@ -42,14 +42,15 @@ def generateSkinSketches(data, model='Model-1'):
                 s3 = s.Line(point1=c[3][0], point2=c[3][1])
                 s4 = s.Line(point1=c[4][0], point2=c[4][1])
                 
-                points[0][ply] += (c[3][0] + (sec,),)
-                points[1][ply] += (c[3][1] + (sec,),)
-                points[2][ply] += (c[4][0] + (sec,),)
-                points[3][ply] += (c[4][1] + (sec,),)
+                if side == 'bot': # Temporary solution, might break with other str
+                    points[0][ply] += ((c[3][0] + (sec,),),)
+                    points[1][ply] += ((c[3][1] + (sec,),),)
+                    points[2][ply] += ((c[4][0] + (sec,),),)
+                    points[3][ply] += ((c[4][1] + (sec,),),)
     
     return points
 
-def createSkinPart(data, model='Model-1'):
+def createSkinPart(data, points, model='Model-1'):
     
     m = mdb.models[model]
     
@@ -101,8 +102,28 @@ def createSkinPart(data, model='Model-1'):
                 
                 del m.sketches['__profile__']
                 
-    # Draw wires
-
+            # Draw wires
+            paths = []
+            for wire in range(4):
+                vertices = p.vertices.findAt(*points[wire][ply])
+                wire_object = p.WireSpline(points=tuple(vertices), mergeType=IMPRINT, meshable=ON, smoothClosedSpline=ON)
+                paths.append(tuple(p.getFeatureEdges(wire_object.name)))
+            
+            
+            # making sure edje objects inside each path are sorted based on z-coord
+            paths_sorted = [sorted(x, key=lambda i:i.pointOn[0][2]) for x in paths]
+            
+            # 2) create list of tuples with edges belonging to each station
+            
+            faces = [tuple([p.edges[x] for x in j.getEdges()])
+                    for i in range(len(sections)) for j in p.faces
+                    if int(j.pointOn[0][2]) == sections[i]]
+            
+            # 3) loft the whole thing
+            p.SolidLoft(loftsections = tuple(faces),
+                        paths = tuple(paths_sorted), globalSmoothing = ON)
+            
+            
 # %% Example
 
 # if __name__ == '__main__':
