@@ -78,7 +78,7 @@ def createSkinPart(data, points, model='Model-1'):
                                       sketchPlaneSide = SIDE1, 
                                       sketchOrientation = RIGHT, 
                                       origin = (0.0,0.0,float(section)))
-
+                
                 # open planar sketch
                 s = m.ConstrainedSketch(name        = '__profile__',
                                         sheetSize   = 2000,
