@@ -28,7 +28,7 @@ def generateSkinSketches(data, model='Model-1'):
     
     # tuple for wire coordinates
     n_plies = len(data[list(data.keys())[0]]['top'].keys())
-    points = {node:{ply+1:() for ply in range(n_plies)} for node in range(4)}
+    points = {node:{side:{ply+1:() for ply in range(n_plies)} for side in ['top','bot']} for node in range(4)}
     
     for sec in sorted(data.keys()):
         for side in data[sec].keys():
@@ -43,10 +43,10 @@ def generateSkinSketches(data, model='Model-1'):
                 s4 = s.Line(point1=c[4][0], point2=c[4][1])
                 
                 if side == 'bot': # Temporary solution, might break with other str
-                    points[0][ply] += ((c[3][0] + (sec,),),)
-                    points[1][ply] += ((c[3][1] + (sec,),),)
-                    points[2][ply] += ((c[4][0] + (sec,),),)
-                    points[3][ply] += ((c[4][1] + (sec,),),)
+                    points[0][side][ply] += ((c[3][0] + (sec,),),)
+                    points[1][side][ply] += ((c[3][1] + (sec,),),)
+                    points[2][side][ply] += ((c[4][0] + (sec,),),)
+                    points[3][side][ply] += ((c[4][1] + (sec,),),)
     
     return points
 
@@ -105,7 +105,7 @@ def createSkinPart(data, points, model='Model-1'):
             # Draw wires
             paths = []
             for wire in range(4):
-                vertices = p.vertices.findAt(*points[wire][ply])
+                vertices = p.vertices.findAt(*points[wire][side][ply])
                 wire_object = p.WireSpline(points=tuple(vertices), mergeType=IMPRINT, meshable=ON, smoothClosedSpline=ON)
                 paths.append(tuple(p.getFeatureEdges(wire_object.name)))
             
@@ -126,6 +126,7 @@ def createSkinPart(data, points, model='Model-1'):
             
 # %% Example
 
-# if __name__ == '__main__':
-#     blade = importData('exports/blade.json')
-#     generateSkinSketches(blade)
+if __name__ == '__main__':
+    data = importData('skin.json')
+    points = generateSkinSketches(data)
+    createSkinPart(data,points)
