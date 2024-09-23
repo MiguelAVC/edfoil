@@ -42,11 +42,10 @@ def generateSkinSketches(data, model='Model-1'):
                 s3 = s.Line(point1=c[3][0], point2=c[3][1])
                 s4 = s.Line(point1=c[4][0], point2=c[4][1])
                 
-                if side == 'bot': # Temporary solution, might break with other str
-                    points[0][side][ply] += ((c[3][0] + (sec,),),)
-                    points[1][side][ply] += ((c[3][1] + (sec,),),)
-                    points[2][side][ply] += ((c[4][0] + (sec,),),)
-                    points[3][side][ply] += ((c[4][1] + (sec,),),)
+                points[0][side][ply] += ((c[3][0] + (sec,),),)
+                points[1][side][ply] += ((c[3][1] + (sec,),),)
+                points[2][side][ply] += ((c[4][0] + (sec,),),)
+                points[3][side][ply] += ((c[4][1] + (sec,),),)
     
     return points
 
@@ -54,7 +53,7 @@ def createSkinPart(data, points, model='Model-1'):
     
     m = mdb.models[model]
     
-    sections = list(data.keys())
+    sections = sorted(list(data.keys()))
     sides = list(data[sections[0]].keys())
     plies = list(data[sections[0]][sides[0]].keys())
     
@@ -103,12 +102,11 @@ def createSkinPart(data, points, model='Model-1'):
                 del m.sketches['__profile__']
                 
             # Draw wires
-            paths = []
             for wire in range(4):
                 vertices = p.vertices.findAt(*points[wire][side][ply])
                 wire_object = p.WireSpline(points=tuple(vertices), mergeType=IMPRINT, meshable=ON, smoothClosedSpline=ON)
-                paths.append(tuple(p.getFeatureEdges(wire_object.name)))
-            
+                
+            paths = [tuple(p.getFeatureEdges('Wire-'+str(x+1))) for x in range(4)]
             
             # making sure edje objects inside each path are sorted based on z-coord
             paths_sorted = [sorted(x, key=lambda i:i.pointOn[0][2]) for x in paths]
