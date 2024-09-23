@@ -27,8 +27,8 @@ def generateSkinSketches(data, model='Model-1'):
     m = mdb.models[model]
     
     # tuple for wire coordinates
-    n_plies = len(data[data.keys()[0]]['top'].keys())
-    points = {node:{ply+1:()} for ply in range(n_plies) for node in range(4)}
+    n_plies = len(data[list(data.keys())[0]]['top'].keys())
+    points = {node:{ply+1:() for ply in range(n_plies)} for node in range(4)}
     
     for sec in sorted(data.keys()):
         for side in data[sec].keys():
