@@ -26,6 +26,9 @@ def importData(filepath):
 def generateSkinSketches(data):
     m = mdb.models['Model-1']
     
+    # tuple for wire coordinates
+    points = {x:() for x in range(4)}
+    
     for sec in data.keys():
         for side in data[sec].keys():
             for ply in data[sec][side].keys():
@@ -37,6 +40,67 @@ def generateSkinSketches(data):
                 s2 = s.Spline(points = c[2], constrainPoints = False)
                 s3 = s.Line(point1=c[3][0], point2=c[3][1])
                 s4 = s.Line(point1=c[4][0], point2=c[4][1])
+                
+                points[0] += (c[3][0] + (sec,),)
+                points[1] += (c[3][1] + (sec,),)
+                points[2] += (c[4][0] + (sec,),)
+                points[3] += (c[4][1] + (sec,),)
+    
+    return points
+
+def createSkinPart(data, model='Model-1'):
+    
+    m = mdb.models[model]
+    
+    sections = list(data.keys())
+    sides = list(data[sections[0]].keys())
+    plies = list(data[sections[0][sides[0]]].keys())
+    
+    for side in sides:
+        for ply in plies:
+            # Part name
+            part_name = 'Skin_{side}_{ply}'.format(side,str(ply))
+            
+            # Create part
+            p = m.Part(name=part_name, dimensionality=THREE_D, type=DEFORMABLE_BODY)
+            
+            # Create y-axis datum
+            y_datum = p.DatumAxisByPrincipalAxis(principalAxis = YAXIS)
+            
+            for section in sections:
+                datumPlane = p.DatumPlaneByPrincipalPlane(principalPlane = XYPLANE,
+                                                          offset = section)
+                
+                t = p.MakeSketchTransform(sketchPlane = p.datums[datumPlane.id], 
+                                      sketchUpEdge = p.datums[y_datum.id],
+                                      sketchPlaneSide = SIDE1, 
+                                      sketchOrientation = RIGHT, 
+                                      origin = (0.0,0.0,float(section)))
+
+                # open planar sketch
+                s = m.ConstrainedSketch(name        = '__profile__',
+                                        sheetSize   = 2000,
+                                        gridSpacing = 100,
+                                        transform   = t)
+                
+                p.projectReferencesOntoSketch(sketch = s,
+                                            filter = COPLANAR_EDGES)
+                
+                # retrieve sketch
+                sketch_name = 'skin_{0}_{1}_{2}'.format(str(section),side,str(ply))
+                
+                s.retrieveSketch(sketch=m.sketches[sketch_name])
+                
+                # generate shell from sketch
+                p.Shell(sketchPlane       = p.datums[datumPlane.id],
+                        sketchUpEdge      = p.datums[y_datum.id],
+                        sketchPlaneSide   = SIDE1,
+                        sketchOrientation = RIGHT,
+                        sketch            = s)
+                
+                del m.sketches['__profile__']
+                
+
 
 # %% Example
 
