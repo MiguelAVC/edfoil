@@ -44,7 +44,7 @@ class Section:
                  overlap_target:float,
                  te_thickness:float = 8,
                  saveFig:bool = False,
-                 circle:bool = False) -> None:
+                ) -> None:
         
         # Parameters
         self.parameters = {'n_plies': n_plies,
@@ -379,7 +379,7 @@ class Section:
             plt.close(fig)
                 
         # Spline trim for plies
-        if not circle:
+        if not station.parameters['isCircle']:
             
             for i in range(n_plies):
         
@@ -488,10 +488,9 @@ if __name__ == '__main__':
     saveFig = False
     overlap_target = 200
     trailing_edge_thickness = 8 # mm
-    circle = True
     
     db = Section(station=sta, n_plies=n_plies, ply_thickness=offset_distance,
                  overlap_target=overlap_target,
-                 te_thickness=trailing_edge_thickness, saveFig=saveFig,
-                 circle=circle)
+                 te_thickness=trailing_edge_thickness, saveFig=saveFig)
     
+    db.figs['top_ply'][1]

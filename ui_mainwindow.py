@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(150, 0))
         self.label_2.setMaximumSize(QSize(150, 40))
-        self.label_2.setPixmap(QPixmap(u":/images/fastablade-white.png"))
+        self.label_2.setPixmap(QPixmap(u":/resources/images/fastablade-white.png"))
         self.label_2.setScaledContents(True)
 
         self.verticalLayout.addWidget(self.label_2)
@@ -400,7 +400,8 @@ class Ui_MainWindow(object):
         self.label_5.setObjectName(u"label_5")
         self.label_5.setMaximumSize(QSize(450, 100))
         self.label_5.setSizeIncrement(QSize(16, 9))
-        self.label_5.setPixmap(QPixmap(u":/images/fastablade.png"))
+        self.label_5.setTextFormat(Qt.TextFormat.AutoText)
+        self.label_5.setPixmap(QPixmap(u":/resources/images/fastablade.png"))
         self.label_5.setScaledContents(True)
         self.label_5.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -1424,29 +1425,37 @@ class Ui_MainWindow(object):
 "}")
         self.gridLayout_11 = QGridLayout(self.widget_8)
         self.gridLayout_11.setObjectName(u"gridLayout_11")
-        self.skin_delstation_button = QPushButton(self.widget_8)
-        self.skin_delstation_button.setObjectName(u"skin_delstation_button")
-        sizePolicy2.setHeightForWidth(self.skin_delstation_button.sizePolicy().hasHeightForWidth())
-        self.skin_delstation_button.setSizePolicy(sizePolicy2)
+        self.horizontalSpacer_22 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.gridLayout_11.addWidget(self.skin_delstation_button, 1, 3, 1, 1)
+        self.gridLayout_11.addItem(self.horizontalSpacer_22, 5, 3, 1, 2)
+
+        self.label_36 = QLabel(self.widget_8)
+        self.label_36.setObjectName(u"label_36")
+        self.label_36.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+
+        self.gridLayout_11.addWidget(self.label_36, 5, 0, 1, 2)
 
         self.label_32 = QLabel(self.widget_8)
         self.label_32.setObjectName(u"label_32")
         self.label_32.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
-        self.gridLayout_11.addWidget(self.label_32, 4, 0, 1, 2)
+        self.gridLayout_11.addWidget(self.label_32, 2, 0, 1, 2)
 
         self.label_34 = QLabel(self.widget_8)
         self.label_34.setObjectName(u"label_34")
         self.label_34.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
-        self.gridLayout_11.addWidget(self.label_34, 6, 0, 1, 2)
+        self.gridLayout_11.addWidget(self.label_34, 4, 0, 1, 2)
 
-        self.skin_tethickness_input = QLineEdit(self.widget_8)
-        self.skin_tethickness_input.setObjectName(u"skin_tethickness_input")
+        self.skin_nplies_input = QLineEdit(self.widget_8)
+        self.skin_nplies_input.setObjectName(u"skin_nplies_input")
 
-        self.gridLayout_11.addWidget(self.skin_tethickness_input, 6, 2, 1, 3)
+        self.gridLayout_11.addWidget(self.skin_nplies_input, 1, 2, 1, 3)
+
+        self.skin_plythickness_input = QLineEdit(self.widget_8)
+        self.skin_plythickness_input.setObjectName(u"skin_plythickness_input")
+
+        self.gridLayout_11.addWidget(self.skin_plythickness_input, 2, 2, 1, 3)
 
         self.skin_savefig_input = QCheckBox(self.widget_8)
         self.skin_savefig_input.setObjectName(u"skin_savefig_input")
@@ -1455,13 +1464,29 @@ class Ui_MainWindow(object):
         self.skin_savefig_input.setMinimumSize(QSize(0, 0))
         self.skin_savefig_input.setMaximumSize(QSize(16777215, 16777215))
 
-        self.gridLayout_11.addWidget(self.skin_savefig_input, 7, 2, 1, 1)
+        self.gridLayout_11.addWidget(self.skin_savefig_input, 5, 2, 1, 1)
+
+        self.skin_liststations = QComboBox(self.widget_8)
+        self.skin_liststations.setObjectName(u"skin_liststations")
+
+        self.gridLayout_11.addWidget(self.skin_liststations, 0, 2, 1, 3)
+
+        self.skin_tethickness_input = QLineEdit(self.widget_8)
+        self.skin_tethickness_input.setObjectName(u"skin_tethickness_input")
+
+        self.gridLayout_11.addWidget(self.skin_tethickness_input, 4, 2, 1, 3)
+
+        self.label_31 = QLabel(self.widget_8)
+        self.label_31.setObjectName(u"label_31")
+        self.label_31.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+
+        self.gridLayout_11.addWidget(self.label_31, 1, 0, 1, 2)
 
         self.label_33 = QLabel(self.widget_8)
         self.label_33.setObjectName(u"label_33")
         self.label_33.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
-        self.gridLayout_11.addWidget(self.label_33, 5, 0, 1, 2)
+        self.gridLayout_11.addWidget(self.label_33, 3, 0, 1, 2)
 
         self.label_30 = QLabel(self.widget_8)
         self.label_30.setObjectName(u"label_30")
@@ -1469,70 +1494,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout_11.addWidget(self.label_30, 0, 0, 1, 2)
 
-        self.horizontalSpacer_25 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_11.addItem(self.horizontalSpacer_25, 1, 4, 1, 1)
-
-        self.skin_plythickness_input = QLineEdit(self.widget_8)
-        self.skin_plythickness_input.setObjectName(u"skin_plythickness_input")
-
-        self.gridLayout_11.addWidget(self.skin_plythickness_input, 4, 2, 1, 3)
-
-        self.skin_liststations = QComboBox(self.widget_8)
-        self.skin_liststations.setObjectName(u"skin_liststations")
-
-        self.gridLayout_11.addWidget(self.skin_liststations, 0, 2, 1, 3)
-
-        self.horizontalSpacer_24 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_11.addItem(self.horizontalSpacer_24, 1, 2, 1, 1)
-
-        self.skin_importstation_button = QPushButton(self.widget_8)
-        self.skin_importstation_button.setObjectName(u"skin_importstation_button")
-
-        self.gridLayout_11.addWidget(self.skin_importstation_button, 1, 1, 1, 1)
-
-        self.horizontalSpacer_22 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_11.addItem(self.horizontalSpacer_22, 7, 3, 1, 2)
-
         self.skin_overlaptarget_input = QLineEdit(self.widget_8)
         self.skin_overlaptarget_input.setObjectName(u"skin_overlaptarget_input")
         self.skin_overlaptarget_input.setReadOnly(True)
 
-        self.gridLayout_11.addWidget(self.skin_overlaptarget_input, 5, 2, 1, 3)
-
-        self.skin_nplies_input = QLineEdit(self.widget_8)
-        self.skin_nplies_input.setObjectName(u"skin_nplies_input")
-
-        self.gridLayout_11.addWidget(self.skin_nplies_input, 3, 2, 1, 3)
-
-        self.horizontalSpacer_23 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_11.addItem(self.horizontalSpacer_23, 1, 0, 1, 1)
-
-        self.label_36 = QLabel(self.widget_8)
-        self.label_36.setObjectName(u"label_36")
-        self.label_36.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.gridLayout_11.addWidget(self.label_36, 7, 0, 1, 2)
-
-        self.label_31 = QLabel(self.widget_8)
-        self.label_31.setObjectName(u"label_31")
-        self.label_31.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.gridLayout_11.addWidget(self.label_31, 3, 0, 1, 2)
-
-        self.label_44 = QLabel(self.widget_8)
-        self.label_44.setObjectName(u"label_44")
-        self.label_44.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.gridLayout_11.addWidget(self.label_44, 2, 0, 1, 2)
-
-        self.skin_circle_input = QCheckBox(self.widget_8)
-        self.skin_circle_input.setObjectName(u"skin_circle_input")
-
-        self.gridLayout_11.addWidget(self.skin_circle_input, 2, 2, 1, 1)
+        self.gridLayout_11.addWidget(self.skin_overlaptarget_input, 3, 2, 1, 3)
 
 
         self.gridLayout_10.addWidget(self.widget_8, 1, 0, 1, 1)
@@ -1750,13 +1716,12 @@ class Ui_MainWindow(object):
         self.label_28.setBuddy(self.station_mirrory_input)
         self.label_27.setBuddy(self.station_mirrorx_input)
         self.label_26.setBuddy(self.station_multz_input)
+        self.label_36.setBuddy(self.skin_savefig_input)
         self.label_32.setBuddy(self.skin_plythickness_input)
         self.label_34.setBuddy(self.skin_tethickness_input)
+        self.label_31.setBuddy(self.skin_nplies_input)
         self.label_33.setBuddy(self.skin_overlaptarget_input)
         self.label_30.setBuddy(self.skin_liststations)
-        self.label_36.setBuddy(self.skin_savefig_input)
-        self.label_31.setBuddy(self.skin_nplies_input)
-        self.label_44.setBuddy(self.skin_circle_input)
         self.label_46.setBuddy(self.abaqus_expFileName_input)
 #endif // QT_CONFIG(shortcut)
         QWidget.setTabOrder(self.home_page_button, self.airfoil_page_button)
@@ -1812,10 +1777,7 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.blade_skinolplen_selected, self.blade_saveparams_button)
         QWidget.setTabOrder(self.blade_saveparams_button, self.blade_skinolpsta_table)
         QWidget.setTabOrder(self.blade_skinolpsta_table, self.skin_liststations)
-        QWidget.setTabOrder(self.skin_liststations, self.skin_importstation_button)
-        QWidget.setTabOrder(self.skin_importstation_button, self.skin_delstation_button)
-        QWidget.setTabOrder(self.skin_delstation_button, self.skin_circle_input)
-        QWidget.setTabOrder(self.skin_circle_input, self.skin_nplies_input)
+        QWidget.setTabOrder(self.skin_liststations, self.skin_nplies_input)
         QWidget.setTabOrder(self.skin_nplies_input, self.skin_plythickness_input)
         QWidget.setTabOrder(self.skin_plythickness_input, self.skin_overlaptarget_input)
         QWidget.setTabOrder(self.skin_overlaptarget_input, self.skin_tethickness_input)
@@ -1916,20 +1878,16 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem3 = self.blade_skinolpsta_table.horizontalHeaderItem(1)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"Value", None));
         self.label_29.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
-        self.skin_delstation_button.setText(QCoreApplication.translate("MainWindow", u"Delete Station", None))
+        self.label_36.setText(QCoreApplication.translate("MainWindow", u"Save figures:", None))
         self.label_32.setText(QCoreApplication.translate("MainWindow", u"Ply thickness:", None))
         self.label_34.setText(QCoreApplication.translate("MainWindow", u"Trailing edge thickness:", None))
-        self.skin_tethickness_input.setText(QCoreApplication.translate("MainWindow", u"8", None))
+        self.skin_nplies_input.setText(QCoreApplication.translate("MainWindow", u"8", None))
+        self.skin_plythickness_input.setText(QCoreApplication.translate("MainWindow", u"1", None))
         self.skin_savefig_input.setText(QCoreApplication.translate("MainWindow", u"True", None))
+        self.skin_tethickness_input.setText(QCoreApplication.translate("MainWindow", u"8", None))
+        self.label_31.setText(QCoreApplication.translate("MainWindow", u"Number of plies:", None))
         self.label_33.setText(QCoreApplication.translate("MainWindow", u"Overlap target:", None))
         self.label_30.setText(QCoreApplication.translate("MainWindow", u"Available stations:", None))
-        self.skin_plythickness_input.setText(QCoreApplication.translate("MainWindow", u"1", None))
-        self.skin_importstation_button.setText(QCoreApplication.translate("MainWindow", u"Import Stations", None))
-        self.skin_nplies_input.setText(QCoreApplication.translate("MainWindow", u"8", None))
-        self.label_36.setText(QCoreApplication.translate("MainWindow", u"Save figures:", None))
-        self.label_31.setText(QCoreApplication.translate("MainWindow", u"Number of plies:", None))
-        self.label_44.setText(QCoreApplication.translate("MainWindow", u"Shape:", None))
-        self.skin_circle_input.setText(QCoreApplication.translate("MainWindow", u"Circle", None))
         self.skin_saveSection_button.setText(QCoreApplication.translate("MainWindow", u"Save Section", None))
         self.skin_delSection_button.setText(QCoreApplication.translate("MainWindow", u"Delete Section", None))
         self.label_43.setText(QCoreApplication.translate("MainWindow", u"Spar Page: Coming Soon", None))

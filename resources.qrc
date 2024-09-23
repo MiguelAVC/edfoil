@@ -1,16 +1,25 @@
 <RCC>
   <qresource>
-    <file>images/fastablade.png</file>
-    <file>images/fastablade-white.png</file>
-    <file>images/board.png</file>
-    <file>images/board-white.png</file>
-    <file>images/door.png</file>
-    <file>images/door-white.png</file>
-    <file>images/energy.png</file>
-    <file>images/energy-white.png</file>
-    <file>images/info.png</file>
-    <file>images/info-white.png</file>
-    <file>images/settings.png</file>
-    <file>images/settings-white.png</file>
+    <file>resources/images/board.png</file>
+    <file>resources/images/board-white.png</file>
+    <file>resources/images/door.png</file>
+    <file>resources/images/door-white.png</file>
+    <file>resources/images/ellipsoid (1).png</file>
+    <file>resources/images/ellipsoid.png</file>
+    <file>resources/images/energy.png</file>
+    <file>resources/images/energy-white.png</file>
+    <file>resources/images/fastablade.png</file>
+    <file>resources/images/fastablade-white.png</file>
+    <file>resources/images/info.png</file>
+    <file>resources/images/info-white.png</file>
+    <file>resources/images/menu.png</file>
+    <file>resources/images/pencil (1).png</file>
+    <file>resources/images/pencil.png</file>
+    <file>resources/images/remove.png</file>
+    <file>resources/images/search.png</file>
+    <file>resources/images/settings.png</file>
+    <file>resources/images/settings-white.png</file>
+    <file>resources/images/wing (1).png</file>
+    <file>resources/images/wing.png</file>
   </qresource>
 </RCC>

@@ -148,11 +148,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.currentChanged.connect(self.update_stabox)
         self.skin_liststations.currentTextChanged.connect(self.update_olptgt)
         
-        self.skin_importstation_button.clicked.connect(self.import_stations)
-        self.paths_stations = {}
-        
         self.skin_liststations.currentTextChanged.connect(self.secInputChanged)
-        self.skin_circle_input.checkStateChanged.connect(self.secInputChanged)
         self.skin_nplies_input.textChanged.connect(self.secInputChanged)
         self.skin_plythickness_input.textChanged.connect(self.secInputChanged)
         self.skin_overlaptarget_input.textChanged.connect(self.secInputChanged)
@@ -420,24 +416,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         for i in range(len(fileNames)):
             self.paths_airfoils[airfoil_names[i]] = fileNames[i]
-            
-    def import_stations(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.ExistingFiles)
-        dialog.setNameFilter(self.tr('Files (*.csv *.txt)'))
-        dialog.setViewMode(QFileDialog.Detail)
-        dialog.setDirectory(QDir(os.path.join(self.main_path,'stations')))
-        fileNames = []
-        if dialog.exec():
-            fileNames = dialog.selectedFiles()
-        
-        # Add new files to the QComboBox
-        station_names = [x.split('/')[-1][:-4] for x in fileNames]
-        n_items_current = self.skin_liststations.count()
-        self.skin_liststations.insertItems(n_items_current, station_names)
-        
-        for i in range(len(fileNames)):
-            self.paths_stations[station_names[i]] = fileNames[i]
     
     def onTextChanged(self):
         # Restart the timer whenever the text changes
@@ -527,8 +505,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         n_station = float(self.skin_liststations.currentText()[4:])
         
         try:
-            olp_tgt = float(olp_sta[np.where(olp_sta[:,0]==n_station)[0],1][0])
-            self.skin_overlaptarget_input.setText(str(olp_tgt))
+            norm_olp_tgt = float(olp_sta[np.where(olp_sta[:,0]==n_station)[0],1][0])
+            station = self.db.stations[self.skin_liststations.currentText()]
+            olp_target = norm_olp_tgt*station.parameters['chord']
+            self.skin_overlaptarget_input.setText(str(olp_target))
             
         except ValueError:
             self.handle_msgbar('Error: Overlap target could not be interpolated.')
@@ -539,10 +519,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 station = self.db.stations[self.skin_liststations.currentText()] if self.skin_liststations.currentText() != '' else None
                 n_plies = int(self.skin_nplies_input.text()) if self.skin_nplies_input.text() else 1
                 ply_thk = float(self.skin_plythickness_input.text()) if self.skin_plythickness_input.text() else 1
-                olp_tgt = float(self.skin_overlaptarget_input.text())*station.parameters['chord'] if self.skin_overlaptarget_input.text() else 10
+                olp_tgt = float(self.skin_overlaptarget_input.text()) if self.skin_overlaptarget_input.text() else 10
                 te_thkn = float(self.skin_tethickness_input.text()) if self.skin_tethickness_input.text() else n_plies*ply_thk
                 saveFig = self.skin_savefig_input.isChecked()
-                isCrcle = self.skin_circle_input.isChecked()
                 
                 data = Section(station = station,
                             n_plies = n_plies,
@@ -550,7 +529,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             overlap_target = olp_tgt,
                             te_thickness = te_thkn,
                             saveFig = saveFig,
-                            circle = isCrcle,
                             )
                 print('section generated')
                 # Plots
@@ -584,7 +562,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #     self.handle_msgbar('Skin section: Wrong input')
             
             except NameError:
-                print('Skin section: Error - Station might be a circle.')
+                print('Skin section: Error - Wrong input.')
                 
     def saveSection(self):
         section_name = f'sec_{int(self.edits['__section__'].parameters['z'])}'

@@ -40,6 +40,6 @@ def generateSkinSketches(data):
 
 # %% Example
 
-if __name__ == '__main__':
-    blade = importData('exports/blade.json')
-    generateSkinSketches(blade)
+# if __name__ == '__main__':
+#     blade = importData('exports/blade.json')
+#     generateSkinSketches(blade)

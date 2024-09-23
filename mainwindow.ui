@@ -105,7 +105,7 @@ Line{
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>:/images/fastablade-white.png</pixmap>
+          <pixmap resource="resources.qrc">:/resources/images/fastablade-white.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -734,8 +734,11 @@ QPushButton:hover{
                 <property name="text">
                  <string/>
                 </property>
+                <property name="textFormat">
+                 <enum>Qt::TextFormat::AutoText</enum>
+                </property>
                 <property name="pixmap">
-                 <pixmap>:/images/fastablade.png</pixmap>
+                 <pixmap resource="resources.qrc">:/resources/images/fastablade.png</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -2621,20 +2624,33 @@ QComboBox{
 }</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_11">
-                 <item row="1" column="3">
-                  <widget class="QPushButton" name="skin_delstation_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
+                 <item row="5" column="3" colspan="2">
+                  <spacer name="horizontalSpacer_22">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
                    </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="5" column="0" colspan="2">
+                  <widget class="QLabel" name="label_36">
                    <property name="text">
-                    <string>Delete Station</string>
+                    <string>Save figures:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buddy">
+                    <cstring>skin_savefig_input</cstring>
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="0" colspan="2">
+                 <item row="2" column="0" colspan="2">
                   <widget class="QLabel" name="label_32">
                    <property name="text">
                     <string>Ply thickness:</string>
@@ -2647,7 +2663,7 @@ QComboBox{
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="0" colspan="2">
+                 <item row="4" column="0" colspan="2">
                   <widget class="QLabel" name="label_34">
                    <property name="text">
                     <string>Trailing edge thickness:</string>
@@ -2660,14 +2676,21 @@ QComboBox{
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="2" colspan="3">
-                  <widget class="QLineEdit" name="skin_tethickness_input">
+                 <item row="1" column="2" colspan="3">
+                  <widget class="QLineEdit" name="skin_nplies_input">
                    <property name="text">
                     <string>8</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="7" column="2">
+                 <item row="2" column="2" colspan="3">
+                  <widget class="QLineEdit" name="skin_plythickness_input">
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="2">
                   <widget class="QCheckBox" name="skin_savefig_input">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -2692,7 +2715,30 @@ QComboBox{
                    </property>
                   </widget>
                  </item>
-                 <item row="5" column="0" colspan="2">
+                 <item row="0" column="2" colspan="3">
+                  <widget class="QComboBox" name="skin_liststations"/>
+                 </item>
+                 <item row="4" column="2" colspan="3">
+                  <widget class="QLineEdit" name="skin_tethickness_input">
+                   <property name="text">
+                    <string>8</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" colspan="2">
+                  <widget class="QLabel" name="label_31">
+                   <property name="text">
+                    <string>Number of plies:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buddy">
+                    <cstring>skin_nplies_input</cstring>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0" colspan="2">
                   <widget class="QLabel" name="label_33">
                    <property name="text">
                     <string>Overlap target:</string>
@@ -2718,132 +2764,10 @@ QComboBox{
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="4">
-                  <spacer name="horizontalSpacer_25">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="4" column="2" colspan="3">
-                  <widget class="QLineEdit" name="skin_plythickness_input">
-                   <property name="text">
-                    <string>1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2" colspan="3">
-                  <widget class="QComboBox" name="skin_liststations"/>
-                 </item>
-                 <item row="1" column="2">
-                  <spacer name="horizontalSpacer_24">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QPushButton" name="skin_importstation_button">
-                   <property name="text">
-                    <string>Import Stations</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="7" column="3" colspan="2">
-                  <spacer name="horizontalSpacer_22">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="5" column="2" colspan="3">
+                 <item row="3" column="2" colspan="3">
                   <widget class="QLineEdit" name="skin_overlaptarget_input">
                    <property name="readOnly">
                     <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="2" colspan="3">
-                  <widget class="QLineEdit" name="skin_nplies_input">
-                   <property name="text">
-                    <string>8</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <spacer name="horizontalSpacer_23">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="7" column="0" colspan="2">
-                  <widget class="QLabel" name="label_36">
-                   <property name="text">
-                    <string>Save figures:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>skin_savefig_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0" colspan="2">
-                  <widget class="QLabel" name="label_31">
-                   <property name="text">
-                    <string>Number of plies:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>skin_nplies_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0" colspan="2">
-                  <widget class="QLabel" name="label_44">
-                   <property name="text">
-                    <string>Shape:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>skin_circle_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="2">
-                  <widget class="QCheckBox" name="skin_circle_input">
-                   <property name="text">
-                    <string>Circle</string>
                    </property>
                   </widget>
                  </item>
@@ -3248,9 +3172,6 @@ QPushButton:hover{
   <tabstop>blade_saveparams_button</tabstop>
   <tabstop>blade_skinolpsta_table</tabstop>
   <tabstop>skin_liststations</tabstop>
-  <tabstop>skin_importstation_button</tabstop>
-  <tabstop>skin_delstation_button</tabstop>
-  <tabstop>skin_circle_input</tabstop>
   <tabstop>skin_nplies_input</tabstop>
   <tabstop>skin_plythickness_input</tabstop>
   <tabstop>skin_overlaptarget_input</tabstop>

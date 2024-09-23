@@ -38,6 +38,7 @@ class Station:
             Defaults to True.
         """
         
+        # Setting parameters
         self.parameters ={'chord':chord,
                           'twist_angle':np.radians(twist_angle),
                           'offset':(x_offset,y_offset,z_offset),
@@ -56,7 +57,7 @@ class Station:
         radius = np.mean(distance_to_centre)
         self.parameters['isCircle'] = bool(np.all(np.abs(distance_to_centre - radius) < tolerance))
         
-        
+        # Generating station
         x_original = coordinates[:,0]
         y_original = coordinates[:,1]
         
@@ -132,3 +133,4 @@ if __name__ == '__main__':
                   path=os.path.join(os.getcwd(),'airfoils','NACA63416.txt'))
     
     sta.plot('Final')
+    print(sta.parameters['isCircle'])
