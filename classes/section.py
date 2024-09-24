@@ -44,6 +44,7 @@ class Section:
                  overlap_target:float,
                  te_thickness:float = 8,
                  saveFig:bool = False,
+                 tolerance:int = 6, # Tolerance for decimal places ACIS
                 ) -> None:
         
         # Parameters
@@ -96,8 +97,8 @@ class Section:
         self.splines = splines
         
         # Index LE
-        idx_LE = {x:splineIntersection(splines[x],chord_line,21) for
-                  x in range(n_plies+1)}
+        idx_LE = {x:round(splineIntersection(splines[x],chord_line,21),tolerance)
+                  for x in range(n_plies+1)}
         self.indexes['idx_LE'] = idx_LE
         
         # Full skin graph
@@ -154,8 +155,12 @@ class Section:
         fig, ax = plt.subplots(figsize=(10,6))
         
         for i in range(n_plies+1):
-            t = np.arange(int(np.ceil(idx_olp_sta[i]))).tolist() + \
-                [idx_olp_sta[i]]
+            
+            t = np.arange(int(np.ceil(idx_olp_sta[i]))).tolist()
+            
+            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
+                t += [idx_olp_sta[i]]
+                
             self.t['t_bot'][i] = t
             
             ax.plot(splines[i]['x'](t),splines[i]['y'](t), 
@@ -201,12 +206,16 @@ class Section:
 
         for i in range(n_plies+1):
             
-            if idx_te_bot[i] == None:
+            if idx_te_bot[i] == None or idx_te_bot[i] == 0:
                 idx_te_bot[i] = 0
+                t = []
+            else:
+                t = [idx_te_bot[i]]
             
-            t = [idx_te_bot[i]]
             t += np.arange(np.ceil(idx_te_bot[i]),np.ceil(idx_olp_sta[i])).tolist()
-            t += [idx_olp_sta[i]]
+            
+            if idx_olp_sta[i] % int(idx_olp_sta[i]) == 0:
+                t += [idx_olp_sta[i]]
             
             self.t['t_splines_bot'][i] = t
             
@@ -331,7 +340,11 @@ class Section:
 
         for i in range(n_plies+1):
             
-            t = [idx_olp_sta[i]]
+            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
+                t = [idx_olp_sta[i]]
+            else:
+                t = []
+                
             t += np.arange(np.ceil(idx_olp_sta[i]), splines[i]['u'] + 1).tolist()
             
             self.t['t_top'][i] = t
@@ -358,13 +371,18 @@ class Section:
 
         for i in range(n_plies+1):
             
-            t = [idx_olp_sta[i]]
+            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
+                t = [idx_olp_sta[i]]
+            else:
+                t = []
             
             if idx_te_top[i] == None:
                 t += np.arange(np.ceil(idx_olp_sta[i]), splines[i]['u']+1).tolist()
             else:
                 t += np.arange(np.ceil(idx_olp_sta[i]), np.ceil(idx_te_top[i])).tolist()
-                t += [idx_te_top[i]]
+                
+                if idx_te_top[i] % int(idx_te_top[i]) == 0:
+                    t += [idx_te_top[i]]
             
             self.t['t_splines_top'][i] = t
             
