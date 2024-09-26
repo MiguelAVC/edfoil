@@ -214,7 +214,7 @@ class Section:
             
             t += np.arange(np.ceil(idx_te_bot[i]),np.ceil(idx_olp_sta[i])).tolist()
             
-            if idx_olp_sta[i] % int(idx_olp_sta[i]) == 0:
+            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
                 t += [idx_olp_sta[i]]
             
             self.t['t_splines_bot'][i] = t
@@ -498,9 +498,19 @@ if __name__ == '__main__':
                   z_offset=1500,
                   y_multiplier=1.55,
                   y_mirror=True,
-                #   path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
-                  path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
+                  path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
+                #   path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
                   )
+    
+    sta = Station(chord=906.8,
+                twist_angle=6.7,
+                x_offset=-317.88,
+                y_offset=50,
+                z_offset=5000,
+                y_mirror=True,
+                path=os.path.join(os.getcwd(),'airfoils','NACA63417.txt'),
+                )
+    
     offset_distance = 1
     n_plies = 8
     saveFig = False
@@ -511,4 +521,4 @@ if __name__ == '__main__':
                  overlap_target=overlap_target,
                  te_thickness=trailing_edge_thickness, saveFig=saveFig)
     
-    db.figs['top_ply'][1]
+    # db.figs['top_ply'][1]

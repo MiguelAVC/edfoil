@@ -451,7 +451,7 @@ def splineIntersection(spline,line,u0=0):
         return x_line - x
     
     # Find the roots (intersection points) of the difference function
-    t_range = np.linspace(u0, u, 30)
+    t_range = np.linspace(u0, u, 50)
     
     for i in range(len(t_range) - 1):
         if difference(t_range[i]) * difference(t_range[i + 1]) < 0:
