@@ -84,7 +84,9 @@ class Section:
         # for i in range(ply_thickness,ply_thickness*(n_plies+1)):
         for i in range(1,n_plies+1):
             thk = round(ply_thickness*i,2)
-            curves_offset[i] = np.array(curve_0.buffer(-thk).exterior.coords)
+            c_buffer = curve_0.buffer(-thk)
+            c_simplified = c_buffer.simplify(tolerance=0.01)
+            curves_offset[i] = np.array(c_simplified.exterior.coords)
             
         # Chord line
         chord_line = lineConstructor(p0 = station.xy[0],
