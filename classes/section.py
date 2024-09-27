@@ -215,9 +215,7 @@ class Section:
                 t = [idx_te_bot[i]]
             
             t += np.arange(np.ceil(idx_te_bot[i]),np.ceil(idx_olp_sta[i])).tolist()
-            
-            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
-                t += [idx_olp_sta[i]]
+            t += [idx_olp_sta[i]]
             
             self.t['t_splines_bot'][i] = t
             
@@ -382,9 +380,7 @@ class Section:
                 t += np.arange(np.ceil(idx_olp_sta[i]), splines[i]['u']+1).tolist()
             else:
                 t += np.arange(np.ceil(idx_olp_sta[i]), np.ceil(idx_te_top[i])).tolist()
-                
-                if idx_te_top[i] % int(idx_te_top[i]) == 0:
-                    t += [idx_te_top[i]]
+                t += [idx_te_top[i]]
             
             self.t['t_splines_top'][i] = t
             
@@ -500,18 +496,18 @@ if __name__ == '__main__':
                   z_offset=1500,
                   y_multiplier=1.55,
                   y_mirror=True,
-                  path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
-                #   path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
+                #   path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
+                  path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
                   )
     
-    sta = Station(chord=906.8,
-                twist_angle=6.7,
-                x_offset=-317.88,
-                y_offset=50,
-                z_offset=5000,
-                y_mirror=True,
-                path=os.path.join(os.getcwd(),'airfoils','NACA63417.txt'),
-                )
+    # sta = Station(chord=906.8,
+    #             twist_angle=6.7,
+    #             x_offset=-317.88,
+    #             y_offset=50,
+    #             z_offset=5000,
+    #             y_mirror=True,
+    #             path=os.path.join(os.getcwd(),'airfoils','NACA63417.txt'),
+    #             )
     
     offset_distance = 1
     n_plies = 8
