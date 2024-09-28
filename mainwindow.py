@@ -1,6 +1,6 @@
 from ui_mainwindow import Ui_MainWindow
 from PySide6.QtWidgets import (QMainWindow, QFileDialog, QMessageBox, 
-                               QLabel, QProgressBar)
+                               QCheckBox, QComboBox, QTableWidgetItem)
 from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
                               QValueAxis, QScatterSeries, QAreaSeries)
 from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
@@ -106,6 +106,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_mirrory_input.checkStateChanged.connect(self.onTextChanged)
         
         self.station_savestation_button.clicked.connect(self.save_station)
+        
+        # Advanced tab
+        # ------------
+        # Default values
+        list_airfoils_advanced = QComboBox()
+        list_airfoils_advanced.addItems(list(self.db.airfoils.keys()))
+        self.station_tableStations_input.setCellWidget(0,0,list_airfoils_advanced)
+        
+        xmirror_airfoils_advanced = QCheckBox()
+        xmirror_airfoils_advanced.setCheckable(True)
+        self.station_tableStations_input.setCellWidget(0,9,xmirror_airfoils_advanced)
+        
+        ymirror_airfoils_advanced = QCheckBox()
+        ymirror_airfoils_advanced.setCheckable(True)
+        ymirror_airfoils_advanced.setChecked(True)
+        self.station_tableStations_input.setCellWidget(0,10,ymirror_airfoils_advanced)
+        
+        self.list_airfoils_advanced_default = [1.,0.,0.,0.,0.,1.,1.,1.]
+        self.station_tableStations_input.setSortingEnabled(False)
+        for column in range(len(self.list_airfoils_advanced_default)):
+            text_cell = QTableWidgetItem(str(self.list_airfoils_advanced_default[column]))
+            self.station_tableStations_input.setItem(0,column+1,text_cell)
+        self.station_tableStations_input.setSortingEnabled(True)
+        
+        # Signals
+        self.station_nStationsAdv_input.valueChanged.connect(self.update_stations_table)
+        self.station_sortTable_button.clicked.connect(self.sort_advanced_stations_table)
+        self.station_saveTable_button.clicked.connect(self.save_multiple_stations)
         
         # ---------------------------------------------------------------------
         # Page 3 (Blade Parameters)
@@ -280,7 +308,70 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.blade_skinolplen_selected.clear()
         self.blade_skinolplen_selected.addItems([str(x+1) for x in range(order)])
+    
+    ### ADVANCED TAB METHODS (Page 2b)
+    def sort_advanced_stations_table(self):
+        self.station_tableStations_input.sortItems(5)
+    
+    
+    def update_stations_table(self, value):
+        n_rows = self.station_tableStations_input.rowCount()
+        # Make first column have a dropdown menu for airfoil
+        list_airfoils = QComboBox()
+        list_airfoils.addItems(list(self.db.airfoils.keys()))
+        xmirror = QCheckBox()
+        xmirror.setCheckable(True)
+        ymirror = QCheckBox()
+        ymirror.setCheckable(True)
+        ymirror.setChecked(True)
         
+        if value > n_rows:
+            self.station_tableStations_input.insertRow(n_rows)
+            self.station_tableStations_input.setCellWidget(n_rows,0,list_airfoils)
+            self.station_tableStations_input.setCellWidget(n_rows,9,xmirror)
+            self.station_tableStations_input.setCellWidget(n_rows,10,ymirror)
+            
+            for column in range(1,9):
+                cell_item = self.station_tableStations_input.item(n_rows-1,column)
+                new_cell = QTableWidgetItem(cell_item.text())
+                self.station_tableStations_input.setItem(n_rows,column,new_cell)
+            
+        elif value < n_rows:
+            self.station_tableStations_input.removeRow(value)
+        
+    def save_multiple_stations(self):
+        n_rows = self.station_tableStations_input.rowCount()
+        n_cols = self.station_tableStations_input.columnCount()
+        sta_data = {}
+        for row in range(n_rows):
+            for col in range(n_cols):
+                if col < 1:
+                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).currentText()
+                elif col > 0 and col < 9:
+                    sta_data[col] = self.station_tableStations_input.item(row, col).text()
+                else:
+                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).isChecked()
+            
+            station = Station(chord=float(sta_data[1]),
+                              twist_angle=float(sta_data[2]),
+                              x_offset=float(sta_data[3]),
+                              y_offset=float(sta_data[4]),
+                              z_offset=float(sta_data[5]),
+                              x_multiplier=float(sta_data[6]),
+                              y_multiplier=float(sta_data[7]),
+                              z_multiplier=float(sta_data[8]),
+                              x_mirror=bool(sta_data[9]),
+                              y_mirror=bool(sta_data[10]),
+                              path=self.paths_airfoils[sta_data[0]])
+            
+            station_name = f'sta_{int(sta_data[5])}'
+            
+            self.db.stations[station_name] = station
+            
+        self.handle_msgbar(f'Total stations created: {n_rows}.')
+    
+    ### PARAMETERS METHODS (Page 3)
+    
     def save_bladeparams(self):
         idx_olp_sta = self.blade_skinolpsta_selected.currentIndex()
         idx_olp_len = self.blade_skinolplen_selected.currentIndex()

@@ -21,7 +21,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget{
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 }
 
 QStatusBar{
@@ -46,7 +46,7 @@ QFrame{
 }
 
 Line{
-	color:rgb(35, 46, 47);
+	color: #0B212E;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -105,38 +105,10 @@ Line{
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources.qrc">:/resources/images/fastablade-white.png</pixmap>
+          <pixmap resource="resources.qrc">:/resources/images/simbladed.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="minimumSize">
-          <size>
-           <width>150</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>200</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>TBlade Designer</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -655,7 +627,7 @@ QPushButton{
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="home_page">
              <property name="styleSheet">
@@ -665,7 +637,7 @@ QPushButton{
 
 QPushButton{
 	font:700 10pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:5px;
 	color:white;
 	padding:0.25em 3em;
@@ -717,37 +689,6 @@ QPushButton:hover{
                 </property>
                </spacer>
               </item>
-              <item row="1" column="1" rowspan="2" colspan="3">
-               <widget class="QLabel" name="label_5">
-                <property name="maximumSize">
-                 <size>
-                  <width>450</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="sizeIncrement">
-                 <size>
-                  <width>16</width>
-                  <height>9</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="textFormat">
-                 <enum>Qt::TextFormat::AutoText</enum>
-                </property>
-                <property name="pixmap">
-                 <pixmap resource="resources.qrc">:/resources/images/fastablade.png</pixmap>
-                </property>
-                <property name="scaledContents">
-                 <bool>true</bool>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="1" colspan="3">
                <spacer name="verticalSpacer_3">
                 <property name="orientation">
@@ -783,7 +724,7 @@ QPushButton:hover{
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Welcome to TBlade Designer</string>
+                 <string>Welcome to SimBladEd</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -835,6 +776,43 @@ QPushButton:hover{
                 </property>
                </spacer>
               </item>
+              <item row="2" column="1" colspan="3">
+               <widget class="QLabel" name="label_5">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>500</width>
+                  <height>115</height>
+                 </size>
+                </property>
+                <property name="sizeIncrement">
+                 <size>
+                  <width>16</width>
+                  <height>9</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::TextFormat::AutoText</enum>
+                </property>
+                <property name="pixmap">
+                 <pixmap resource="resources.qrc">:/resources/images/simbladed-dark.png</pixmap>
+                </property>
+                <property name="scaledContents">
+                 <bool>true</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="airfoil_page">
@@ -844,7 +822,7 @@ QPushButton:hover{
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
 	font:700 10pt;
-	background-color: rgb(35, 46, 47);
+	background-color:#0B212E;
 	border-radius:5px;
 	color:white;
 	padding:0.25em 1em;
@@ -906,20 +884,20 @@ QPushButton:hover{
                <widget class="QWidget" name="airfoil_parameters_widget" native="true">
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
+	background-color:#0B212E;
 	color:white;
 	border-radius:10px;
 }
 
 QSpinBox{
 	background-color:white;
-	color: rgb(35, 46, 47);
+	color: #0B212E;
 	border-radius:5px;
 }
 
 QLineEdit{
 	background-color:white;
-	color: rgb(35, 46, 47);
+	color:#0B212E;
 	border-radius:5px;
 }</string>
                 </property>
@@ -1190,7 +1168,7 @@ QLineEdit{
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
+	background-color:#0B212E;
 	color:white;
 	border-radius:10px;
 }</string>
@@ -1283,7 +1261,7 @@ QLineEdit{
                 <property name="styleSheet">
                  <string notr="true">QLabel{
 	font:700 12pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:10px;
 	color:white;
 	padding:0.25em 1em;
@@ -1327,7 +1305,7 @@ QLineEdit{
                 <property name="styleSheet">
                  <string notr="true">QLabel{
 	font:700 12pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:10px;
 	color:white;
 	padding:0.25em 1em;
@@ -1345,736 +1323,9 @@ QLineEdit{
             </widget>
             <widget class="QWidget" name="station_page">
              <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_8">
-              <item row="1" column="0" colspan="3">
-               <widget class="QWidget" name="widget_3" native="true">
-                <property name="styleSheet">
-                 <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
-	color:white;
-}</string>
-                </property>
-                <layout class="QFormLayout" name="formLayout_3">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_16">
-                   <property name="text">
-                    <string>Upload airfoil file:</string>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_uploadairfoil_button</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QPushButton" name="station_uploadairfoil_button">
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton{
-	background-color:white;
-	color:rgb(35, 46, 47);
-	border-radius:5px;
-}</string>
-                   </property>
-                   <property name="text">
-                    <string>Select file...</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_17">
-                   <property name="text">
-                    <string>Available airfoils:</string>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_listairfoils_box</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QComboBox" name="station_listairfoils_box">
-                   <property name="styleSheet">
-                    <string notr="true">QComboBox{
-	background-color:white;
-	color:rgb(35, 46, 47);
-	border-radius:5px;
-}</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="4" rowspan="5">
-               <widget class="QWidget" name="station_graph_widget" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>800</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
-	color:white;
-	border-radius:10px;
-}</string>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_13">
-                 <item row="0" column="2">
-                  <widget class="QPushButton" name="station_resetzoom_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Reset</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="station_xy_current">
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <spacer name="horizontalSpacer_26">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="1" column="0" colspan="3">
-                  <widget class="QChartView" name="station_chartview">
-                   <property name="cursor" stdset="0">
-                    <cursorShape>CrossCursor</cursorShape>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QGraphicsView{
-	background-color:white;
-}</string>
-                   </property>
-                   <property name="renderHints">
-                    <set>QPainter::RenderHint::Antialiasing|QPainter::RenderHint::LosslessImageRendering|QPainter::RenderHint::NonCosmeticBrushPatterns|QPainter::RenderHint::SmoothPixmapTransform|QPainter::RenderHint::TextAntialiasing|QPainter::RenderHint::VerticalSubpixelPositioning</set>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="4" column="0" colspan="3">
-               <widget class="QWidget" name="widget_4" native="true">
-                <property name="styleSheet">
-                 <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
-	color:white;
-}
-
-QLineEdit{
-	background-color:white;
-	color:rgb(35, 46, 47);
-	padding-left:0.5em;
-}</string>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_9">
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="label_22">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Offset y:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_offsety_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="9" column="2">
-                  <widget class="QCheckBox" name="station_mirrory_input">
-                   <property name="text">
-                    <string>True</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="0">
-                  <widget class="QLabel" name="label_24">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Multiplier x:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_multx_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="1">
-                  <spacer name="horizontalSpacer_17">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="label_25">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Multiplier y:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_multy_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_21">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Offset x:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_offsetx_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_20">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Twist angle:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_twistangle_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_19">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Chord length:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_chordlength_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="label_23">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Offset z:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_offsetz_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="2">
-                  <widget class="QCheckBox" name="station_mirrorx_input">
-                   <property name="text">
-                    <string>True</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="9" column="1">
-                  <spacer name="horizontalSpacer_16">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="9" column="0">
-                  <widget class="QLabel" name="label_28">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Mirror y:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_mirrory_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="0">
-                  <widget class="QLabel" name="label_27">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Mirror x:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_mirrorx_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="7" column="0">
-                  <widget class="QLabel" name="label_26">
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Multiplier z:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>station_multz_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="3">
-                  <spacer name="horizontalSpacer_18">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="9" column="3">
-                  <spacer name="horizontalSpacer_19">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="7" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_multz_input">
-                   <property name="text">
-                    <string>1.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_multy_input">
-                   <property name="text">
-                    <string>1.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_multx_input">
-                   <property name="text">
-                    <string>1.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_offsetz_input">
-                   <property name="text">
-                    <string>0.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_offsety_input">
-                   <property name="text">
-                    <string>0.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_offsetx_input">
-                   <property name="text">
-                    <string>0.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_twistangle_input">
-                   <property name="text">
-                    <string>18.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1" colspan="3">
-                  <widget class="QLineEdit" name="station_chordlength_input">
-                   <property name="text">
-                    <string>1.0</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="5" column="0" colspan="3">
-               <widget class="QWidget" name="widget_5" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QPushButton{
-	font:700 10pt;
-	background-color: rgb(35, 46, 47);
-	border-radius:5px;
-	color:white;
-	padding:0.25em 0.5em;
-}
-
-QPushButton:hover{
-	background-color: rgba(0,0,0,0.2);
-	color:rgb(35, 46, 47);
-	font: 700;
-}</string>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_5">
-                 <item>
-                  <widget class="QPushButton" name="station_savestation_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Save Station</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_9">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Policy::Preferred</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="station_delstation_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Delete Station</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLabel" name="label_18">
-                <property name="styleSheet">
-                 <string notr="true">QLabel{
-	font: 700 14pt;
-}</string>
-                </property>
-                <property name="text">
-                 <string>Parameters</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <spacer name="horizontalSpacer_13">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_14">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_12">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="3" column="2">
-               <spacer name="horizontalSpacer_15">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="label_15">
-                <property name="styleSheet">
-                 <string notr="true">QLabel{
-	font: 700 14pt;
-}</string>
-                </property>
-                <property name="text">
-                 <string>Airfoil</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <spacer name="verticalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Policy::Preferred</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="5" column="3" colspan="2">
-               <widget class="QWidget" name="widget" native="true">
-                <layout class="QHBoxLayout" name="horizontalLayout_6">
-                 <item>
-                  <spacer name="horizontalSpacer_11">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-                  <widget class="QWidget" name="sta_list_widget" native="true">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
-	border-radius:10px;
-	color:white;
-}
-
-QComboBox{
-	background-color:white;
-	border-radius:5px;
-	color:rgb(35, 46, 47);
-	padding-left:0.5em;
-}</string>
-                   </property>
-                   <layout class="QFormLayout" name="formLayout">
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_35">
-                      <property name="text">
-                       <string>Current station:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QComboBox" name="station_liststation_box">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>100</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="sizeAdjustPolicy">
-                       <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_20">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="blade_page">
-             <property name="styleSheet">
               <string notr="true">QPushButton{
 	font:700 10pt;
-	background-color: rgb(35, 46, 47);
+	background-color:#0B212E;
 	border-radius:5px;
 	color:white;
 	padding:0.25em 1em;
@@ -2083,6 +1334,968 @@ QComboBox{
 QPushButton:hover{
 	background-color: rgba(0,0,0,0.2);
 	color:rgb(35, 46, 47);
+	font: 700;
+}</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QTabWidget" name="station_tab_widget">
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
+                <widget class="QWidget" name="station_tab1">
+                 <attribute name="title">
+                  <string>Interactive</string>
+                 </attribute>
+                 <layout class="QGridLayout" name="gridLayout_16">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_15">
+                    <property name="styleSheet">
+                     <string notr="true">QLabel{
+	font: 700 14pt;
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Airfoil</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignmentFlag::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QWidget" name="widget_3" native="true">
+                    <property name="styleSheet">
+                     <string notr="true">QWidget{
+	background-color:#0B212E;
+	color:white;
+}</string>
+                    </property>
+                    <layout class="QFormLayout" name="formLayout_3">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_16">
+                       <property name="text">
+                        <string>Upload airfoil file:</string>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_uploadairfoil_button</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QPushButton" name="station_uploadairfoil_button">
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{
+	background-color:white;
+	color:rgb(35, 46, 47);
+	border-radius:5px;
+}</string>
+                       </property>
+                       <property name="text">
+                        <string>Select file...</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_17">
+                       <property name="text">
+                        <string>Available airfoils:</string>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_listairfoils_box</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QComboBox" name="station_listairfoils_box">
+                       <property name="styleSheet">
+                        <string notr="true">QComboBox{
+	background-color:white;
+	color:rgb(35, 46, 47);
+	border-radius:5px;
+}</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <spacer name="verticalSpacer_6">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Vertical</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Policy::Preferred</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>55</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_18">
+                    <property name="styleSheet">
+                     <string notr="true">QLabel{
+	font: 700 14pt;
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Parameters</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignmentFlag::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QWidget" name="widget_4" native="true">
+                    <property name="styleSheet">
+                     <string notr="true">QWidget{
+	background-color:#0B212E;
+	color:white;
+}
+
+QLineEdit{
+	background-color:white;
+	color:rgb(35, 46, 47);
+	padding-left:0.5em;
+}</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_9">
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_22">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Offset y:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_offsety_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="9" column="2">
+                      <widget class="QCheckBox" name="station_mirrory_input">
+                       <property name="text">
+                        <string>True</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QLabel" name="label_24">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Multiplier x:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_multx_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="8" column="1">
+                      <spacer name="horizontalSpacer_17">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="6" column="0">
+                      <widget class="QLabel" name="label_25">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Multiplier y:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_multy_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_21">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Offset x:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_offsetx_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_20">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Twist angle:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_twistangle_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QLabel" name="label_23">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Offset z:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_offsetz_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="8" column="2">
+                      <widget class="QCheckBox" name="station_mirrorx_input">
+                       <property name="text">
+                        <string>True</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="9" column="1">
+                      <spacer name="horizontalSpacer_16">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="9" column="0">
+                      <widget class="QLabel" name="label_28">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Mirror y:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_mirrory_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="8" column="0">
+                      <widget class="QLabel" name="label_27">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Mirror x:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_mirrorx_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="0">
+                      <widget class="QLabel" name="label_26">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Multiplier z:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_multz_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="8" column="3">
+                      <spacer name="horizontalSpacer_18">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="9" column="3">
+                      <spacer name="horizontalSpacer_19">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="7" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_multz_input">
+                       <property name="text">
+                        <string>1.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_multy_input">
+                       <property name="text">
+                        <string>1.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_multx_input">
+                       <property name="text">
+                        <string>1.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_offsetz_input">
+                       <property name="text">
+                        <string>0.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_offsety_input">
+                       <property name="text">
+                        <string>0.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_offsetx_input">
+                       <property name="text">
+                        <string>0.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_twistangle_input">
+                       <property name="text">
+                        <string>18.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1" colspan="3">
+                      <widget class="QLineEdit" name="station_chordlength_input">
+                       <property name="text">
+                        <string>1.0</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_19">
+                       <property name="minimumSize">
+                        <size>
+                         <width>100</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Chord length:</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                       </property>
+                       <property name="buddy">
+                        <cstring>station_chordlength_input</cstring>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="5" column="0" colspan="2">
+                   <widget class="QWidget" name="widget_5" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	font:700 10pt;
+	background-color: #0B212E;
+	border-radius:5px;
+	color:white;
+	padding:0.25em 0.5em;
+}
+
+QPushButton:hover{
+	background-color: rgba(0,0,0,0.2);
+	color:#0B212E;
+	font: 700;
+}</string>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_5">
+                     <item>
+                      <widget class="QPushButton" name="station_savestation_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Save Station</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_9">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeType">
+                        <enum>QSizePolicy::Policy::Preferred</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="station_delstation_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Delete Station</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="5" column="2">
+                   <widget class="QWidget" name="widget" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout_6">
+                     <item>
+                      <spacer name="horizontalSpacer_11">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+                      <widget class="QWidget" name="sta_list_widget" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>50</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>50</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QWidget{
+	background-color:#0B212E;
+	border-radius:10px;
+	color:white;
+}
+
+QComboBox{
+	background-color:white;
+	border-radius:5px;
+	color:#0B212E;
+	padding-left:0.5em;
+}</string>
+                       </property>
+                       <layout class="QFormLayout" name="formLayout">
+                        <item row="0" column="0">
+                         <widget class="QLabel" name="label_35">
+                          <property name="text">
+                           <string>Current station:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="1">
+                         <widget class="QComboBox" name="station_liststation_box">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>100</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="sizeAdjustPolicy">
+                           <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_20">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="0" column="1" rowspan="5" colspan="2">
+                   <widget class="QWidget" name="station_graph_widget" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>800</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QWidget{
+	background-color:#0B212E;
+	color:white;
+	border-radius:10px;
+}</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_13">
+                     <item row="0" column="2">
+                      <widget class="QPushButton" name="station_resetzoom_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Reset</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QLabel" name="station_xy_current">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <spacer name="horizontalSpacer_26">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="1" column="0" colspan="3">
+                      <widget class="QChartView" name="station_chartview">
+                       <property name="cursor" stdset="0">
+                        <cursorShape>CrossCursor</cursorShape>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QGraphicsView{
+	background-color:white;
+}</string>
+                       </property>
+                       <property name="renderHints">
+                        <set>QPainter::RenderHint::Antialiasing|QPainter::RenderHint::LosslessImageRendering|QPainter::RenderHint::NonCosmeticBrushPatterns|QPainter::RenderHint::SmoothPixmapTransform|QPainter::RenderHint::TextAntialiasing|QPainter::RenderHint::VerticalSubpixelPositioning</set>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="station_tab2">
+                 <property name="styleSheet">
+                  <string notr="true">QSpinBox{
+	border: 2px solid #0B212E;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	padding-left:0.5rem;
+	border-radius:5px;
+}</string>
+                 </property>
+                 <attribute name="title">
+                  <string>Advanced</string>
+                 </attribute>
+                 <layout class="QGridLayout" name="gridLayout_17">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_44">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Number of stations:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>station_nStationsAdv_input</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QPushButton" name="station_saveTable_button">
+                    <property name="text">
+                     <string>Save Stations</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QPushButton" name="station_sortTable_button">
+                    <property name="text">
+                     <string>Sort Stations</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <spacer name="horizontalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="station_nStationsAdv_input">
+                    <property name="mouseTracking">
+                     <bool>false</bool>
+                    </property>
+                    <property name="showGroupSeparator" stdset="0">
+                     <bool>false</bool>
+                    </property>
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0" colspan="3">
+                   <widget class="QTableWidget" name="station_tableStations_input">
+                    <property name="font">
+                     <font>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QTableWidget{
+	border: 3px solid #0B212E;
+	border-radius:10px;
+}</string>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::Shape::StyledPanel</enum>
+                    </property>
+                    <property name="sizeAdjustPolicy">
+                     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
+                    </property>
+                    <property name="editTriggers">
+                     <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
+                    </property>
+                    <property name="alternatingRowColors">
+                     <bool>true</bool>
+                    </property>
+                    <property name="gridStyle">
+                     <enum>Qt::PenStyle::SolidLine</enum>
+                    </property>
+                    <property name="sortingEnabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                    <property name="rowCount">
+                     <number>1</number>
+                    </property>
+                    <attribute name="horizontalHeaderCascadingSectionResizes">
+                     <bool>false</bool>
+                    </attribute>
+                    <attribute name="horizontalHeaderMinimumSectionSize">
+                     <number>40</number>
+                    </attribute>
+                    <attribute name="horizontalHeaderDefaultSectionSize">
+                     <number>90</number>
+                    </attribute>
+                    <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+                     <bool>true</bool>
+                    </attribute>
+                    <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+                     <bool>false</bool>
+                    </attribute>
+                    <attribute name="verticalHeaderStretchLastSection">
+                     <bool>false</bool>
+                    </attribute>
+                    <row/>
+                    <column>
+                     <property name="text">
+                      <string>Airfoil</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Chord Length</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Twist Angle</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>x-offset</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>y-offset</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>z-offset</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>x-multiplier</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>y-multiplier</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>z-mutiplier</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>x-mirror</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>y-mirror</string>
+                     </property>
+                    </column>
+                    <item row="0" column="3">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                    <item row="0" column="4">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                    <item row="0" column="5">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                    <item row="0" column="6">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                    <item row="0" column="7">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                    <item row="0" column="8">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                    <item row="0" column="9">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                    <item row="0" column="10">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="blade_page">
+             <property name="styleSheet">
+              <string notr="true">QPushButton{
+	font:700 10pt;
+	background-color: #0B212E;
+	border-radius:5px;
+	color:white;
+	padding:0.25em 1em;
+}
+
+QPushButton:hover{
+	background-color: rgba(0,0,0,0.2);
+	color: #0B212E;
 	font: 700;
 }</string>
              </property>
@@ -2192,7 +2405,7 @@ QGraphicsView{
                    <property name="styleSheet">
                     <string notr="true">QLabel{
 	font:700 12pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:10px;
 	color:white;
 	padding:0.25em 1em;
@@ -2330,7 +2543,7 @@ QGraphicsView{
                    <property name="styleSheet">
                     <string notr="true">QLabel{
 	font:700 10pt;
-	background-color: rgb(35, 46, 47);
+	background-color:#0B212E;
 	border-radius:10px;
 	color:white;
 	padding:0.25em 1em;
@@ -2415,7 +2628,7 @@ QGraphicsView{
                    <property name="styleSheet">
                     <string notr="true">QLabel{
 	font:700 12pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:10px;
 	color:white;
 	padding:0.25em 1em;
@@ -2513,7 +2726,7 @@ QGraphicsView{
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
+	background-color:#0B212E;
 	border-radius:10px;
 }</string>
                 </property>
@@ -2546,7 +2759,7 @@ QGraphicsView{
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
+	background-color:#0B212E;
 	border-radius:10px;
 }</string>
                 </property>
@@ -2589,21 +2802,21 @@ QGraphicsView{
                <widget class="QWidget" name="widget_8" native="true">
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color:rgb(35, 46, 47);
+	background-color:#0B212E;
 	color:white;
 	border-radius:10px;
 }
 
 QLineEdit{
 	background-color:white;
-	color: rgb(35, 46, 47);
+	color: #0B212E;
 	border-radius:5px;
 	padding-left:5px;
 }
 
 QPushButton{
 	background-color:white;
-	color:rgb(35, 46, 47);
+	color:#0B212E;
 	padding: 0em 1.5em;
 	border:none;
 	border-radius:5px;
@@ -2619,7 +2832,7 @@ QCheckBox{
 
 QComboBox{
 	background-color:white;
-	color:rgb(35, 46, 47);
+	color:#0B212E;
 	border-radius:5px;
 }</string>
                 </property>
@@ -2779,7 +2992,7 @@ QComboBox{
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
 	font:700 10pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:5px;
 	color:white;
 	padding:0.25em 1em;
@@ -2787,7 +3000,7 @@ QComboBox{
 
 QPushButton:hover{
 	background-color: rgba(0,0,0,0.2);
-	color:rgb(35, 46, 47);
+	color: #0B212E;
 	font: 700;
 }</string>
                 </property>
@@ -2876,7 +3089,7 @@ QPushButton:hover{
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit{
-	border: 2px solid rgb(35, 46, 47);
+	border: 2px solid #0B212E;
 	padding-top: 0.1em;
 	padding-bottom: 0.1em;
 	padding-left:0.5em;
@@ -2923,7 +3136,7 @@ QPushButton:hover{
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
 	font:700 10pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:5px;
 	color:white;
 	padding:0.25em 1em;
@@ -2931,7 +3144,7 @@ QPushButton:hover{
 
 QPushButton:hover{
 	background-color: rgba(0,0,0,0.2);
-	color:rgb(35, 46, 47);
+	color: #0B212E;
 	font: 700;
 }</string>
                 </property>
@@ -2945,7 +3158,7 @@ QPushButton:hover{
                 <property name="styleSheet">
                  <string notr="true">QLabel{
 	font:700 12pt;
-	background-color: rgb(35, 46, 47);
+	background-color: #0B212E;
 	border-radius:10px;
 	color:white;
 	padding:0.25em 1em;
@@ -2960,7 +3173,7 @@ QPushButton:hover{
                <widget class="QListWidget" name="abaqus_sectionsList">
                 <property name="styleSheet">
                  <string notr="true">QListWidget{
-	border: 2px solid rgb(35, 46, 47);
+	border: 2px solid #0B212E;
 	padding-top:1em;
 	padding-bottom: 1em;
 	padding-left:1em;

@@ -16,13 +16,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QAbstractSpinBox, QApplication, QCheckBox,
-    QComboBox, QFormLayout, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QLineEdit, QListView,
-    QListWidget, QListWidgetItem, QMainWindow, QProgressBar,
-    QPushButton, QSizePolicy, QSpacerItem, QSpinBox,
-    QStackedWidget, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QAbstractSpinBox, QApplication,
+    QCheckBox, QComboBox, QFormLayout, QGridLayout,
+    QHBoxLayout, QHeaderView, QLabel, QLineEdit,
+    QListView, QListWidget, QListWidgetItem, QMainWindow,
+    QProgressBar, QPushButton, QSizePolicy, QSpacerItem,
+    QSpinBox, QStackedWidget, QTabWidget, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -32,7 +32,7 @@ class Ui_MainWindow(object):
         MainWindow.resize(1280, 720)
         MainWindow.setMinimumSize(QSize(1280, 720))
         MainWindow.setStyleSheet(u"QWidget{\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "}\n"
 "\n"
 "QStatusBar{\n"
@@ -57,7 +57,7 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "Line{\n"
-"	color:rgb(35, 46, 47);\n"
+"	color: #0B212E;\n"
 "}")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -85,22 +85,10 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(150, 0))
         self.label_2.setMaximumSize(QSize(150, 40))
-        self.label_2.setPixmap(QPixmap(u":/resources/images/fastablade-white.png"))
+        self.label_2.setPixmap(QPixmap(u":/resources/images/simbladed.png"))
         self.label_2.setScaledContents(True)
 
         self.verticalLayout.addWidget(self.label_2)
-
-        self.label = QLabel(self.sidebar_widget)
-        self.label.setObjectName(u"label")
-        self.label.setMinimumSize(QSize(150, 0))
-        self.label.setMaximumSize(QSize(200, 16777215))
-        font = QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        self.label.setFont(font)
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.verticalLayout.addWidget(self.label)
 
         self.verticalSpacer = QSpacerItem(150, 60, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
@@ -274,10 +262,10 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.page_title_label.sizePolicy().hasHeightForWidth())
         self.page_title_label.setSizePolicy(sizePolicy)
-        font1 = QFont()
-        font1.setPointSize(16)
-        font1.setBold(True)
-        self.page_title_label.setFont(font1)
+        font = QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        self.page_title_label.setFont(font)
 
         self.horizontalLayout_2.addWidget(self.page_title_label)
 
@@ -367,7 +355,7 @@ class Ui_MainWindow(object):
 "\n"
 "QPushButton{\n"
 "	font:700 10pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
 "	padding:0.25em 3em;\n"
@@ -395,17 +383,6 @@ class Ui_MainWindow(object):
         self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.gridLayout_5.addItem(self.verticalSpacer_4, 5, 1, 1, 3)
-
-        self.label_5 = QLabel(self.home_page)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setMaximumSize(QSize(450, 100))
-        self.label_5.setSizeIncrement(QSize(16, 9))
-        self.label_5.setTextFormat(Qt.TextFormat.AutoText)
-        self.label_5.setPixmap(QPixmap(u":/resources/images/fastablade.png"))
-        self.label_5.setScaledContents(True)
-        self.label_5.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout_5.addWidget(self.label_5, 1, 1, 2, 3)
 
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -439,6 +416,19 @@ class Ui_MainWindow(object):
 
         self.gridLayout_5.addItem(self.horizontalSpacer_4, 3, 2, 2, 1)
 
+        self.label_5 = QLabel(self.home_page)
+        self.label_5.setObjectName(u"label_5")
+        sizePolicy4.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
+        self.label_5.setSizePolicy(sizePolicy4)
+        self.label_5.setMaximumSize(QSize(500, 115))
+        self.label_5.setSizeIncrement(QSize(16, 9))
+        self.label_5.setTextFormat(Qt.TextFormat.AutoText)
+        self.label_5.setPixmap(QPixmap(u":/resources/images/simbladed-dark.png"))
+        self.label_5.setScaledContents(True)
+        self.label_5.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout_5.addWidget(self.label_5, 2, 1, 1, 3)
+
         self.stackedWidget.addWidget(self.home_page)
         self.airfoil_page = QWidget()
         self.airfoil_page.setObjectName(u"airfoil_page")
@@ -448,7 +438,7 @@ class Ui_MainWindow(object):
         self.horizontalWidget_2.setObjectName(u"horizontalWidget_2")
         self.horizontalWidget_2.setStyleSheet(u"QPushButton{\n"
 "	font:700 10pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -485,20 +475,20 @@ class Ui_MainWindow(object):
         self.airfoil_parameters_widget = QWidget(self.airfoil_page)
         self.airfoil_parameters_widget.setObjectName(u"airfoil_parameters_widget")
         self.airfoil_parameters_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	color:white;\n"
 "	border-radius:10px;\n"
 "}\n"
 "\n"
 "QSpinBox{\n"
 "	background-color:white;\n"
-"	color: rgb(35, 46, 47);\n"
+"	color: #0B212E;\n"
 "	border-radius:5px;\n"
 "}\n"
 "\n"
 "QLineEdit{\n"
 "	background-color:white;\n"
-"	color: rgb(35, 46, 47);\n"
+"	color:#0B212E;\n"
 "	border-radius:5px;\n"
 "}")
         self.formLayout_2 = QFormLayout(self.airfoil_parameters_widget)
@@ -622,7 +612,7 @@ class Ui_MainWindow(object):
         self.airfoil_graph_widget.setObjectName(u"airfoil_graph_widget")
         self.airfoil_graph_widget.setMinimumSize(QSize(800, 0))
         self.airfoil_graph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	color:white;\n"
 "	border-radius:10px;\n"
 "}")
@@ -667,14 +657,14 @@ class Ui_MainWindow(object):
 
         self.label_14 = QLabel(self.airfoil_page)
         self.label_14.setObjectName(u"label_14")
-        font2 = QFont()
-        font2.setPointSize(12)
-        font2.setBold(True)
-        font2.setItalic(False)
-        self.label_14.setFont(font2)
+        font1 = QFont()
+        font1.setPointSize(12)
+        font1.setBold(True)
+        font1.setItalic(False)
+        self.label_14.setFont(font1)
         self.label_14.setStyleSheet(u"QLabel{\n"
 "	font:700 12pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -697,10 +687,10 @@ class Ui_MainWindow(object):
         self.label_8 = QLabel(self.airfoil_page)
         self.label_8.setObjectName(u"label_8")
         self.label_8.setMaximumSize(QSize(16777215, 40))
-        self.label_8.setFont(font2)
+        self.label_8.setFont(font1)
         self.label_8.setStyleSheet(u"QLabel{\n"
 "	font:700 12pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -712,13 +702,42 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.airfoil_page)
         self.station_page = QWidget()
         self.station_page.setObjectName(u"station_page")
-        self.station_page.setStyleSheet(u"")
+        self.station_page.setStyleSheet(u"QPushButton{\n"
+"	font:700 10pt;\n"
+"	background-color:#0B212E;\n"
+"	border-radius:5px;\n"
+"	color:white;\n"
+"	padding:0.25em 1em;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font: 700;\n"
+"}")
         self.gridLayout_8 = QGridLayout(self.station_page)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
-        self.widget_3 = QWidget(self.station_page)
+        self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.station_tab_widget = QTabWidget(self.station_page)
+        self.station_tab_widget.setObjectName(u"station_tab_widget")
+        self.station_tab1 = QWidget()
+        self.station_tab1.setObjectName(u"station_tab1")
+        self.gridLayout_16 = QGridLayout(self.station_tab1)
+        self.gridLayout_16.setObjectName(u"gridLayout_16")
+        self.gridLayout_16.setContentsMargins(0, 0, 0, 0)
+        self.label_15 = QLabel(self.station_tab1)
+        self.label_15.setObjectName(u"label_15")
+        self.label_15.setStyleSheet(u"QLabel{\n"
+"	font: 700 14pt;\n"
+"}")
+        self.label_15.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout_16.addWidget(self.label_15, 0, 0, 1, 1)
+
+        self.widget_3 = QWidget(self.station_tab1)
         self.widget_3.setObjectName(u"widget_3")
         self.widget_3.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	color:white;\n"
 "}")
         self.formLayout_3 = QFormLayout(self.widget_3)
@@ -754,56 +773,25 @@ class Ui_MainWindow(object):
         self.formLayout_3.setWidget(1, QFormLayout.FieldRole, self.station_listairfoils_box)
 
 
-        self.gridLayout_8.addWidget(self.widget_3, 1, 0, 1, 3)
+        self.gridLayout_16.addWidget(self.widget_3, 1, 0, 1, 1)
 
-        self.station_graph_widget = QWidget(self.station_page)
-        self.station_graph_widget.setObjectName(u"station_graph_widget")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.station_graph_widget.sizePolicy().hasHeightForWidth())
-        self.station_graph_widget.setSizePolicy(sizePolicy8)
-        self.station_graph_widget.setMinimumSize(QSize(800, 0))
-        self.station_graph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
-"	color:white;\n"
-"	border-radius:10px;\n"
+        self.verticalSpacer_6 = QSpacerItem(20, 55, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+
+        self.gridLayout_16.addItem(self.verticalSpacer_6, 2, 0, 1, 1)
+
+        self.label_18 = QLabel(self.station_tab1)
+        self.label_18.setObjectName(u"label_18")
+        self.label_18.setStyleSheet(u"QLabel{\n"
+"	font: 700 14pt;\n"
 "}")
-        self.gridLayout_13 = QGridLayout(self.station_graph_widget)
-        self.gridLayout_13.setObjectName(u"gridLayout_13")
-        self.station_resetzoom_button = QPushButton(self.station_graph_widget)
-        self.station_resetzoom_button.setObjectName(u"station_resetzoom_button")
-        sizePolicy7.setHeightForWidth(self.station_resetzoom_button.sizePolicy().hasHeightForWidth())
-        self.station_resetzoom_button.setSizePolicy(sizePolicy7)
+        self.label_18.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.gridLayout_13.addWidget(self.station_resetzoom_button, 0, 2, 1, 1)
+        self.gridLayout_16.addWidget(self.label_18, 3, 0, 1, 1)
 
-        self.station_xy_current = QLabel(self.station_graph_widget)
-        self.station_xy_current.setObjectName(u"station_xy_current")
-
-        self.gridLayout_13.addWidget(self.station_xy_current, 0, 1, 1, 1)
-
-        self.horizontalSpacer_26 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_13.addItem(self.horizontalSpacer_26, 0, 0, 1, 1)
-
-        self.station_chartview = QChartView(self.station_graph_widget)
-        self.station_chartview.setObjectName(u"station_chartview")
-        self.station_chartview.viewport().setProperty("cursor", QCursor(Qt.CursorShape.CrossCursor))
-        self.station_chartview.setStyleSheet(u"QGraphicsView{\n"
-"	background-color:white;\n"
-"}")
-        self.station_chartview.setRenderHints(QPainter.RenderHint.Antialiasing|QPainter.RenderHint.LosslessImageRendering|QPainter.RenderHint.NonCosmeticBrushPatterns|QPainter.RenderHint.SmoothPixmapTransform|QPainter.RenderHint.TextAntialiasing|QPainter.RenderHint.VerticalSubpixelPositioning)
-
-        self.gridLayout_13.addWidget(self.station_chartview, 1, 0, 1, 3)
-
-
-        self.gridLayout_8.addWidget(self.station_graph_widget, 0, 4, 5, 1)
-
-        self.widget_4 = QWidget(self.station_page)
+        self.widget_4 = QWidget(self.station_tab1)
         self.widget_4.setObjectName(u"widget_4")
         self.widget_4.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	color:white;\n"
 "}\n"
 "\n"
@@ -858,13 +846,6 @@ class Ui_MainWindow(object):
         self.label_20.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout_9.addWidget(self.label_20, 1, 0, 1, 1)
-
-        self.label_19 = QLabel(self.widget_4)
-        self.label_19.setObjectName(u"label_19")
-        self.label_19.setMinimumSize(QSize(100, 0))
-        self.label_19.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.gridLayout_9.addWidget(self.label_19, 0, 0, 1, 1)
 
         self.label_23 = QLabel(self.widget_4)
         self.label_23.setObjectName(u"label_23")
@@ -951,16 +932,23 @@ class Ui_MainWindow(object):
 
         self.gridLayout_9.addWidget(self.station_chordlength_input, 0, 1, 1, 3)
 
+        self.label_19 = QLabel(self.widget_4)
+        self.label_19.setObjectName(u"label_19")
+        self.label_19.setMinimumSize(QSize(100, 0))
+        self.label_19.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
-        self.gridLayout_8.addWidget(self.widget_4, 4, 0, 1, 3)
+        self.gridLayout_9.addWidget(self.label_19, 0, 0, 1, 1)
 
-        self.widget_5 = QWidget(self.station_page)
+
+        self.gridLayout_16.addWidget(self.widget_4, 4, 0, 1, 1)
+
+        self.widget_5 = QWidget(self.station_tab1)
         self.widget_5.setObjectName(u"widget_5")
         sizePolicy4.setHeightForWidth(self.widget_5.sizePolicy().hasHeightForWidth())
         self.widget_5.setSizePolicy(sizePolicy4)
         self.widget_5.setStyleSheet(u"QPushButton{\n"
 "	font:700 10pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
 "	padding:0.25em 0.5em;\n"
@@ -968,7 +956,7 @@ class Ui_MainWindow(object):
 "\n"
 "QPushButton:hover{\n"
 "	background-color: rgba(0,0,0,0.2);\n"
-"	color:rgb(35, 46, 47);\n"
+"	color:#0B212E;\n"
 "	font: 700;\n"
 "}")
         self.horizontalLayout_5 = QHBoxLayout(self.widget_5)
@@ -992,47 +980,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.station_delstation_button)
 
 
-        self.gridLayout_8.addWidget(self.widget_5, 5, 0, 1, 3)
+        self.gridLayout_16.addWidget(self.widget_5, 5, 0, 1, 2)
 
-        self.label_18 = QLabel(self.station_page)
-        self.label_18.setObjectName(u"label_18")
-        self.label_18.setStyleSheet(u"QLabel{\n"
-"	font: 700 14pt;\n"
-"}")
-        self.label_18.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout_8.addWidget(self.label_18, 3, 1, 1, 1)
-
-        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_8.addItem(self.horizontalSpacer_13, 3, 0, 1, 1)
-
-        self.horizontalSpacer_14 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_8.addItem(self.horizontalSpacer_14, 0, 2, 1, 1)
-
-        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_8.addItem(self.horizontalSpacer_12, 0, 0, 1, 1)
-
-        self.horizontalSpacer_15 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_8.addItem(self.horizontalSpacer_15, 3, 2, 1, 1)
-
-        self.label_15 = QLabel(self.station_page)
-        self.label_15.setObjectName(u"label_15")
-        self.label_15.setStyleSheet(u"QLabel{\n"
-"	font: 700 14pt;\n"
-"}")
-        self.label_15.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout_8.addWidget(self.label_15, 0, 1, 1, 1)
-
-        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
-
-        self.gridLayout_8.addItem(self.verticalSpacer_6, 2, 1, 1, 1)
-
-        self.widget = QWidget(self.station_page)
+        self.widget = QWidget(self.station_tab1)
         self.widget.setObjectName(u"widget")
         self.horizontalLayout_6 = QHBoxLayout(self.widget)
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
@@ -1045,7 +995,7 @@ class Ui_MainWindow(object):
         self.sta_list_widget.setMinimumSize(QSize(50, 0))
         self.sta_list_widget.setMaximumSize(QSize(16777215, 50))
         self.sta_list_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
 "}\n"
@@ -1053,7 +1003,7 @@ class Ui_MainWindow(object):
 "QComboBox{\n"
 "	background-color:white;\n"
 "	border-radius:5px;\n"
-"	color:rgb(35, 46, 47);\n"
+"	color:#0B212E;\n"
 "	padding-left:0.5em;\n"
 "}")
         self.formLayout = QFormLayout(self.sta_list_widget)
@@ -1080,14 +1030,169 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addItem(self.horizontalSpacer_20)
 
 
-        self.gridLayout_8.addWidget(self.widget, 5, 3, 1, 2)
+        self.gridLayout_16.addWidget(self.widget, 5, 2, 1, 1)
+
+        self.station_graph_widget = QWidget(self.station_tab1)
+        self.station_graph_widget.setObjectName(u"station_graph_widget")
+        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.station_graph_widget.sizePolicy().hasHeightForWidth())
+        self.station_graph_widget.setSizePolicy(sizePolicy8)
+        self.station_graph_widget.setMinimumSize(QSize(800, 0))
+        self.station_graph_widget.setStyleSheet(u"QWidget{\n"
+"	background-color:#0B212E;\n"
+"	color:white;\n"
+"	border-radius:10px;\n"
+"}")
+        self.gridLayout_13 = QGridLayout(self.station_graph_widget)
+        self.gridLayout_13.setObjectName(u"gridLayout_13")
+        self.station_resetzoom_button = QPushButton(self.station_graph_widget)
+        self.station_resetzoom_button.setObjectName(u"station_resetzoom_button")
+        sizePolicy7.setHeightForWidth(self.station_resetzoom_button.sizePolicy().hasHeightForWidth())
+        self.station_resetzoom_button.setSizePolicy(sizePolicy7)
+
+        self.gridLayout_13.addWidget(self.station_resetzoom_button, 0, 2, 1, 1)
+
+        self.station_xy_current = QLabel(self.station_graph_widget)
+        self.station_xy_current.setObjectName(u"station_xy_current")
+
+        self.gridLayout_13.addWidget(self.station_xy_current, 0, 1, 1, 1)
+
+        self.horizontalSpacer_26 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout_13.addItem(self.horizontalSpacer_26, 0, 0, 1, 1)
+
+        self.station_chartview = QChartView(self.station_graph_widget)
+        self.station_chartview.setObjectName(u"station_chartview")
+        self.station_chartview.viewport().setProperty("cursor", QCursor(Qt.CursorShape.CrossCursor))
+        self.station_chartview.setStyleSheet(u"QGraphicsView{\n"
+"	background-color:white;\n"
+"}")
+        self.station_chartview.setRenderHints(QPainter.RenderHint.Antialiasing|QPainter.RenderHint.LosslessImageRendering|QPainter.RenderHint.NonCosmeticBrushPatterns|QPainter.RenderHint.SmoothPixmapTransform|QPainter.RenderHint.TextAntialiasing|QPainter.RenderHint.VerticalSubpixelPositioning)
+
+        self.gridLayout_13.addWidget(self.station_chartview, 1, 0, 1, 3)
+
+
+        self.gridLayout_16.addWidget(self.station_graph_widget, 0, 1, 5, 2)
+
+        self.station_tab_widget.addTab(self.station_tab1, "")
+        self.station_tab2 = QWidget()
+        self.station_tab2.setObjectName(u"station_tab2")
+        self.station_tab2.setStyleSheet(u"QSpinBox{\n"
+"	border: 2px solid #0B212E;\n"
+"	padding-top: 0.2em;\n"
+"	padding-bottom: 0.2em;\n"
+"	padding-left:0.5rem;\n"
+"	border-radius:5px;\n"
+"}")
+        self.gridLayout_17 = QGridLayout(self.station_tab2)
+        self.gridLayout_17.setObjectName(u"gridLayout_17")
+        self.gridLayout_17.setContentsMargins(0, 0, 0, 0)
+        self.label_44 = QLabel(self.station_tab2)
+        self.label_44.setObjectName(u"label_44")
+        sizePolicy.setHeightForWidth(self.label_44.sizePolicy().hasHeightForWidth())
+        self.label_44.setSizePolicy(sizePolicy)
+
+        self.gridLayout_17.addWidget(self.label_44, 0, 0, 1, 1)
+
+        self.station_saveTable_button = QPushButton(self.station_tab2)
+        self.station_saveTable_button.setObjectName(u"station_saveTable_button")
+
+        self.gridLayout_17.addWidget(self.station_saveTable_button, 2, 1, 1, 1)
+
+        self.station_sortTable_button = QPushButton(self.station_tab2)
+        self.station_sortTable_button.setObjectName(u"station_sortTable_button")
+
+        self.gridLayout_17.addWidget(self.station_sortTable_button, 2, 0, 1, 1)
+
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout_17.addItem(self.horizontalSpacer_12, 0, 2, 1, 1)
+
+        self.station_nStationsAdv_input = QSpinBox(self.station_tab2)
+        self.station_nStationsAdv_input.setObjectName(u"station_nStationsAdv_input")
+        self.station_nStationsAdv_input.setMouseTracking(False)
+        self.station_nStationsAdv_input.setProperty("showGroupSeparator", False)
+        self.station_nStationsAdv_input.setMinimum(1)
+
+        self.gridLayout_17.addWidget(self.station_nStationsAdv_input, 0, 1, 1, 1)
+
+        self.station_tableStations_input = QTableWidget(self.station_tab2)
+        if (self.station_tableStations_input.columnCount() < 11):
+            self.station_tableStations_input.setColumnCount(11)
+        __qtablewidgetitem = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        __qtablewidgetitem1 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(4, __qtablewidgetitem4)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(5, __qtablewidgetitem5)
+        __qtablewidgetitem6 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(6, __qtablewidgetitem6)
+        __qtablewidgetitem7 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(7, __qtablewidgetitem7)
+        __qtablewidgetitem8 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(8, __qtablewidgetitem8)
+        __qtablewidgetitem9 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(9, __qtablewidgetitem9)
+        __qtablewidgetitem10 = QTableWidgetItem()
+        self.station_tableStations_input.setHorizontalHeaderItem(10, __qtablewidgetitem10)
+        if (self.station_tableStations_input.rowCount() < 1):
+            self.station_tableStations_input.setRowCount(1)
+        __qtablewidgetitem11 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 3, __qtablewidgetitem11)
+        __qtablewidgetitem12 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 4, __qtablewidgetitem12)
+        __qtablewidgetitem13 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 5, __qtablewidgetitem13)
+        __qtablewidgetitem14 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 6, __qtablewidgetitem14)
+        __qtablewidgetitem15 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 7, __qtablewidgetitem15)
+        __qtablewidgetitem16 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 8, __qtablewidgetitem16)
+        __qtablewidgetitem17 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 9, __qtablewidgetitem17)
+        __qtablewidgetitem18 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 10, __qtablewidgetitem18)
+        self.station_tableStations_input.setObjectName(u"station_tableStations_input")
+        font2 = QFont()
+        font2.setBold(False)
+        self.station_tableStations_input.setFont(font2)
+        self.station_tableStations_input.setStyleSheet(u"QTableWidget{\n"
+"	border: 3px solid #0B212E;\n"
+"	border-radius:10px;\n"
+"}")
+        self.station_tableStations_input.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
+        self.station_tableStations_input.setEditTriggers(QAbstractItemView.EditTrigger.AnyKeyPressed|QAbstractItemView.EditTrigger.DoubleClicked|QAbstractItemView.EditTrigger.EditKeyPressed|QAbstractItemView.EditTrigger.SelectedClicked)
+        self.station_tableStations_input.setAlternatingRowColors(True)
+        self.station_tableStations_input.setGridStyle(Qt.PenStyle.SolidLine)
+        self.station_tableStations_input.setSortingEnabled(True)
+        self.station_tableStations_input.setWordWrap(True)
+        self.station_tableStations_input.setRowCount(1)
+        self.station_tableStations_input.horizontalHeader().setCascadingSectionResizes(False)
+        self.station_tableStations_input.horizontalHeader().setMinimumSectionSize(40)
+        self.station_tableStations_input.horizontalHeader().setDefaultSectionSize(90)
+        self.station_tableStations_input.horizontalHeader().setProperty("showSortIndicator", True)
+
+        self.gridLayout_17.addWidget(self.station_tableStations_input, 1, 0, 1, 3)
+
+        self.station_tab_widget.addTab(self.station_tab2, "")
+
+        self.gridLayout_8.addWidget(self.station_tab_widget, 0, 0, 1, 2)
 
         self.stackedWidget.addWidget(self.station_page)
         self.blade_page = QWidget()
         self.blade_page.setObjectName(u"blade_page")
         self.blade_page.setStyleSheet(u"QPushButton{\n"
 "	font:700 10pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -1095,7 +1200,7 @@ class Ui_MainWindow(object):
 "\n"
 "QPushButton:hover{\n"
 "	background-color: rgba(0,0,0,0.2);\n"
-"	color:rgb(35, 46, 47);\n"
+"	color: #0B212E;\n"
 "	font: 700;\n"
 "}")
         self.gridLayout_2 = QGridLayout(self.blade_page)
@@ -1164,7 +1269,7 @@ class Ui_MainWindow(object):
         self.label_37.setObjectName(u"label_37")
         self.label_37.setStyleSheet(u"QLabel{\n"
 "	font:700 12pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -1177,12 +1282,12 @@ class Ui_MainWindow(object):
             self.blade_skinolplen_table.setColumnCount(2)
         font3 = QFont()
         font3.setBold(True)
-        __qtablewidgetitem = QTableWidgetItem()
-        __qtablewidgetitem.setFont(font3);
-        self.blade_skinolplen_table.setHorizontalHeaderItem(0, __qtablewidgetitem)
-        __qtablewidgetitem1 = QTableWidgetItem()
-        __qtablewidgetitem1.setFont(font3);
-        self.blade_skinolplen_table.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem19 = QTableWidgetItem()
+        __qtablewidgetitem19.setFont(font3);
+        self.blade_skinolplen_table.setHorizontalHeaderItem(0, __qtablewidgetitem19)
+        __qtablewidgetitem20 = QTableWidgetItem()
+        __qtablewidgetitem20.setFont(font3);
+        self.blade_skinolplen_table.setHorizontalHeaderItem(1, __qtablewidgetitem20)
         if (self.blade_skinolplen_table.rowCount() < 2):
             self.blade_skinolplen_table.setRowCount(2)
         self.blade_skinolplen_table.setObjectName(u"blade_skinolplen_table")
@@ -1237,7 +1342,7 @@ class Ui_MainWindow(object):
         self.label_40.setFont(font4)
         self.label_40.setStyleSheet(u"QLabel{\n"
 "	font:700 10pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -1291,7 +1396,7 @@ class Ui_MainWindow(object):
         self.label_3.setObjectName(u"label_3")
         self.label_3.setStyleSheet(u"QLabel{\n"
 "	font:700 12pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -1302,12 +1407,12 @@ class Ui_MainWindow(object):
         self.blade_skinolpsta_table = QTableWidget(self.widget_2)
         if (self.blade_skinolpsta_table.columnCount() < 2):
             self.blade_skinolpsta_table.setColumnCount(2)
-        __qtablewidgetitem2 = QTableWidgetItem()
-        __qtablewidgetitem2.setFont(font3);
-        self.blade_skinolpsta_table.setHorizontalHeaderItem(0, __qtablewidgetitem2)
-        __qtablewidgetitem3 = QTableWidgetItem()
-        __qtablewidgetitem3.setFont(font3);
-        self.blade_skinolpsta_table.setHorizontalHeaderItem(1, __qtablewidgetitem3)
+        __qtablewidgetitem21 = QTableWidgetItem()
+        __qtablewidgetitem21.setFont(font3);
+        self.blade_skinolpsta_table.setHorizontalHeaderItem(0, __qtablewidgetitem21)
+        __qtablewidgetitem22 = QTableWidgetItem()
+        __qtablewidgetitem22.setFont(font3);
+        self.blade_skinolpsta_table.setHorizontalHeaderItem(1, __qtablewidgetitem22)
         if (self.blade_skinolpsta_table.rowCount() < 2):
             self.blade_skinolpsta_table.setRowCount(2)
         self.blade_skinolpsta_table.setObjectName(u"blade_skinolpsta_table")
@@ -1340,7 +1445,7 @@ class Ui_MainWindow(object):
         self.skin_zoomedgraph_widget.setObjectName(u"skin_zoomedgraph_widget")
         self.skin_zoomedgraph_widget.setMinimumSize(QSize(600, 0))
         self.skin_zoomedgraph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	border-radius:10px;\n"
 "}")
         self.gridLayout_15 = QGridLayout(self.skin_zoomedgraph_widget)
@@ -1362,7 +1467,7 @@ class Ui_MainWindow(object):
         self.skin_maingraph_widget.setObjectName(u"skin_maingraph_widget")
         self.skin_maingraph_widget.setMinimumSize(QSize(600, 0))
         self.skin_maingraph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	border-radius:10px;\n"
 "}")
         self.gridLayout_7 = QGridLayout(self.skin_maingraph_widget)
@@ -1382,7 +1487,10 @@ class Ui_MainWindow(object):
 
         self.label_29 = QLabel(self.skin_page)
         self.label_29.setObjectName(u"label_29")
-        self.label_29.setFont(font)
+        font5 = QFont()
+        font5.setPointSize(12)
+        font5.setBold(True)
+        self.label_29.setFont(font5)
         self.label_29.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_10.addWidget(self.label_29, 0, 0, 1, 1)
@@ -1390,21 +1498,21 @@ class Ui_MainWindow(object):
         self.widget_8 = QWidget(self.skin_page)
         self.widget_8.setObjectName(u"widget_8")
         self.widget_8.setStyleSheet(u"QWidget{\n"
-"	background-color:rgb(35, 46, 47);\n"
+"	background-color:#0B212E;\n"
 "	color:white;\n"
 "	border-radius:10px;\n"
 "}\n"
 "\n"
 "QLineEdit{\n"
 "	background-color:white;\n"
-"	color: rgb(35, 46, 47);\n"
+"	color: #0B212E;\n"
 "	border-radius:5px;\n"
 "	padding-left:5px;\n"
 "}\n"
 "\n"
 "QPushButton{\n"
 "	background-color:white;\n"
-"	color:rgb(35, 46, 47);\n"
+"	color:#0B212E;\n"
 "	padding: 0em 1.5em;\n"
 "	border:none;\n"
 "	border-radius:5px;\n"
@@ -1420,7 +1528,7 @@ class Ui_MainWindow(object):
 "\n"
 "QComboBox{\n"
 "	background-color:white;\n"
-"	color:rgb(35, 46, 47);\n"
+"	color:#0B212E;\n"
 "	border-radius:5px;\n"
 "}")
         self.gridLayout_11 = QGridLayout(self.widget_8)
@@ -1507,7 +1615,7 @@ class Ui_MainWindow(object):
         self.widget_11.setObjectName(u"widget_11")
         self.widget_11.setStyleSheet(u"QPushButton{\n"
 "	font:700 10pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -1515,7 +1623,7 @@ class Ui_MainWindow(object):
 "\n"
 "QPushButton:hover{\n"
 "	background-color: rgba(0,0,0,0.2);\n"
-"	color:rgb(35, 46, 47);\n"
+"	color: #0B212E;\n"
 "	font: 700;\n"
 "}")
         self.horizontalLayout_3 = QHBoxLayout(self.widget_11)
@@ -1565,7 +1673,7 @@ class Ui_MainWindow(object):
         self.abaqus_expFileName_input.setObjectName(u"abaqus_expFileName_input")
         self.abaqus_expFileName_input.setMaximumSize(QSize(200, 16777215))
         self.abaqus_expFileName_input.setStyleSheet(u"QLineEdit{\n"
-"	border: 2px solid rgb(35, 46, 47);\n"
+"	border: 2px solid #0B212E;\n"
 "	padding-top: 0.1em;\n"
 "	padding-bottom: 0.1em;\n"
 "	padding-left:0.5em;\n"
@@ -1592,7 +1700,7 @@ class Ui_MainWindow(object):
         self.abaqus_export_button.setObjectName(u"abaqus_export_button")
         self.abaqus_export_button.setStyleSheet(u"QPushButton{\n"
 "	font:700 10pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -1600,7 +1708,7 @@ class Ui_MainWindow(object):
 "\n"
 "QPushButton:hover{\n"
 "	background-color: rgba(0,0,0,0.2);\n"
-"	color:rgb(35, 46, 47);\n"
+"	color: #0B212E;\n"
 "	font: 700;\n"
 "}")
 
@@ -1610,7 +1718,7 @@ class Ui_MainWindow(object):
         self.label_42.setObjectName(u"label_42")
         self.label_42.setStyleSheet(u"QLabel{\n"
 "	font:700 12pt;\n"
-"	background-color: rgb(35, 46, 47);\n"
+"	background-color: #0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -1621,7 +1729,7 @@ class Ui_MainWindow(object):
         self.abaqus_sectionsList = QListWidget(self.abaqus_page)
         self.abaqus_sectionsList.setObjectName(u"abaqus_sectionsList")
         self.abaqus_sectionsList.setStyleSheet(u"QListWidget{\n"
-"	border: 2px solid rgb(35, 46, 47);\n"
+"	border: 2px solid #0B212E;\n"
 "	padding-top:1em;\n"
 "	padding-bottom: 1em;\n"
 "	padding-left:1em;\n"
@@ -1711,11 +1819,12 @@ class Ui_MainWindow(object):
         self.label_25.setBuddy(self.station_multy_input)
         self.label_21.setBuddy(self.station_offsetx_input)
         self.label_20.setBuddy(self.station_twistangle_input)
-        self.label_19.setBuddy(self.station_chordlength_input)
         self.label_23.setBuddy(self.station_offsetz_input)
         self.label_28.setBuddy(self.station_mirrory_input)
         self.label_27.setBuddy(self.station_mirrorx_input)
         self.label_26.setBuddy(self.station_multz_input)
+        self.label_19.setBuddy(self.station_chordlength_input)
+        self.label_44.setBuddy(self.station_nStationsAdv_input)
         self.label_36.setBuddy(self.skin_savefig_input)
         self.label_32.setBuddy(self.skin_plythickness_input)
         self.label_34.setBuddy(self.skin_tethickness_input)
@@ -1787,7 +1896,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(2)
+        self.station_tab_widget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1796,7 +1906,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.label_2.setText("")
-        self.label.setText(QCoreApplication.translate("MainWindow", u"TBlade Designer", None))
         self.home_page_button.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.airfoil_page_button.setText(QCoreApplication.translate("MainWindow", u"Airfoil Creator", None))
         self.station_page_button.setText(QCoreApplication.translate("MainWindow", u"Station Generator", None))
@@ -1814,9 +1923,9 @@ class Ui_MainWindow(object):
         self.changedir_button.setText(QCoreApplication.translate("MainWindow", u"Change...", None))
         self.loadproject_button.setText(QCoreApplication.translate("MainWindow", u"Load Project...", None))
         self.newproject_button.setText(QCoreApplication.translate("MainWindow", u"New Project...", None))
-        self.label_5.setText("")
-        self.label_6.setText(QCoreApplication.translate("MainWindow", u"Welcome to TBlade Designer", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"Welcome to SimBladEd", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Version 0.1", None))
+        self.label_5.setText("")
         self.airfoil_saveairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Save airfoil", None))
         self.airfoil_delairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Delete airfoil", None))
         self.airfoil_uploadcoords_button.setText(QCoreApplication.translate("MainWindow", u"Upload coordinates:", None))
@@ -1830,18 +1939,17 @@ class Ui_MainWindow(object):
         self.airfoil_xy_current.setText("")
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Airfoils available:", None))
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
+        self.label_15.setText(QCoreApplication.translate("MainWindow", u"Airfoil", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"Upload airfoil file:", None))
         self.station_uploadairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Select file...", None))
         self.label_17.setText(QCoreApplication.translate("MainWindow", u"Available airfoils:", None))
-        self.station_resetzoom_button.setText(QCoreApplication.translate("MainWindow", u"Reset", None))
-        self.station_xy_current.setText("")
+        self.label_18.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
         self.label_22.setText(QCoreApplication.translate("MainWindow", u"Offset y:", None))
         self.station_mirrory_input.setText(QCoreApplication.translate("MainWindow", u"True", None))
         self.label_24.setText(QCoreApplication.translate("MainWindow", u"Multiplier x:", None))
         self.label_25.setText(QCoreApplication.translate("MainWindow", u"Multiplier y:", None))
         self.label_21.setText(QCoreApplication.translate("MainWindow", u"Offset x:", None))
         self.label_20.setText(QCoreApplication.translate("MainWindow", u"Twist angle:", None))
-        self.label_19.setText(QCoreApplication.translate("MainWindow", u"Chord length:", None))
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"Offset z:", None))
         self.station_mirrorx_input.setText(QCoreApplication.translate("MainWindow", u"True", None))
         self.label_28.setText(QCoreApplication.translate("MainWindow", u"Mirror y:", None))
@@ -1855,17 +1963,50 @@ class Ui_MainWindow(object):
         self.station_offsetx_input.setText(QCoreApplication.translate("MainWindow", u"0.0", None))
         self.station_twistangle_input.setText(QCoreApplication.translate("MainWindow", u"18.0", None))
         self.station_chordlength_input.setText(QCoreApplication.translate("MainWindow", u"1.0", None))
+        self.label_19.setText(QCoreApplication.translate("MainWindow", u"Chord length:", None))
         self.station_savestation_button.setText(QCoreApplication.translate("MainWindow", u"Save Station", None))
         self.station_delstation_button.setText(QCoreApplication.translate("MainWindow", u"Delete Station", None))
-        self.label_18.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
-        self.label_15.setText(QCoreApplication.translate("MainWindow", u"Airfoil", None))
         self.label_35.setText(QCoreApplication.translate("MainWindow", u"Current station:", None))
+        self.station_resetzoom_button.setText(QCoreApplication.translate("MainWindow", u"Reset", None))
+        self.station_xy_current.setText("")
+        self.station_tab_widget.setTabText(self.station_tab_widget.indexOf(self.station_tab1), QCoreApplication.translate("MainWindow", u"Interactive", None))
+        self.label_44.setText(QCoreApplication.translate("MainWindow", u"Number of stations:", None))
+        self.station_saveTable_button.setText(QCoreApplication.translate("MainWindow", u"Save Stations", None))
+        self.station_sortTable_button.setText(QCoreApplication.translate("MainWindow", u"Sort Stations", None))
+        ___qtablewidgetitem = self.station_tableStations_input.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Airfoil", None));
+        ___qtablewidgetitem1 = self.station_tableStations_input.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"Chord Length", None));
+        ___qtablewidgetitem2 = self.station_tableStations_input.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Twist Angle", None));
+        ___qtablewidgetitem3 = self.station_tableStations_input.horizontalHeaderItem(3)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"x-offset", None));
+        ___qtablewidgetitem4 = self.station_tableStations_input.horizontalHeaderItem(4)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"y-offset", None));
+        ___qtablewidgetitem5 = self.station_tableStations_input.horizontalHeaderItem(5)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"z-offset", None));
+        ___qtablewidgetitem6 = self.station_tableStations_input.horizontalHeaderItem(6)
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"x-multiplier", None));
+        ___qtablewidgetitem7 = self.station_tableStations_input.horizontalHeaderItem(7)
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"y-multiplier", None));
+        ___qtablewidgetitem8 = self.station_tableStations_input.horizontalHeaderItem(8)
+        ___qtablewidgetitem8.setText(QCoreApplication.translate("MainWindow", u"z-mutiplier", None));
+        ___qtablewidgetitem9 = self.station_tableStations_input.horizontalHeaderItem(9)
+        ___qtablewidgetitem9.setText(QCoreApplication.translate("MainWindow", u"x-mirror", None));
+        ___qtablewidgetitem10 = self.station_tableStations_input.horizontalHeaderItem(10)
+        ___qtablewidgetitem10.setText(QCoreApplication.translate("MainWindow", u"y-mirror", None));
+
+        __sortingEnabled = self.station_tableStations_input.isSortingEnabled()
+        self.station_tableStations_input.setSortingEnabled(False)
+        self.station_tableStations_input.setSortingEnabled(__sortingEnabled)
+
+        self.station_tab_widget.setTabText(self.station_tab_widget.indexOf(self.station_tab2), QCoreApplication.translate("MainWindow", u"Advanced", None))
         self.blade_interpolate_button.setText(QCoreApplication.translate("MainWindow", u"Calculate", None))
         self.label_37.setText(QCoreApplication.translate("MainWindow", u"Skin Overlap Length", None))
-        ___qtablewidgetitem = self.blade_skinolplen_table.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Distance", None));
-        ___qtablewidgetitem1 = self.blade_skinolplen_table.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"Value", None));
+        ___qtablewidgetitem11 = self.blade_skinolplen_table.horizontalHeaderItem(0)
+        ___qtablewidgetitem11.setText(QCoreApplication.translate("MainWindow", u"Distance", None));
+        ___qtablewidgetitem12 = self.blade_skinolplen_table.horizontalHeaderItem(1)
+        ___qtablewidgetitem12.setText(QCoreApplication.translate("MainWindow", u"Value", None));
         self.label_41.setText(QCoreApplication.translate("MainWindow", u"Interpolation order:", None))
         self.blade_order_input.setSuffix("")
         self.label_40.setText(QCoreApplication.translate("MainWindow", u"Choose interpolation order:", None))
@@ -1873,10 +2014,10 @@ class Ui_MainWindow(object):
         self.label_39.setText(QCoreApplication.translate("MainWindow", u"Skin overlap length:", None))
         self.blade_saveparams_button.setText(QCoreApplication.translate("MainWindow", u"Save Parameters", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Skin Overlap Distance", None))
-        ___qtablewidgetitem2 = self.blade_skinolpsta_table.horizontalHeaderItem(0)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Distance", None));
-        ___qtablewidgetitem3 = self.blade_skinolpsta_table.horizontalHeaderItem(1)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"Value", None));
+        ___qtablewidgetitem13 = self.blade_skinolpsta_table.horizontalHeaderItem(0)
+        ___qtablewidgetitem13.setText(QCoreApplication.translate("MainWindow", u"Distance", None));
+        ___qtablewidgetitem14 = self.blade_skinolpsta_table.horizontalHeaderItem(1)
+        ___qtablewidgetitem14.setText(QCoreApplication.translate("MainWindow", u"Value", None));
         self.label_29.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
         self.label_36.setText(QCoreApplication.translate("MainWindow", u"Save figures:", None))
         self.label_32.setText(QCoreApplication.translate("MainWindow", u"Ply thickness:", None))

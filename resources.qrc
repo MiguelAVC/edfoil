@@ -1,5 +1,7 @@
 <RCC>
   <qresource>
+    <file>resources/images/simbladed-dark.png</file>
+    <file>resources/images/simbladed.png</file>
     <file>resources/images/board.png</file>
     <file>resources/images/board-white.png</file>
     <file>resources/images/door.png</file>
