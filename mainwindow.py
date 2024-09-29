@@ -65,7 +65,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # ---------------------------------------------------------------------
         # Page 1 (Airfoil Creator)
         
-        self.airfoil_chart = self.graph_template('Airfoil Plot')
+        self.airfoil_chart = self.graph_template()
         self.airfoil_chartview.setChart(self.airfoil_chart)
         self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
         
@@ -88,7 +88,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_uploadairfoil_button.clicked.connect(self.upload_airfoil_file)
         
         # Main chart
-        self.station_chart = self.graph_template('Station Plot')
+        self.station_chart = self.graph_template()
         self.station_chartview.setChart(self.station_chart)
         self.station_chartview.mouseMoveEvent = self.station_mousecoords
         
@@ -139,10 +139,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Page 3 (Blade Parameters)
         
         # Charts
-        self.blade_olpsta_chart = self.graph_template('Skin Overlap Start Interpolation')
+        self.blade_olpsta_chart = self.graph_template()
         self.blade_olpsta_chartview.setChart(self.blade_olpsta_chart)
         
-        self.blade_olplen_chart = self.graph_template('Skin Overlap Length Interpolation')
+        self.blade_olplen_chart = self.graph_template()
         self.blade_olplen_chartview.setChart(self.blade_olplen_chart)
         
         # Signals
@@ -166,10 +166,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_skin.timeout.connect(self.build_section)
         
         # Charts
-        self.skin_zoom_chart = self.graph_template('Trailing Edge')
+        self.skin_zoom_chart = self.graph_template()
         self.skin_zoom_chartview.setChart(self.skin_zoom_chart)
         
-        self.skin_full_chart = self.graph_template('Skin Section')
+        self.skin_full_chart = self.graph_template()
         self.skin_full_chartview.setChart(self.skin_full_chart)
         
         # Signals
@@ -190,331 +190,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.currentChanged.connect(self.update_sectionList)
         self.abaqus_export_button.clicked.connect(self.exportSections)
         
-        
-    def new_row_table(self, table, row, col):
-        last_row = table.rowCount() - 1
-        last_col = table.columnCount() - 1
-        
-        if row == last_row and col == last_col:
-            self.handle_msgbar(f'New row created.')
-            n_rows = table.rowCount()
-            table.insertRow(n_rows)
-            
-    def resize_blade_table(self, order):
-        tables = [self.blade_skinolpsta_table,self.blade_skinolplen_table]
-        
-        for i in tables:    
-            last_row = i.rowCount() - 1
-            if last_row > order:
-                i.removeRow(last_row)
-            elif last_row < order:
-                i.insertRow(last_row+1)
     
-    def interpolate_overlap(self):
-        
-        # OLP_STA
-        data = []
-        for row in range(self.blade_skinolpsta_table.rowCount()-1):
-            row_data = []
-            for col in range(self.blade_skinolpsta_table.columnCount()):
-                item = self.blade_skinolpsta_table.item(row, col)
-                row_data.append(float(item.text()))
-            data.append(tuple(row_data))
-        coords = tuple(data)
-        
-        x_target = [float(x[4:]) for x in self.db.stations.keys()]
-        # Handling error in case no stations have been created
-        if len(x_target) == 0:
-            x_target, _ = zip(*coords)
-            
-        order = int(self.blade_order_input.text())
-        
-        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
-        
-        # Update graphs
-        line_series = [QLineSeries() for x in range(len(y_target))]
-        scatter_series = [QScatterSeries() for x in range(len(y_target))]
-        x_line = np.linspace(coords[0][0],coords[-1][0],100)
-        y_line = [splev(x_line, x) for x in tck]
-        
-        xy_line = [list(zip(x_line,y)) for y in y_line]
-        xy_pts = [list(zip(x_target,y)) for y in y_target]
-        
-        # save in temporary database
-        self.edits['__olp_sta__'] = np.array(xy_pts)
-        
-        # Add points to series
-        for i in range(len(xy_line)):
-            for j in xy_line[i]:
-                line_series[i].append(float(j[0]), float(j[1]))
-                
-        for i in range(len(xy_pts)):
-            for j in xy_pts[i]:
-                scatter_series[i].append(float(j[0]), float(j[1]))
-        
-        # Add series to the chart
-        self.blade_olpsta_chart.removeAllSeries()
-        
-        for i in line_series:
-            self.blade_olpsta_chart.addSeries(i)
-        
-        for i in scatter_series:
-            self.blade_olpsta_chart.addSeries(i)
-            
-        self.blade_olpsta_chart.createDefaultAxes()
-        self.blade_olpsta_chart.zoom(0.9)
-        
-        # OLP_LEN
-        data = []
-        for row in range(self.blade_skinolplen_table.rowCount()-1):
-            row_data = []
-            for col in range(self.blade_skinolplen_table.columnCount()):
-                item = self.blade_skinolplen_table.item(row, col)
-                row_data.append(float(item.text()))
-            data.append(tuple(row_data))
-        coords = tuple(data)
-        
-        x_target = [float(x[4:]) for x in self.db.stations.keys()]
-        # Handling error in case no stations have been created
-        if len(x_target) == 0 :
-            x_target, _ = zip(*coords)
-        
-        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
-        
-        # Update graphs
-        series = [QLineSeries() for x in range(len(y_target))]
-        x_plot = np.linspace(x_target[0],x_target[-1],100)
-        y_plot = [splev(x_plot, x) for x in tck]
-        
-        xy = []
-        for i in y_plot:
-            xy.append(list(zip(x_plot,i)))
-        # save in temporary database
-        self.edits['__olp_len__'] = xy
-        
-        for i in range(len(xy)):
-            for j in xy[i]:
-                series[i].append(float(j[0]), float(j[1]))
-        
-        self.blade_olplen_chart.removeAllSeries()
-        for i in series:
-            self.blade_olplen_chart.addSeries(i)
-        self.blade_olplen_chart.createDefaultAxes()
-        self.blade_olplen_chart.zoom(0.9)
-        
-        # Update QComboBox with order selection
-        self.blade_skinolpsta_selected.clear()
-        self.blade_skinolpsta_selected.addItems([str(x+1) for x in range(order)])
-        
-        self.blade_skinolplen_selected.clear()
-        self.blade_skinolplen_selected.addItems([str(x+1) for x in range(order)])
-    
-    ### ADVANCED TAB METHODS (Page 2b)
-    def sort_advanced_stations_table(self):
-        self.station_tableStations_input.sortItems(5)
-    
-    
-    def update_stations_table(self, value):
-        n_rows = self.station_tableStations_input.rowCount()
-        # Make first column have a dropdown menu for airfoil
-        list_airfoils = QComboBox()
-        list_airfoils.addItems(list(self.db.airfoils.keys()))
-        xmirror = QCheckBox()
-        xmirror.setCheckable(True)
-        ymirror = QCheckBox()
-        ymirror.setCheckable(True)
-        ymirror.setChecked(True)
-        
-        if value > n_rows:
-            self.station_tableStations_input.insertRow(n_rows)
-            self.station_tableStations_input.setCellWidget(n_rows,0,list_airfoils)
-            self.station_tableStations_input.setCellWidget(n_rows,9,xmirror)
-            self.station_tableStations_input.setCellWidget(n_rows,10,ymirror)
-            
-            for column in range(1,9):
-                cell_item = self.station_tableStations_input.item(n_rows-1,column)
-                new_cell = QTableWidgetItem(cell_item.text())
-                self.station_tableStations_input.setItem(n_rows,column,new_cell)
-            
-        elif value < n_rows:
-            self.station_tableStations_input.removeRow(value)
-        
-    def save_multiple_stations(self):
-        n_rows = self.station_tableStations_input.rowCount()
-        n_cols = self.station_tableStations_input.columnCount()
-        sta_data = {}
-        for row in range(n_rows):
-            for col in range(n_cols):
-                if col < 1:
-                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).currentText()
-                elif col > 0 and col < 9:
-                    sta_data[col] = self.station_tableStations_input.item(row, col).text()
-                else:
-                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).isChecked()
-            
-            station = Station(chord=float(sta_data[1]),
-                              twist_angle=float(sta_data[2]),
-                              x_offset=float(sta_data[3]),
-                              y_offset=float(sta_data[4]),
-                              z_offset=float(sta_data[5]),
-                              x_multiplier=float(sta_data[6]),
-                              y_multiplier=float(sta_data[7]),
-                              z_multiplier=float(sta_data[8]),
-                              x_mirror=bool(sta_data[9]),
-                              y_mirror=bool(sta_data[10]),
-                              path=self.paths_airfoils[sta_data[0]])
-            
-            station_name = f'sta_{int(sta_data[5])}'
-            
-            self.db.stations[station_name] = station
-            
-        self.handle_msgbar(f'Total stations created: {n_rows}.')
-    
-    ### PARAMETERS METHODS (Page 3)
-    
-    def save_bladeparams(self):
-        idx_olp_sta = self.blade_skinolpsta_selected.currentIndex()
-        idx_olp_len = self.blade_skinolplen_selected.currentIndex()
-        
-        self.db.blade['olp_sta'] = self.edits['__olp_sta__'][idx_olp_sta]
-        print(self.db.blade['olp_sta'])
-        self.db.blade['olp_len'] = self.edits['__olp_len__'][idx_olp_len]
-        
-        self.handle_msgbar(f'Parameters saved.')
-    
-    def airfoil_mousecoords(self, event: QMouseEvent) -> str:
-        coords = event.position()
-        x,y = coords.x(), coords.y()
-        coord_lims = self.airfoil_chart.plotArea().getCoords()
-        
-        if (x >= coord_lims[0] and x <= coord_lims[2] and
-            y >= coord_lims[1] and y <= coord_lims[3]):
-            
-            coords_scaled = self.airfoil_chart.mapToValue(coords)
-            x_scaled = coords_scaled.x()
-            y_scaled = coords_scaled.y()
-            
-            self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
-            
-    def station_mousecoords(self, event: QMouseEvent) -> str:
-        coords = event.position()
-        x,y = coords.x(), coords.y()
-        coord_lims = self.station_chart.plotArea().getCoords()
-        
-        if (x >= coord_lims[0] and x <= coord_lims[2] and
-            y >= coord_lims[1] and y <= coord_lims[3]):
-            
-            coords_scaled = self.station_chart.mapToValue(coords)
-            x_scaled = coords_scaled.x()
-            y_scaled = coords_scaled.y()
-            
-            self.station_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
-    
-    def graph_template(self,title:str):
-        """Empty graph template.
-
-        Args:
-            title (str): Plot title.
-
-        Returns:
-            chart: Chart Object.
-        """
-        data = QLineSeries()
-        chart = QChart()
-        chart.setAnimationOptions(QChart.AllAnimations)
-        chart.legend().hide()
-        chart.addSeries(data)
-        chart.setTitle(title)
-        
-        # chart.createDefaultAxes()
-        axisX = QValueAxis()
-        axisY = QValueAxis()
-        axisX.setTitleText('x [-]')
-        axisY.setTitleText('y [-]')
-        chart.addAxis(axisX, Qt.AlignBottom)
-        chart.addAxis(axisY, Qt.AlignLeft)
-        # chart.setLocalizeNumbers(True)
-        data.attachAxis(axisX)
-        data.attachAxis(axisY)
-        
-        return chart
-    
-    def change_work_directory(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.Directory)
-        dialog.setViewMode(QFileDialog.List)
-        if dialog.exec():
-            self.main_path = dialog.selectedFiles()[0]
-            self.workpath_lineedit.setText(self.main_path)
-        
-    def load_db(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.ExistingFile)
-        dialog.setNameFilter(self.tr('Tblade (*.tbd *.json)'))
-        dialog.setViewMode(QFileDialog.Detail)
-        if dialog.exec():
-            filepath = dialog.selectedFiles() # [0]
-            # TODO: decode tbd or json file into db class dictionary.
-            
-    def new_db(self):
-        self.db = db()
-        self.handle_msgbar('New session started.')
-        
-    def mouse_coords(self,label,event):
-        label.setText(f'({event.x()},{event.y()})')
-        
-    def switch_to_homePage(self):
-        self.stackedWidget.setCurrentIndex(0)
-        self.page_title_label.setText(self.home_page_button.text())
-    
-    def switch_to_airfoilPage(self):
-        self.stackedWidget.setCurrentIndex(1)
-        self.page_title_label.setText(self.airfoil_page_button.text())
-        
-    def switch_to_stationPage(self):
-        self.stackedWidget.setCurrentIndex(2)
-        self.page_title_label.setText(self.station_page_button.text())
-        
-    def switch_to_bladePage(self):
-        self.stackedWidget.setCurrentIndex(3)
-        self.page_title_label.setText(self.blade_page_button.text())
-        
-    def switch_to_skinPage(self):
-        self.stackedWidget.setCurrentIndex(4)
-        self.page_title_label.setText(self.skin_page_button.text())
-    
-    def switch_to_sparPage(self):
-        self.stackedWidget.setCurrentIndex(5)
-        self.page_title_label.setText(self.spar_page_button.text())
-    
-    def switch_to_abaqusPage(self):
-        self.stackedWidget.setCurrentIndex(6)
-        self.page_title_label.setText(self.abaqus_page_button.text())
-    
-    def upload_airfoil_file(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.ExistingFiles)
-        dialog.setNameFilter(self.tr('Files (*.csv *.txt)'))
-        dialog.setViewMode(QFileDialog.Detail)
-        fileNames = []
-        if dialog.exec():
-            fileNames = dialog.selectedFiles()
-        
-        # Add new files to the QComboBox
-        airfoil_names = [x.split('/')[-1][:-4] for x in fileNames]
-        n_items_current = self.station_listairfoils_box.count()
-        self.station_listairfoils_box.insertItems(n_items_current, airfoil_names)
-        
-        for i in range(len(fileNames)):
-            self.paths_airfoils[airfoil_names[i]] = fileNames[i]
-    
-    def onTextChanged(self):
-        # Restart the timer whenever the text changes
-        self.timer_station.start(500)
-        
-    def secInputChanged(self):
-        # Restart the timer whenever the text changes
-        self.timer_skin.start(500)
+    ### STATION METHODS (Page 2a)
     
     def update_airfoil_chart(self):
         
@@ -582,6 +259,225 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except ValueError:
             self.handle_msgbar('Station: Wrong input')
     
+    
+    def save_station(self):
+        station = self.edits['__station__']
+        station_name  = 'sta_' + str(int(station.parameters['offset'][2]))
+        self.db.stations[station_name] = station
+        self.handle_msgbar(f'Station {station_name} saved.')
+        n_stations = len(self.db.stations.keys())
+        sorted_stations = sorted(list(self.db.stations.keys()), key=len)
+        # self.handle_msgbar(f'Number of stations: {n_stations}')
+        self.station_liststation_box.clear()
+        self.station_liststation_box.insertItems(0,sorted_stations)
+        self.station_liststation_box.setCurrentText(station_name)
+        # print(self.station_liststation_box.currentIndex())
+    
+    ### ADVANCED TAB METHODS (Page 2b)
+    def sort_advanced_stations_table(self):
+        self.station_tableStations_input.sortItems(5)
+    
+    
+    def update_stations_table(self, value):
+        n_rows = self.station_tableStations_input.rowCount()
+        # Make first column have a dropdown menu for airfoil
+        list_airfoils = QComboBox()
+        list_airfoils.addItems(list(self.db.airfoils.keys()))
+        xmirror = QCheckBox()
+        xmirror.setCheckable(True)
+        ymirror = QCheckBox()
+        ymirror.setCheckable(True)
+        ymirror.setChecked(True)
+        
+        if value > n_rows:
+            self.station_tableStations_input.insertRow(n_rows)
+            self.station_tableStations_input.setCellWidget(n_rows,0,list_airfoils)
+            self.station_tableStations_input.setCellWidget(n_rows,9,xmirror)
+            self.station_tableStations_input.setCellWidget(n_rows,10,ymirror)
+            
+            for column in range(1,9):
+                cell_item = self.station_tableStations_input.item(n_rows-1,column)
+                new_cell = QTableWidgetItem(cell_item.text())
+                self.station_tableStations_input.setItem(n_rows,column,new_cell)
+            
+        elif value < n_rows:
+            self.station_tableStations_input.removeRow(value)
+        
+    def save_multiple_stations(self):
+        n_rows = self.station_tableStations_input.rowCount()
+        n_cols = self.station_tableStations_input.columnCount()
+        sta_data = {}
+        for row in range(n_rows):
+            for col in range(n_cols):
+                if col < 1:
+                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).currentText()
+                elif col > 0 and col < 9:
+                    sta_data[col] = self.station_tableStations_input.item(row, col).text()
+                else:
+                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).isChecked()
+            
+            station = Station(chord=float(sta_data[1]),
+                              twist_angle=float(sta_data[2]),
+                              x_offset=float(sta_data[3]),
+                              y_offset=float(sta_data[4]),
+                              z_offset=float(sta_data[5]),
+                              x_multiplier=float(sta_data[6]),
+                              y_multiplier=float(sta_data[7]),
+                              z_multiplier=float(sta_data[8]),
+                              x_mirror=bool(sta_data[9]),
+                              y_mirror=bool(sta_data[10]),
+                              path=self.paths_airfoils[sta_data[0]])
+            
+            station_name = f'sta_{int(sta_data[5])}'
+            
+            self.db.stations[station_name] = station
+            
+        self.handle_msgbar(f'Total stations created: {n_rows}.')
+    
+    ### PARAMETERS METHODS (Page 3)
+    
+    def new_row_table(self, table, row, col):
+        last_row = table.rowCount() - 1
+        last_col = table.columnCount() - 1
+        
+        if row == last_row and col == last_col:
+            self.handle_msgbar(f'New row created.')
+            n_rows = table.rowCount()
+            table.insertRow(n_rows)
+            
+    def resize_blade_table(self, order):
+        tables = [self.blade_skinolpsta_table,self.blade_skinolplen_table]
+        
+        for i in tables:    
+            last_row = i.rowCount() - 1
+            if last_row > order:
+                i.removeRow(last_row)
+            elif last_row < order:
+                i.insertRow(last_row+1)
+    
+    def interpolate_overlap(self):
+        
+        # OLP_STA
+        data = []
+        for row in range(self.blade_skinolpsta_table.rowCount()-1):
+            row_data = []
+            for col in range(self.blade_skinolpsta_table.columnCount()):
+                item = self.blade_skinolpsta_table.item(row, col)
+                row_data.append(float(item.text()))
+            data.append(tuple(row_data))
+        coords = tuple(data)
+        
+        x_target = [float(x[4:]) for x in self.db.stations.keys()]
+        # Handling error in case no stations have been created
+        if len(x_target) < len(coords):
+            x_target, _ = zip(*coords)
+            
+        order = int(self.blade_order_input.text())
+        
+        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
+        
+        # Update graphs
+        line_series = [QLineSeries() for x in range(len(y_target))]
+        scatter_series = [QScatterSeries() for x in range(len(y_target))]
+        x_line = np.linspace(x_target[0],x_target[-1],100)
+        y_line = [splev(x_line, x) for x in tck]
+        
+        xy_line = [list(zip(x_line,y)) for y in y_line]
+        xy_pts = [list(zip(x_target,y)) for y in y_target]
+        
+        # save in temporary database
+        self.edits['__olp_sta__'] = np.array(xy_pts)
+        
+        # Add points to series
+        for i in range(len(xy_line)):
+            for j in xy_line[i]:
+                line_series[i].append(float(j[0]), float(j[1]))
+                
+        for i in range(len(xy_pts)):
+            for j in xy_pts[i]:
+                scatter_series[i].append(float(j[0]), float(j[1]))
+        
+        # Add series to the chart
+        self.blade_olpsta_chart.removeAllSeries()
+        
+        for i in line_series:
+            self.blade_olpsta_chart.addSeries(i)
+        
+        for i in scatter_series:
+            i.setMarkerShape(QScatterSeries.MarkerShapeRectangle)
+            i.setMarkerSize(10)
+            self.blade_olpsta_chart.addSeries(i)
+            
+        self.blade_olpsta_chart.createDefaultAxes()
+        self.blade_olpsta_chart.zoom(0.9)
+        
+        # OLP_LEN
+        data = []
+        for row in range(self.blade_skinolplen_table.rowCount()-1):
+            row_data = []
+            for col in range(self.blade_skinolplen_table.columnCount()):
+                item = self.blade_skinolplen_table.item(row, col)
+                row_data.append(float(item.text()))
+            data.append(tuple(row_data))
+        coords = tuple(data)
+        
+        x_target = [float(x[4:]) for x in self.db.stations.keys()]
+        # Handling error in case no stations have been created
+        if len(x_target) < len(coords) :
+            x_target, _ = zip(*coords)
+        
+        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
+        
+        # Update graphs
+        series = [QLineSeries() for x in range(len(y_target))]
+        points = [QScatterSeries() for x in range(len(y_target))]
+        
+        x_plot = np.linspace(x_target[0],x_target[-1],100)
+        y_plot = [splev(x_plot, x) for x in tck]
+        
+        xy = [list(zip(x_plot,y)) for y in y_plot]
+        xy_pts = [list(zip(x_target,y)) for y in y_target]
+        
+        # save in temporary database
+        self.edits['__olp_len__'] = xy
+        
+        for i in range(len(xy)):
+            for j in xy[i]:
+                series[i].append(float(j[0]), float(j[1]))
+                
+        for i in range(len(xy)):
+            for j in xy_pts[i]:
+                points[i].append(float(j[0]), float(j[1]))
+        
+        self.blade_olplen_chart.removeAllSeries()
+        for i in series:
+            self.blade_olplen_chart.addSeries(i)
+            
+        for i in points:
+            i.setMarkerShape(QScatterSeries.MarkerShapeRectangle)
+            i.setMarkerSize(10)
+            self.blade_olplen_chart.addSeries(i)
+            
+        self.blade_olplen_chart.createDefaultAxes()
+        self.blade_olplen_chart.zoom(0.9)
+        
+        # Update QComboBox with order selection
+        self.blade_skinolpsta_selected.clear()
+        self.blade_skinolpsta_selected.addItems([str(x+1) for x in range(order)])
+        
+        self.blade_skinolplen_selected.clear()
+        self.blade_skinolplen_selected.addItems([str(x+1) for x in range(order)])
+    
+    def save_bladeparams(self):
+        idx_olp_sta = self.blade_skinolpsta_selected.currentIndex()
+        idx_olp_len = self.blade_skinolplen_selected.currentIndex()
+        
+        self.db.blade['olp_sta'] = self.edits['__olp_sta__'][idx_olp_sta]
+        print(self.db.blade['olp_sta'])
+        self.db.blade['olp_len'] = self.edits['__olp_len__'][idx_olp_len]
+        print(self.db.blade['olp_len'])
+        
+        self.handle_msgbar(f'Parameters saved.')
     
     ### SKIN METHODS
     
@@ -681,18 +577,139 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     ### GENERAL UI METHODS
     
-    def save_station(self):
-        station = self.edits['__station__']
-        station_name  = 'sta_' + str(int(station.parameters['offset'][2]))
-        self.db.stations[station_name] = station
-        self.handle_msgbar(f'Station {station_name} saved.')
-        n_stations = len(self.db.stations.keys())
-        sorted_stations = sorted(list(self.db.stations.keys()), key=len)
-        # self.handle_msgbar(f'Number of stations: {n_stations}')
-        self.station_liststation_box.clear()
-        self.station_liststation_box.insertItems(0,sorted_stations)
-        self.station_liststation_box.setCurrentText(station_name)
-        # print(self.station_liststation_box.currentIndex())
+    def airfoil_mousecoords(self, event: QMouseEvent) -> str:
+        coords = event.position()
+        x,y = coords.x(), coords.y()
+        coord_lims = self.airfoil_chart.plotArea().getCoords()
+        
+        if (x >= coord_lims[0] and x <= coord_lims[2] and
+            y >= coord_lims[1] and y <= coord_lims[3]):
+            
+            coords_scaled = self.airfoil_chart.mapToValue(coords)
+            x_scaled = coords_scaled.x()
+            y_scaled = coords_scaled.y()
+            
+            self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
+            
+    def station_mousecoords(self, event: QMouseEvent) -> str:
+        coords = event.position()
+        x,y = coords.x(), coords.y()
+        coord_lims = self.station_chart.plotArea().getCoords()
+        
+        if (x >= coord_lims[0] and x <= coord_lims[2] and
+            y >= coord_lims[1] and y <= coord_lims[3]):
+            
+            coords_scaled = self.station_chart.mapToValue(coords)
+            x_scaled = coords_scaled.x()
+            y_scaled = coords_scaled.y()
+            
+            self.station_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
+    
+    def graph_template(self):
+        """Empty graph template.
+
+        Args:
+            title (str): Plot title.
+
+        Returns:
+            chart: Chart Object.
+        """
+        data = QLineSeries()
+        chart = QChart()
+        chart.setAnimationOptions(QChart.AllAnimations)
+        chart.legend().hide()
+        chart.addSeries(data)
+        # chart.setTitle(title)
+        
+        # chart.createDefaultAxes()
+        axisX = QValueAxis()
+        axisY = QValueAxis()
+        axisX.setTitleText('x [-]')
+        axisY.setTitleText('y [-]')
+        chart.addAxis(axisX, Qt.AlignBottom)
+        chart.addAxis(axisY, Qt.AlignLeft)
+        # chart.setLocalizeNumbers(True)
+        data.attachAxis(axisX)
+        data.attachAxis(axisY)
+        
+        return chart
+    
+    def change_work_directory(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.Directory)
+        dialog.setViewMode(QFileDialog.List)
+        if dialog.exec():
+            self.main_path = dialog.selectedFiles()[0]
+            self.workpath_lineedit.setText(self.main_path)
+        
+    def load_db(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.ExistingFile)
+        dialog.setNameFilter(self.tr('Tblade (*.tbd *.json)'))
+        dialog.setViewMode(QFileDialog.Detail)
+        if dialog.exec():
+            filepath = dialog.selectedFiles() # [0]
+            # TODO: decode tbd or json file into db class dictionary.
+            
+    def new_db(self):
+        self.db = db()
+        self.handle_msgbar('New session started.')
+        
+    def mouse_coords(self,label,event):
+        label.setText(f'({event.x()},{event.y()})')
+        
+    def switch_to_homePage(self):
+        self.stackedWidget.setCurrentIndex(0)
+        self.page_title_label.setText(self.home_page_button.text())
+    
+    def switch_to_airfoilPage(self):
+        self.stackedWidget.setCurrentIndex(1)
+        self.page_title_label.setText(self.airfoil_page_button.text())
+        
+    def switch_to_stationPage(self):
+        self.stackedWidget.setCurrentIndex(2)
+        self.page_title_label.setText(self.station_page_button.text())
+        
+    def switch_to_bladePage(self):
+        self.stackedWidget.setCurrentIndex(3)
+        self.page_title_label.setText(self.blade_page_button.text())
+        
+    def switch_to_skinPage(self):
+        self.stackedWidget.setCurrentIndex(4)
+        self.page_title_label.setText(self.skin_page_button.text())
+    
+    def switch_to_sparPage(self):
+        self.stackedWidget.setCurrentIndex(5)
+        self.page_title_label.setText(self.spar_page_button.text())
+    
+    def switch_to_abaqusPage(self):
+        self.stackedWidget.setCurrentIndex(6)
+        self.page_title_label.setText(self.abaqus_page_button.text())
+    
+    def upload_airfoil_file(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.ExistingFiles)
+        dialog.setNameFilter(self.tr('Files (*.csv *.txt)'))
+        dialog.setViewMode(QFileDialog.Detail)
+        fileNames = []
+        if dialog.exec():
+            fileNames = dialog.selectedFiles()
+        
+        # Add new files to the QComboBox
+        airfoil_names = [x.split('/')[-1][:-4] for x in fileNames]
+        n_items_current = self.station_listairfoils_box.count()
+        self.station_listairfoils_box.insertItems(n_items_current, airfoil_names)
+        
+        for i in range(len(fileNames)):
+            self.paths_airfoils[airfoil_names[i]] = fileNames[i]
+    
+    def onTextChanged(self):
+        # Restart the timer whenever the text changes
+        self.timer_station.start(500)
+        
+    def secInputChanged(self):
+        # Restart the timer whenever the text changes
+        self.timer_skin.start(500)
     
     def quit_message_box(self):
         msgBox = QMessageBox()
