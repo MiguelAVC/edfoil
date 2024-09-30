@@ -121,6 +121,42 @@ def createSkinPart(data, points, model='Model-1'):
             p.SolidLoft(loftsections = tuple(faces),
                         paths = tuple(paths_sorted), globalSmoothing = ON)
             
+def PartitionSkin(data, part, m=mdb.models['Model-1']):
+
+    # define local variables
+    name_parts = m.parts.keys()
+    p = m.parts[name_parts[part]]
+    name_datums = p.datums.keys()
+    
+    # partition starting from the root
+    for i in range(len(data)-2):
+        
+        # 1) locate datum plane for reference and for split
+        datumPl_ref = p.datums[name_datums[i+1]]
+        datumPl_split = p.datums[name_datums[i+2]]
+        
+        # 2) locate cells past the reference datum plane
+        cells = [x for x in p.cells if x.pointOn[0][2]>=datumPl_ref.pointOn[2]]
+        
+        # 3) partition picked cells
+        p.PartitionCellByDatumPlane(cells=tuple(cells),
+                                    datumPlane=datumPl_split)
+
+def MeshSkin(part,seedSize=10, m=mdb.models['Model-1']):
+    
+    # define local variables
+    name_parts = m.parts.keys()
+    p = m.parts[name_parts[part]]
+    
+    # seed part
+    p.seedPart(size=seedSize, deviationFactor=0.1, minSizeFactor=0.1)
+    
+    # identify non structured hex regions
+    regions = [x for x in p.cells if p.getMeshControl(x,TECHNIQUE)!=STRUCTURED]
+    p.setMeshControls(regions=tuple(regions),elemShape=HEX_DOMINATED)
+    
+    # generate mesh
+    p.generateMesh()
             
 # %% Example
 
