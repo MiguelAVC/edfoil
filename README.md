@@ -6,11 +6,15 @@ Repository for the future TBlade-Designer software for tidal turbine blade struc
 
 Follow the next steps:
 
-1. Clone the repository.
+1. Clone the repository. (Open cmd in the root directory)
 
-2. Install python version 3.12.2 (or 3.12) in your computer.
+```bat
+git clone https://github.com/MiguelAVC/TBlade-Designer.git
+```
 
-3. Create a python virtual environment inside the root directory. This can be done in the terminal with the following:
+3. Install python version 3.12.2 (or 3.12) in your computer.
+
+4. Create a python virtual environment inside the root directory. This can be done in the terminal with the following:
 
 ```bat
 python -m venv .venv
