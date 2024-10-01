@@ -520,22 +520,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 print('section generated')
                 # Plots
                 plies = list(data.t['t_plies_bot'].keys())
-                ply = data.t['t_plies_bot'][1]
-                series = {x:QLineSeries() for x in list(ply.keys())}
+                ply_series = {}
+                for i in (plies):
+                    ply = data.t['t_plies_bot'][i]
+                    ply_series[i] = {x:QLineSeries() for x in list(ply.keys())}
                 
-                for j in list(ply.keys()):
-                    x = data.splines[j]['x'](ply[j]).tolist()
-                    y = data.splines[j]['y'](ply[j]).tolist()
-                    xy = list(zip(x,y))
-                    points = [QPointF(float(x), float(y)) for x, y in xy]
-                    series[j].append(points)
-                    series[j].setName(f'Curve {j}')
+                    for j in list(ply.keys()):
+                        x = data.splines[j]['x'](ply[j]).tolist()
+                        y = data.splines[j]['y'](ply[j]).tolist()
+                        xy = list(zip(x,y))
+                        points = [QPointF(float(x), float(y)) for x, y in xy]
+                        ply_series[i][j].append(points)
+                        ply_series[i][j].setName(f'Curve {j}')
                 
                 # series = QAreaSeries(series_1,series_0)
                 
                 self.skin_full_chart.removeAllSeries()
-                for j in series:
-                    self.skin_full_chart.addSeries(series[j])
+                for i in list(ply_series.keys()):
+                    for j in list(ply_series[i].keys()):
+                        self.skin_full_chart.addSeries(ply_series[i][j])
                 self.skin_full_chart.createDefaultAxes()
                 self.skin_full_chart.legend().show()
                 self.skin_full_chart.zoom(0.9)
