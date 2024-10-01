@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (QMainWindow, QFileDialog, QMessageBox,
 from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
                               QValueAxis, QScatterSeries, QAreaSeries)
 from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
-from PySide6.QtCore import QTimer, Qt, QDir, QPointF
+from PySide6.QtCore import QTimer, Qt, QDir, QPointF, QSizeF, QRectF
 
 
 from classes.station import Station
@@ -14,6 +14,7 @@ from utils.abaqusExp import *
 
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.interpolate import splev
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -233,9 +234,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                            y_mirror=y_mirror)
             
             # Clear the current series data and update with new values
-            self.airfoil_series = QLineSeries()
+            airfoil_series = QLineSeries()
             for i in data.xy:
-                self.airfoil_series.append(float(i[0]),float(i[1]))
+                airfoil_series.append(float(i[0]),float(i[1]))
             
             # Draw scatter points TE and LE
             scatter_series = QScatterSeries()
@@ -246,12 +247,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             scatter_series.setMarkerShape(QScatterSeries.MarkerShapeRectangle)
             scatter_series.setMarkerSize(10)
             
-            # Update axes to fit new data
-            self.station_chart.removeAllSeries()
-            self.station_chart.addSeries(self.airfoil_series)
-            self.station_chart.addSeries(scatter_series)
-            self.station_chart.createDefaultAxes()
-            self.station_chart.zoom(0.9)
+            # Create new chart
+            chart = QChart()
+            chart.setAnimationOptions(QChart.SeriesAnimations)
+            chart.legend().hide()
+            chart.addSeries(airfoil_series)
+            chart.addSeries(scatter_series)
+
+            chart.createDefaultAxes()
+            
+            # self.equal_axes(chart=chart, range_values=data.xyRange())
+            self.station_chartview.setChart(chart)
+            # self.station_chart.zoom(0.9)
+            area =chart.plotArea() 
+            print(area)
+            w = area.width()
+            h = area.height()
+            print(f'w: {w}, h: {h}')
+            new_QSF = QSizeF(w,h)
+            
+            xy_range = data.xyRange()
+            dx = xy_range[0][1] - xy_range[0][0]
+            dy = xy_range[1][1] - xy_range[1][0]
+            new_QSF.scale(dx,dy,Qt.KeepAspectRatio)
+            new_QRF = QRectF(QPointF(xy_range[0][0],xy_range[1][1]),new_QSF)
+            chart.setPlotArea(new_QRF)
             
             # Store it as an unsaved station
             self.edits['__station__'] = data
@@ -518,6 +538,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             saveFig = saveFig,
                             )
                 print('section generated')
+                
+                # Generate colours
+                colours = self.generate_colours(num_curves=n_plies, cmap_name='viridis')
+                
                 # Plots
                 plies = list(data.t['t_plies_bot'].keys())
                 ply_series = {}
@@ -531,10 +555,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         xy = list(zip(x,y))
                         points = [QPointF(float(x), float(y)) for x, y in xy]
                         ply_series[i][j].append(points)
-                        ply_series[i][j].setName(f'Curve {j}')
+                        # ply_series[i][j].setName(f'Curve {j}')
+                        ply_series[i][j].setColor(colours[i-1])
                 
                 # series = QAreaSeries(series_1,series_0)
                 
+                # Add to chart
                 self.skin_full_chart.removeAllSeries()
                 for i in list(ply_series.keys()):
                     for j in list(ply_series[i].keys()):
@@ -611,15 +637,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def graph_template(self):
         """Empty graph template.
 
-        Args:
-            title (str): Plot title.
-
         Returns:
             chart: Chart Object.
         """
         data = QLineSeries()
         chart = QChart()
-        chart.setAnimationOptions(QChart.AllAnimations)
+        chart.setAnimationOptions(QChart.SeriesAnimations)
         chart.legend().hide()
         chart.addSeries(data)
         # chart.setTitle(title)
@@ -627,8 +650,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # chart.createDefaultAxes()
         axisX = QValueAxis()
         axisY = QValueAxis()
-        axisX.setTitleText('x [-]')
-        axisY.setTitleText('y [-]')
+        # axisX.setTitleText('x [-]')
+        # axisY.setTitleText('y [-]')
         chart.addAxis(axisX, Qt.AlignBottom)
         chart.addAxis(axisY, Qt.AlignLeft)
         # chart.setLocalizeNumbers(True)
@@ -637,7 +660,110 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         return chart
     
-    def change_work_directory(self):
+    def generate_colours(self, num_curves:int, cmap_name:str='viridis') -> list[QColor]:
+        """
+        Generate a list of QColor objects for the given number of curves.
+
+        :param num_curves: Number of colours (curves)
+        :param cmap_name: Matplotlib colormap name (default is 'viridis')
+        :return: List of QColor objects
+        """
+        
+        cmap = plt.get_cmap(cmap_name)
+        colours = [cmap(i / num_curves) for i in range(num_curves)]
+        qcolours = [QColor(int(r * 255), int(g * 255), int(b * 255)) for r, g, b, _ in colours]
+        
+        return qcolours
+    
+    def equal_axes(self, chart:QChart, range_values:list[list[float,float]]) -> None:
+        
+        # Determine aspect ratio
+        height = chart.plotArea().height()
+        width = chart.plotArea().width()
+        
+        print(f'Heigh: {height}, width: {width}')
+        
+        aspect_ratio = width / height
+        
+        # New axes
+        x_axis = QValueAxis()
+        y_axis = QValueAxis()
+        
+        # set ranges
+        x_max, x_min = range_values[0]
+        y_max, y_min = range_values[1]
+        x_range = range_values[0][1] - range_values[0][0]
+        y_range = range_values[1][1] - range_values[1][0]
+        # x_range = chart.axisX().max() - chart.axisX().min()
+        # y_range = chart.axisY().max() - chart.axisY().min()
+        
+        if x_range > y_range * aspect_ratio:
+            # Adjust y-axis to match x-axis scale
+            # mid_y = (chart.axisY().max() + chart.axisY().min()) / 2
+            mid_y = (y_max + y_min) / 2
+            new_y_range = x_range / aspect_ratio
+            y_min = mid_y - new_y_range / 2
+            y_max = mid_y + new_y_range / 2
+            
+            # x_axis.setRange(chart.axisX().min(),chart.axisX().max())
+            # y_axis.setRange(mid_y - new_y_range / 2, mid_y + new_y_range / 2)
+        else:
+            # Adjust x-axis to match y-axis scale
+            # mid_x = (chart.axisX().max() + chart.axisX().min()) / 2
+            # new_x_range = y_range * aspect_ratio
+            mid_x = (x_max + x_min) / 2
+            new_x_range = y_range * aspect_ratio
+            x_min = mid_x - new_x_range / 2
+            x_max = mid_x + new_x_range / 2
+            
+            
+            # x_axis.setRange(mid_x - new_x_range / 2, mid_x + new_x_range / 2)
+            # y_axis.setRange(chart.axisY().min(),chart.axisY().max())
+        
+        # Save the series so we can reattach them later
+        # series_list = chart.series()
+        
+        # Remove current axes
+        # axes = chart.axes()
+        # for axis in axes:
+        #     chart.removeAxis(axis)
+        
+        # Add new axes
+        # chart.addAxis(x_axis, Qt.AlignBottom)
+        # chart.addAxis(y_axis, Qt.AlignLeft)
+        
+        # Reattach series to new axes
+        # for series in series_list:
+        #     series.attachAxis(x_axis)
+        #     series.attachAxis(y_axis)
+        
+        # Update current axes
+        # chart.axes(Qt.Horizontal)[0].setRange(x_axis.min(),x_axis.max())
+        # chart.axes(Qt.Vertical)[0].setRange(y_axis.min(),y_axis.max())
+        # chart.axes(Qt.Horizontal)[0].setRange(x_min,x_max)
+        # chart.axes(Qt.Vertical)[0].setRange(y_min,y_max)
+        
+        # Remove current axes and add new ones if axes don't exist
+        axes = chart.axes()
+        for axis in axes:
+            chart.removeAxis(axis)
+
+        # Create new axes
+        x_axis = QValueAxis()
+        y_axis = QValueAxis()
+        x_axis.setRange(x_min, x_max)
+        y_axis.setRange(y_min, y_max)
+
+        # Add new axes to the chart
+        chart.addAxis(x_axis, Qt.AlignBottom)
+        chart.addAxis(y_axis, Qt.AlignLeft)
+
+        # Reattach the series to the new axes
+        for series in chart.series():
+            series.attachAxis(x_axis)
+            series.attachAxis(y_axis)
+    
+    def change_work_directory(self) -> None:
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.Directory)
         dialog.setViewMode(QFileDialog.List)
@@ -645,7 +771,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.main_path = dialog.selectedFiles()[0]
             self.workpath_lineedit.setText(self.main_path)
         
-    def load_db(self):
+    def load_db(self) -> None:
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFile)
         dialog.setNameFilter(self.tr('Tblade (*.tbd *.json)'))
@@ -654,7 +780,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             filepath = dialog.selectedFiles() # [0]
             # TODO: decode tbd or json file into db class dictionary.
             
-    def new_db(self):
+    def new_db(self) -> None:
         self.db = db()
         self.handle_msgbar('New session started.')
         

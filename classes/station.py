@@ -110,6 +110,10 @@ class Station:
 
         plt.tight_layout()
         plt.show()
+        
+    def xyRange(self) -> list[list[float]]:
+        range_list = [[float(np.min(self.xy[:,col])),float(np.max(self.xy[:,col]))] for col in range(2)]
+        return range_list
 
 # %%
 
