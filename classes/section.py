@@ -124,44 +124,64 @@ class Section:
             fig.savefig('skin.png',dpi=800)
         plt.close(fig)
         
+        # Split in overlap
         if station.parameters['isCircle']:
-            idx_olp_sta = {x:idx_LE[x] for x in range(n_plies+1)}
+            idx_olp_sta = {x:{0:idx_LE[x]} for x in range(n_plies+1)}
+            idx_top_sta = {x:idx_LE[x] for x in range(n_plies+1)}
             overlap_line = chord_line
             self.indexes['idx_olp_sta'] = idx_olp_sta
+            self.indexes['idx_top_sta'] = idx_top_sta
             
         else:
             # Locate overlap
+            
+            # Reference point at the leading edge
             p_ref = np.array([splines[0]['x'](idx_LE[0]),
                             splines[0]['y'](idx_LE[0])])
             
-            t_target = skinOverlapLocator(overlap_target,p_ref,
-                        station.parameters['twist_angle'], splines[0],idx_LE[0])
-
+            t_target = skinOverlapLocator(d_target=overlap_target, p0= p_ref,
+                        twist_ang=station.parameters['twist_angle'], spline=splines[0], u0=idx_LE[0])
+            
+            # Intersection coordinates
             p0 = np.array([splines[0]['x'](t_target,0),
                         splines[0]['y'](t_target,0)])
             p1 = p0 + np.array([-splines[0]['y'](t_target,1),
                                 splines[0]['x'](t_target,1)])
-
+            
             overlap_line = lineConstructor(p0 = tuple(p0), p1 = tuple(p1))
-            idx_olp_sta = {0:t_target}
+            
+            # Offset overlap line
+            idx_olp_sta = {}
+            idx_top_sta = {i:splineIntersection(spline=splines[i], line= overlap_line, u0=idx_LE[i]) for i in range(n_plies+1)}
+            # idx_olp_sta = {0:t_target}
 
             ### Cut all other lines at this point
-            for i in range(1,n_plies+1):
-                idx_olp_sta[i] = splineIntersection(splines[i],overlap_line,idx_LE[i])
+            for i in range(n_plies+1):
+            # for i in range(1,n_plies+1):
+                idx_olp_sta[i] = {}
+                x0 = ply_thickness * (i+1) * np.cos(overlap_line['nor']) + overlap_line['p'][0]
+                y0 = ply_thickness * (i+1) * np.sin(overlap_line['nor']) + overlap_line['p'][1]
+                p0 = tuple([x0, y0])
+                offset_olp_line = lineConstructor(p0 = p0, ang = overlap_line['tan'])
+                idx_olp_sta[i][0] = splineIntersection(spline=splines[i], line=offset_olp_line, u0=idx_LE[i])
+                
+                if i < n_plies:
+                    idx_olp_sta[i][1] = splineIntersection(spline=splines[i+1], line=offset_olp_line, u0=idx_LE[i])
                 
             ### Store variables
             self.guides['line_overlap_start'] = overlap_line
             self.indexes['idx_olp_sta'] = idx_olp_sta
+            self.indexes['idx_top_sta'] = idx_top_sta
         
         # Bottom skin plot
         fig, ax = plt.subplots(figsize=(10,6))
         
         for i in range(n_plies+1):
             
-            t = np.arange(int(np.ceil(idx_olp_sta[i]))).tolist()
+            t = np.arange(int(np.ceil(idx_olp_sta[i][0]))).tolist()
             
-            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
-                t += [idx_olp_sta[i]]
+            if idx_olp_sta[i][0] % int(idx_olp_sta[i][0]) != 0:
+                t += [idx_olp_sta[i][0]]
                 
             self.t['t_bot'][i] = t
             
@@ -214,8 +234,8 @@ class Section:
             else:
                 t = [idx_te_bot[i]]
             
-            t += np.arange(np.ceil(idx_te_bot[i]),np.ceil(idx_olp_sta[i])).tolist()
-            t += [idx_olp_sta[i]]
+            t += np.arange(np.ceil(idx_te_bot[i]),np.ceil(idx_olp_sta[i][0])).tolist()
+            t += [idx_olp_sta[i][0]]
             
             self.t['t_splines_bot'][i] = t
             
@@ -278,6 +298,7 @@ class Section:
                 
         # Ply curves
         t_plies_bot = {}
+        
         for i in range(n_plies):
             t_plies_bot[i+1] = {}
             
@@ -288,7 +309,21 @@ class Section:
                     [x for x in self.t['t_splines_bot'][i] if
                      x > self.indexes['idx_ply_cut_bot'][i]]
                 
-            t_plies_bot[i+1][i+1] = self.t['t_splines_bot'][i+1]
+            if station.parameters['isCircle']:
+            
+                t_plies_bot[i+1][i+1] = self.t['t_splines_bot'][i+1]
+                
+            else:
+            
+                if idx_te_bot[i+1] == 0:
+                    t = []
+                else:
+                    t = [idx_te_bot[i+1]]
+                
+                t += np.arange(np.ceil(idx_te_bot[i+1]),np.ceil(idx_olp_sta[i][1])).tolist()
+                t += [idx_olp_sta[i][1]]
+                
+                t_plies_bot[i+1][i+1] = t
         
         ### Store variables
         self.t['t_plies_bot'] = t_plies_bot
@@ -340,12 +375,12 @@ class Section:
 
         for i in range(n_plies+1):
             
-            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
-                t = [idx_olp_sta[i]]
+            if idx_top_sta[i] % int(idx_top_sta[i]) != 0:
+                t = [idx_top_sta[i]]
             else:
                 t = []
                 
-            t += np.arange(np.ceil(idx_olp_sta[i]), splines[i]['u'] + 1).tolist()
+            t += np.arange(np.ceil(idx_top_sta[i]), splines[i]['u'] + 1).tolist()
             
             self.t['t_top'][i] = t
             
@@ -364,22 +399,22 @@ class Section:
             idx_te_top = {x:None for x in range(n_plies+1)}
         
         else:
-            idx_te_top = {x:splineIntersection(splines[x],te_line,idx_olp_sta[i]) 
+            idx_te_top = {x:splineIntersection(splines[x],te_line,idx_top_sta[i]) 
                 for x in range(n_plies+1)}
         
         fig, ax = plt.subplots(figsize=(10,6))
 
         for i in range(n_plies+1):
             
-            if idx_olp_sta[i] % int(idx_olp_sta[i]) != 0:
-                t = [idx_olp_sta[i]]
+            if idx_top_sta[i] % int(idx_top_sta[i]) != 0:
+                t = [idx_top_sta[i]]
             else:
                 t = []
             
             if idx_te_top[i] == None:
-                t += np.arange(np.ceil(idx_olp_sta[i]), splines[i]['u']+1).tolist()
+                t += np.arange(np.ceil(idx_top_sta[i]), splines[i]['u']+1).tolist()
             else:
-                t += np.arange(np.ceil(idx_olp_sta[i]), np.ceil(idx_te_top[i])).tolist()
+                t += np.arange(np.ceil(idx_top_sta[i]), np.ceil(idx_te_top[i])).tolist()
                 t += [idx_te_top[i]]
             
             self.t['t_splines_top'][i] = t
@@ -419,7 +454,7 @@ class Section:
                                                 splines[i+1]['y'](idx_te_top[i+1])),
                                             ang=te_line['tan'])
                     self.indexes['idx_ply_cut_top'][i] = splineIntersection(
-                        splines[i], line_cut, idx_olp_sta[i])
+                        splines[i], line_cut, idx_top_sta[i])
         
         ### Store variables
         self.indexes['idx_te_top'] = idx_te_top
@@ -496,8 +531,8 @@ if __name__ == '__main__':
                   z_offset=1500,
                   y_multiplier=1.55,
                   y_mirror=True,
-                #   path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
-                  path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
+                  path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
+                #   path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
                   )
     
     # sta = Station(chord=906.8,
