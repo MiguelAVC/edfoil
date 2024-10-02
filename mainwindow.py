@@ -259,20 +259,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             aspect_ratio = QSizeF(16,9)
             
             xy_range = data.xyRange()
-            print(xy_range)
+            # print(xy_range)
             x_min, x_max = xy_range[0]
             y_min, y_max = xy_range[1]
             
             dx = x_max - x_min
             dy = y_max - y_min
-            print(f'dx: {dx}, dy: {dy}')
+            # print(f'dx: {dx}, dy: {dy}')
             
             aspect_ratio.scale(dx,dy,Qt.KeepAspectRatioByExpanding)
-            print(f'Scaled aspect ratio: {aspect_ratio}')
+            # print(f'Scaled aspect ratio: {aspect_ratio}')
             
             height = aspect_ratio.height()
             width = aspect_ratio.width()
-            print(f'height: {height}, width: {width}')
+            # print(f'height: {height}, width: {width}')
             
             x_mid = (x_min + x_max) / 2
             y_mid = (y_min + y_max) / 2
@@ -667,9 +667,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         chart.setAnimationOptions(QChart.SeriesAnimations)
         chart.legend().hide()
         chart.addSeries(data)
-        # chart.setTitle(title)
         
-        # chart.createDefaultAxes()
         axisX = QValueAxis()
         axisY = QValueAxis()
         # axisX.setTitleText('x [-]')
