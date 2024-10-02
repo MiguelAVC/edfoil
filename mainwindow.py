@@ -89,8 +89,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_uploadairfoil_button.clicked.connect(self.upload_airfoil_file)
         
         # Main chart
-        self.station_chart = self.graph_template()
-        self.station_chartview.setChart(self.station_chart)
+        self.station_chart_empty = self.graph_template()
+        self.station_chartview.setChart(self.station_chart_empty)
         self.station_chartview.mouseMoveEvent = self.station_mousecoords
         
         # Signals
@@ -253,25 +253,47 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             chart.legend().hide()
             chart.addSeries(airfoil_series)
             chart.addSeries(scatter_series)
-
-            chart.createDefaultAxes()
             
-            # self.equal_axes(chart=chart, range_values=data.xyRange())
-            self.station_chartview.setChart(chart)
-            # self.station_chart.zoom(0.9)
-            area =chart.plotArea() 
-            print(area)
-            w = area.width()
-            h = area.height()
-            print(f'w: {w}, h: {h}')
-            new_QSF = QSizeF(w,h)
+            x_axis = QValueAxis()
+            y_axis = QValueAxis()
+            aspect_ratio = QSizeF(16,9)
             
             xy_range = data.xyRange()
-            dx = xy_range[0][1] - xy_range[0][0]
-            dy = xy_range[1][1] - xy_range[1][0]
-            new_QSF.scale(dx,dy,Qt.KeepAspectRatio)
-            new_QRF = QRectF(QPointF(xy_range[0][0],xy_range[1][1]),new_QSF)
-            chart.setPlotArea(new_QRF)
+            print(xy_range)
+            x_min, x_max = xy_range[0]
+            y_min, y_max = xy_range[1]
+            
+            dx = x_max - x_min
+            dy = y_max - y_min
+            print(f'dx: {dx}, dy: {dy}')
+            
+            aspect_ratio.scale(dx,dy,Qt.KeepAspectRatioByExpanding)
+            print(f'Scaled aspect ratio: {aspect_ratio}')
+            
+            height = aspect_ratio.height()
+            width = aspect_ratio.width()
+            print(f'height: {height}, width: {width}')
+            
+            x_mid = (x_min + x_max) / 2
+            y_mid = (y_min + y_max) / 2
+            
+            new_x_min = x_mid - width * 0.5 * 1.1
+            new_x_max = x_mid + width * 0.5 * 1.1
+            
+            new_y_min = y_mid - height * 0.5 * 1.1
+            new_y_max = y_mid + height * 0.5 * 1.1
+            
+            x_axis.setRange(new_x_min, new_x_max)
+            y_axis.setRange(new_y_min, new_y_max)
+            
+            chart.addAxis(x_axis, Qt.AlignBottom)
+            chart.addAxis(y_axis, Qt.AlignLeft)
+            airfoil_series.attachAxis(x_axis)
+            airfoil_series.attachAxis(y_axis)
+            scatter_series.attachAxis(x_axis)
+            scatter_series.attachAxis(y_axis)
+
+            self.station_chartview.setChart(chart)
             
             # Store it as an unsaved station
             self.edits['__station__'] = data
@@ -623,12 +645,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def station_mousecoords(self, event: QMouseEvent) -> str:
         coords = event.position()
         x,y = coords.x(), coords.y()
-        coord_lims = self.station_chart.plotArea().getCoords()
+        coord_lims = self.station_chartview.chart().plotArea().getCoords()
         
         if (x >= coord_lims[0] and x <= coord_lims[2] and
             y >= coord_lims[1] and y <= coord_lims[3]):
             
-            coords_scaled = self.station_chart.mapToValue(coords)
+            coords_scaled = self.station_chartview.chart().mapToValue(coords)
             x_scaled = coords_scaled.x()
             y_scaled = coords_scaled.y()
             
