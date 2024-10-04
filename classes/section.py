@@ -10,8 +10,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import CubicSpline
-from shapely import LineString, offset_curve, Polygon
+from shapely import Polygon
 
 from utils.utils import (splineConstructor, lineConstructor, skinOverlapLocator,
                          splineIntersection, trailingEdgeThickness)
@@ -59,7 +58,7 @@ class Section:
                            }
         
         # self.splines = {} defined later
-        self.lines = {}
+        self.points = {}
         self.guides = {}
         self.indexes = {}
         self.indexes['idx_ply_cut_bot'] = {}
@@ -335,6 +334,8 @@ class Section:
         self.t['t_plies_bot'] = t_plies_bot
             
         # Generate ply graphs
+        pts_bot_1 = {}
+        
         for i in range(1,n_plies+1):
             
             fig, ax = plt.subplots(figsize=(10,6))
@@ -344,27 +345,39 @@ class Section:
             c1 = splines[idx_curves[0]]
             c2 = splines[idx_curves[1]]
             
+            pts_bot_1[i] = {}
+            
+            # Outer curve
+            pts_bot_1[i][0] = {axis:c1[axis](t_plies_bot[i][idx_curves[0]]) for axis in ['x','y']}
+            
             ax.plot(c1['x'](t_plies_bot[i][idx_curves[0]]),
                     c1['y'](t_plies_bot[i][idx_curves[0]]),
                     label = 'Outer curve')
+            
+            # Inner curve
+            pts_bot_1[i][1] = {axis:c2[axis](t_plies_bot[i][idx_curves[1]]) for axis in ['x','y']}
             
             ax.plot(c2['x'](t_plies_bot[i][idx_curves[1]]),
                     c2['y'](t_plies_bot[i][idx_curves[1]]),
                     label = 'Inner curve')
             
             # TE side line
-            x_edge_right = (c1['x'](t_plies_bot[i][idx_curves[0]][0]),
+            x_edge_left = (c1['x'](t_plies_bot[i][idx_curves[0]][0]),
                             c2['x'](t_plies_bot[i][idx_curves[1]][0]))
-            y_edge_right = (c1['y'](t_plies_bot[i][idx_curves[0]][0]),
+            y_edge_left = (c1['y'](t_plies_bot[i][idx_curves[0]][0]),
                             c2['y'](t_plies_bot[i][idx_curves[1]][0]))
             
-            ax.plot(x_edge_right, y_edge_right, label = 'Right edge')
+            pts_bot_1[i][2] = {'x':x_edge_left, 'y':y_edge_left}
+            
+            ax.plot(x_edge_left, y_edge_left, label = 'Right edge')
             
             # Left edge line
             x_edge_right = (c1['x'](t_plies_bot[i][idx_curves[0]][-1]),
                             c2['x'](t_plies_bot[i][idx_curves[1]][-1]))
             y_edge_right = (c1['y'](t_plies_bot[i][idx_curves[0]][-1]),
                             c2['y'](t_plies_bot[i][idx_curves[1]][-1]))
+            
+            pts_bot_1[i][3] = {'x':x_edge_right, 'y':y_edge_right}
             
             ax.plot(x_edge_right, y_edge_right, label = 'Left edge')
             
@@ -375,7 +388,10 @@ class Section:
             if saveFig:
                 fig.savefig(f'Ply{i}_bot.png', dpi=800)
             plt.close(fig)
-                
+        
+        ### Store points
+        self.points['bot_1'] = pts_bot_1
+        
         # Top skin graph
         fig, ax = plt.subplots(figsize=(10,6))
 
@@ -483,6 +499,8 @@ class Section:
         self.t['t_plies_top'] = t_plies_top
         
         # Generate top plies
+        pts_top_1 = {}
+        
         for i in range(1,n_plies+1):
             
             fig, ax = plt.subplots(figsize=(10,6))
@@ -492,27 +510,39 @@ class Section:
             c1 = splines[idx_curves[0]]
             c2 = splines[idx_curves[1]]
             
+            pts_top_1[i] = {}
+            
+            # Outer curve
+            pts_top_1[i][0] = {axis:c1[axis](t_plies_top[i][idx_curves[0]]) for axis in ['x','y']}
+            
             ax.plot(c1['x'](t_plies_top[i][idx_curves[0]]),
                     c1['y'](t_plies_top[i][idx_curves[0]]),
                     label = 'Outer curve')
+            
+            # Inner curve
+            pts_top_1[i][1] = {axis:c2[axis](t_plies_top[i][idx_curves[1]]) for axis in ['x','y']}
             
             ax.plot(c2['x'](t_plies_top[i][idx_curves[1]]),
                     c2['y'](t_plies_top[i][idx_curves[1]]),
                     label = 'Inner curve')
             
             # TE side line
-            x_edge_right = (c1['x'](t_plies_top[i][idx_curves[0]][0]),
+            x_edge_left = (c1['x'](t_plies_top[i][idx_curves[0]][0]),
                             c2['x'](t_plies_top[i][idx_curves[1]][0]))
-            y_edge_right = (c1['y'](t_plies_top[i][idx_curves[0]][0]),
+            y_edge_left = (c1['y'](t_plies_top[i][idx_curves[0]][0]),
                             c2['y'](t_plies_top[i][idx_curves[1]][0]))
             
-            ax.plot(x_edge_right, y_edge_right, label = 'Right edge')
+            pts_top_1[i][2] = {'x':x_edge_left, 'y':y_edge_left}
+            
+            ax.plot(x_edge_left, y_edge_left, label = 'Right edge')
             
             # Left edge line
             x_edge_right = (c1['x'](t_plies_top[i][idx_curves[0]][-1]),
                             c2['x'](t_plies_top[i][idx_curves[1]][-1]))
             y_edge_right = (c1['y'](t_plies_top[i][idx_curves[0]][-1]),
                             c2['y'](t_plies_top[i][idx_curves[1]][-1]))
+            
+            pts_top_1[i][3] = {'x':x_edge_right, 'y':y_edge_right}
             
             ax.plot(x_edge_right, y_edge_right, label = 'Left edge')
             
@@ -523,61 +553,40 @@ class Section:
             if saveFig:
                 fig.savefig(f'Ply{i}_top.png', dpi=800)
             plt.close(fig)
+            
+        self.points['top_1'] = pts_top_1
         
     def plotSection(self):
         
         fig, ax = plt.subplots(figsize=(10,6))
         
         n_plies = self.parameters['n_plies']
-        t_plies = [self.t['t_plies_top'], self.t['t_plies_bot']]
         
         cmap = plt.get_cmap('rainbow')
         colours = [cmap(x/n_plies) for x in range(n_plies)]
         
         for i in range(1,n_plies+1):
             
-            for j in range(2):
-                
-                label = f'Ply {i}' if j == 0 else None
-                    
-                idx_c = list(t_plies[j][i].keys())
+            ax.plot(self.points['bot_1'][i][0]['x'],self.points['bot_1'][i][0]['y'],
+                    label = f'Ply {i}', c = colours[i-1])
+            ax.plot(self.points['top_1'][i][0]['x'],self.points['top_1'][i][0]['y'],
+                    label = None, c = colours[i-1])
             
-                c1 = self.splines[idx_c[0]]
-                c2 = self.splines[idx_c[1]]
-                
-                ax.plot(c1['x'](t_plies[j][i][idx_c[0]]),
-                        c1['y'](t_plies[j][i][idx_c[0]]),
-                        label = label, c = colours[i-1])
-                
-                ax.plot(c2['x'](t_plies[j][i][idx_c[1]]),
-                        c2['y'](t_plies[j][i][idx_c[1]]),
+            for j in range(1,4):
+                ax.plot(self.points['bot_1'][i][j]['x'],self.points['bot_1'][i][j]['y'],
                         label = None, c = colours[i-1])
-                
-                # TE side line
-                x_edge_right = (c1['x'](t_plies[j][i][idx_c[0]][0]),
-                                c2['x'](t_plies[j][i][idx_c[1]][0]))
-                y_edge_right = (c1['y'](t_plies[j][i][idx_c[0]][0]),
-                                c2['y'](t_plies[j][i][idx_c[1]][0]))
-                
-                ax.plot(x_edge_right, y_edge_right, label = None, c = colours[i-1])
-                
-                # Left edge line
-                x_edge_right = (c1['x'](t_plies[j][i][idx_c[0]][-1]),
-                                c2['x'](t_plies[j][i][idx_c[1]][-1]))
-                y_edge_right = (c1['y'](t_plies[j][i][idx_c[0]][-1]),
-                                c2['y'](t_plies[j][i][idx_c[1]][-1]))
-                
-                ax.plot(x_edge_right, y_edge_right, label = None, c = colours[i-1])
+                ax.plot(self.points['top_1'][i][j]['x'],self.points['top_1'][i][j]['y'],
+                        label = None, c = colours[i-1])
             
-            # Figure properties
-            figProperties(ax=ax, title=f'Full Section')
+        # Figure properties
+        figProperties(ax=ax, title=f'Full Section')
+        
+        self.figs['full'] = fig
+        if saveFig:
+            fig.savefig(f'Section.png', dpi=800)
+        plt.close(fig)
             
-            self.figs['full'] = fig
-            if saveFig:
-                fig.savefig(f'Section.png', dpi=800)
-            plt.close(fig)
-            
-    def jiggle(self, overlap_dist:float):
+    def jiggle(self, overlap_dist:float) -> None:
         
         n_plies = self.parameters['n_plies']
         last_spline = self.splines[n_plies]
@@ -643,7 +652,7 @@ class Section:
                 t_bot_3[i][j] += np.arange(np.ceil(t_target[i][j][0]),np.ceil(t_target[i][j][1])).tolist()
                 t_bot_3[i][j] += [float(t_target[i][j][1])]
         
-        self.t['t_bot_3'] = t_bot_3
+        self.t['bot_3'] = t_bot_3
         
         # Jiggle PART 2 (Vertical part)
         x_bot_2 = {}
@@ -689,7 +698,7 @@ class Section:
         x_bot_2 = {ply:[float(x) for x in values] for ply,values in x_bot_2.items()}
         y_bot_2 = {ply:[float(y) for y in values] for ply,values in y_bot_2.items()}
         
-        self.lines['bot_2'] = {'x':x_bot_2,'y':y_bot_2}
+        self.points['bot_2'] = {'x':x_bot_2,'y':y_bot_2}
         
         # Plot
         fig, ax = plt.subplots(figsize=(10,6))
@@ -699,17 +708,23 @@ class Section:
         cmap = plt.get_cmap('rainbow')
         colours = [cmap(x/(n_plies)) for x in range(n_plies)]
         
-        # OVERLAP
+        # BOT_3 - OVERLAP
+        pts_bot_3 = {}
         
         for i in range(1,n_plies+1):
             idx_c = list(t_bot_3[i].keys())
+            pts_bot_3[i] = {}
             
             # First curve
+            pts_bot_3[i][0] = {axis:c_offset[i-1][axis](t_bot_3[i][idx_c[0]]) for axis in ['x','y']}
+            
             ax.plot(c_offset[i-1]['x'](t_bot_3[i][idx_c[0]]),
                     c_offset[i-1]['y'](t_bot_3[i][idx_c[0]]),
                     c = colours[i-1], label = f'Ply {i}')
             
             # Second curve
+            pts_bot_3[i][1] = {axis:c_offset[i][axis](t_bot_3[i][idx_c[1]]) for axis in ['x','y']}
+            
             ax.plot(c_offset[i]['x'](t_bot_3[i][idx_c[1]]),
                     c_offset[i]['y'](t_bot_3[i][idx_c[1]]),
                     c = colours[i-1], label = None)
@@ -720,6 +735,8 @@ class Section:
             y_edge_left = (c_offset[i-1]['y'](t_bot_3[i][idx_c[0]][0]),
                             c_offset[i]['y'](t_bot_3[i][idx_c[1]][0]))
             
+            pts_bot_3[i][2] = {'x':x_edge_left, 'y':y_edge_left}
+            
             ax.plot(x_edge_left, y_edge_left, label = None, c = colours[i-1])
             
             # Right edge
@@ -728,46 +745,24 @@ class Section:
             y_edge_right = (c_offset[i-1]['y'](t_bot_3[i][idx_c[0]][-1]),
                             c_offset[i]['y'](t_bot_3[i][idx_c[1]][-1]))
             
+            pts_bot_3[i][3] = {'x':x_edge_right, 'y':y_edge_right}
+            
             ax.plot(x_edge_right, y_edge_right, label = None, c = colours[i-1])
+            
+        self.points['bot_3'] = pts_bot_3
         
-        # SKIN
+        # BOT_1 AND TOP_1 - SKIN
+        for i in range(1,n_plies+1):
+            for j in range(4):
+                
+                ax.plot(self.points['bot_1'][i][j]['x'],self.points['bot_1'][i][j]['y'],
+                        label = None, c = colours[i-1])
+                ax.plot(self.points['top_1'][i][j]['x'],self.points['top_1'][i][j]['y'],
+                        label = None, c = colours[i-1])
         
+        # BOT_2 - JIGGLE
         for i in range(1,n_plies+1):
             
-            for j in range(2):
-                    
-                idx_c = list(t_plies[j][i].keys())
-            
-                c1 = self.splines[idx_c[0]]
-                c2 = self.splines[idx_c[1]]
-                
-                ax.plot(c1['x'](t_plies[j][i][idx_c[0]]),
-                        c1['y'](t_plies[j][i][idx_c[0]]),
-                        label = None, c = colours[i-1])
-                
-                ax.plot(c2['x'](t_plies[j][i][idx_c[1]]),
-                        c2['y'](t_plies[j][i][idx_c[1]]),
-                        label = None, c = colours[i-1])
-                
-                # TE side line
-                x_edge_right = (c1['x'](t_plies[j][i][idx_c[0]][0]),
-                                c2['x'](t_plies[j][i][idx_c[1]][0]))
-                y_edge_right = (c1['y'](t_plies[j][i][idx_c[0]][0]),
-                                c2['y'](t_plies[j][i][idx_c[1]][0]))
-                
-                ax.plot(x_edge_right, y_edge_right, label = None, c = colours[i-1])
-                
-                # Left edge line
-                x_edge_right = (c1['x'](t_plies[j][i][idx_c[0]][-1]),
-                                c2['x'](t_plies[j][i][idx_c[1]][-1]))
-                y_edge_right = (c1['y'](t_plies[j][i][idx_c[0]][-1]),
-                                c2['y'](t_plies[j][i][idx_c[1]][-1]))
-                
-                ax.plot(x_edge_right, y_edge_right, label = None, c = colours[i-1])
-        
-        # JIGGLE
-        
-        for i in range(1,n_plies+1):
             ax.plot(x_bot_2[i],y_bot_2[i],label=None, c=colours[i-1])
         
         # Figure properties
@@ -778,13 +773,14 @@ class Section:
             fig.savefig(f'Jiggle.png', dpi=800)
         plt.close(fig)
         
-    def section_info(self) -> str:
+    def section_info(self) -> None:
         output = f'Station instance name: {self.name}\n'
         output += f'Parameters: {list(self.parameters.keys())}\n'
         output += f'Guides: {list(self.guides.keys())}\n'
         output += f'Indexes: {list(self.indexes.keys())}\n'
         output += f't-parameters: {list(self.t.keys())}\n'
-        output += f'CubicSplines: {list(self.splines.keys())}'
+        output += f'CubicSplines: {list(self.splines.keys())}\n'
+        output += f'Points: {list(self.points.keys())}'
         
         return print(output)
 
