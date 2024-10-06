@@ -253,8 +253,8 @@ def progressTime(func):
         print('- Completed in {:.3f}s.\n'.format(elapsed_time))
         
         # save changes to database
-        if result is not None:
-            saveDB(db=kwargs['db'])
+        # if result is not None:
+        #     saveDB(db=kwargs['db'])
         
         return result
     return wrapper
