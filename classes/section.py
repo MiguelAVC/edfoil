@@ -176,7 +176,7 @@ class Section:
                 if i < n_plies:
                     
                     idx_olp_sta[i][1] = splineIntersection(spline = splines[i+1],
-                        line = offset_olp_line, u0 = idx_LE[i])
+                        line = offset_olp_line, u0 = idx_LE[i+1])
                 
             # Store variables
             self.guides['line_overlap_start'] = overlap_line
@@ -614,7 +614,7 @@ class Section:
         
         self.figs['full'] = fig
         
-        if saveFig:
+        if self.parameters['saveFig']:
             
             fig.savefig(f'Section.png', dpi = 800)
             
@@ -624,12 +624,13 @@ class Section:
         
         # Variables
         n_plies = self.parameters['n_plies']
-        last_spline = self.splines[n_plies]
+        base_spline = self.splines[0]
         
         # Inner spline data
-        lspl_t = np.arange(np.floor(self.indexes['idx_LE'][n_plies]), last_spline['u']+1)
-        lspl_x = last_spline['x'](lspl_t)
-        lspl_y = last_spline['y'](lspl_t)
+        # lspl_t = np.arange(np.floor(self.indexes['idx_LE'][n_plies]), base_spline['u']+1)
+        lspl_t = np.arange(0, base_spline['u']+1)
+        lspl_x = base_spline['x'](lspl_t)
+        lspl_y = base_spline['y'](lspl_t)
         lspl_xy = list(zip(lspl_x,lspl_y))
         
         # Offset inner spline
@@ -638,7 +639,7 @@ class Section:
         
         for i in range(n_plies+1):
             
-            thk = round(self.parameters['ply_thickness']*i +1, 2)
+            thk = round(self.parameters['ply_thickness']*(i+n_plies) +1, 2)
             c_buffer = curve_0.buffer(-thk)
             c_simplified = c_buffer.simplify(tolerance = 0.01)
             c_offset[i] = splineConstructor(np.array(c_simplified.exterior.coords))
@@ -646,8 +647,11 @@ class Section:
         # Overlap end guide
         p_olp_sta = self.guides['line_overlap_start']['p']
         
-        t_target = skinOverlapLocator(d_target=overlap_dist, p0=p_olp_sta,
-            twist_ang=self.parameters['twist_angle'], spline=c_offset[0], u0=0)
+        u0 = splineIntersection(spline = c_offset[0], 
+            line = self.guides['line_chord'], u0 = 0)
+        
+        t_target = skinOverlapLocator(d_target = overlap_dist, p0 = p_olp_sta,
+            twist_ang = self.parameters['twist_angle'], spline = c_offset[0], u0 = u0)
         
         # Intersection coordinates
         p0 = np.array([c_offset[0]['x'](t_target,0),
@@ -669,16 +673,22 @@ class Section:
             line_end = line_olp_end
             
             # First curve of ply
+            u0 = splineIntersection(spline = c_offset[i-1],
+                line = self.guides['line_chord'], u0 = 0)
+            
             t_target[i][i-1] = {}
             t_target[i][i-1][0] = splineIntersection(spline = c_offset[i-1], 
-                line = line_start, u0 = 0)
+                line = line_start, u0 = u0)
             t_target[i][i-1][1] = splineIntersection(spline = c_offset[i-1],
                 line = line_end, u0 = t_target[i][i-1][0])
             
             # Second curve of ply
+            u0 = splineIntersection(spline = c_offset[i],
+                line = self.guides['line_chord'], u0 = 0)
+            
             t_target[i][i] = {}
             t_target[i][i][0] = splineIntersection(spline = c_offset[i],
-                line = line_start, u0 = 0)
+                line = line_start, u0 = u0)
             t_target[i][i][1] = splineIntersection(spline = c_offset[i],
                 line = line_end, u0 = t_target[i][i][0])
             
@@ -745,9 +755,9 @@ class Section:
                 x_bot_2[i].append(c_offset[i-1]['x'](t_target))
                 y_bot_2[i].append(c_offset[i-1]['y'](t_target))
                 
-            # Point 4
-            x_bot_2[i].append(c_offset[i-1]['x'](t_bot_3[i][i][0]))
-            y_bot_2[i].append(c_offset[i-1]['y'](t_bot_3[i][i][0]))
+            # # Point 4
+            x_bot_2[i].append(c_offset[i-1]['x'](t_bot_3[i][i-1][0]))
+            y_bot_2[i].append(c_offset[i-1]['y'](t_bot_3[i][i-1][0]))
             
             # Repeating Point 1 to make closed shape
             x_bot_2[i].append(x_bot_2[i][0])
@@ -818,9 +828,9 @@ class Section:
         
         self.figs['jiggle'] = fig
         
-        if saveFig:
+        if self.parameters['saveFig']:
             
-            fig.savefig(f'Jiggle.png', dpi=800)
+            fig.savefig(f'Jiggle.png', dpi = 800)
             
         plt.close(fig)
         
@@ -837,39 +847,66 @@ class Section:
         
         return print(output)
 
-# %% Example
+# %% Tests
 
 if __name__ == '__main__':
     
-    # Arguments
-    sta = Station(chord=1334,
-                  twist_angle=24.3,
-                  x_offset=-474.26,
-                  y_offset=255,
-                  z_offset=1500,
-                  y_multiplier=1.55,
-                  y_mirror=True,
-                  path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
-                #   path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
-                  )
+    switch = 2
     
-    # sta = Station(chord=906.8,
-    #             twist_angle=6.7,
-    #             x_offset=-317.88,
-    #             y_offset=50,
-    #             z_offset=5000,
-    #             y_mirror=True,
-    #             path=os.path.join(os.getcwd(),'airfoils','NACA63417.txt'),
-    #             )
+    # Debug (#3)
+    if switch == 1:
     
-    offset_distance = 1
-    n_plies = 8
-    saveFig = False
-    overlap_target = 44.022 #200
-    trailing_edge_thickness = 8 # mm
+        # Arguments
+        sta = Station(chord=1334,
+                    twist_angle=24.3,
+                    x_offset=-474.26,
+                    y_offset=255,
+                    z_offset=1500,
+                    y_multiplier=1.55,
+                    y_mirror=True,
+                    path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
+                    #   path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
+                    )
+        
+        # sta = Station(chord=906.8,
+        #             twist_angle=6.7,
+        #             x_offset=-317.88,
+        #             y_offset=50,
+        #             z_offset=5000,
+        #             y_mirror=True,
+        #             path=os.path.join(os.getcwd(),'airfoils','NACA63417.txt'),
+        #             )
+        
+        offset_distance = 1
+        n_plies = 8
+        saveFig = False
+        overlap_target = 44.022 #200
+        trailing_edge_thickness = 8 # mm
+        
+        db = Section(station=sta, n_plies=n_plies, ply_thickness=offset_distance,
+                    overlap_target=overlap_target, te_thickness=trailing_edge_thickness,
+                    saveFig=saveFig)
+        
+        db.jiggle(86.71)
     
-    db = Section(station=sta, n_plies=n_plies, ply_thickness=offset_distance,
-                 overlap_target=overlap_target, te_thickness=trailing_edge_thickness,
-                 saveFig=saveFig)
-    
-    db.jiggle(86.71)
+    # Debug (#8)
+    elif switch == 2:
+        
+        sta = Station(chord=768.7,
+                    twist_angle=5.2,
+                    x_offset=-270.03,
+                    y_offset=25,
+                    z_offset=6000,
+                    y_mirror=True,
+                    path=os.path.join(os.getcwd(),'airfoils','NACA63416.txt'),
+                    )
+        
+        db = Section(station=sta,
+                    n_plies=8,
+                    ply_thickness=1,
+                    overlap_target=38.1787666667,
+                    te_thickness=8,
+                    saveFig=False)
+        
+        db.jiggle(40)
+        db.figs['jiggle'].show()
