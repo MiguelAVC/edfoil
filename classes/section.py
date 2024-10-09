@@ -519,7 +519,7 @@ class Section:
 
                 if np.abs(d) > 0.5 * ply_thickness:
                     
-                    print(f'Curve {i} does need trim.')
+                    # print(f'Curve {i} trimmed.')
                     
                     line_cut = lineConstructor(p0 = (splines[i+1]['x'](idx_te_top[i+1]),
                         splines[i+1]['y'](idx_te_top[i+1])), ang = te_line['tan'])
@@ -623,6 +623,11 @@ class Section:
         plt.close(fig)
             
     def jiggle(self, overlap_dist:float, bond_thickness:float=2.0) -> None:
+        
+        # Error handling for circular airfoil
+        if self.parameters['isCircle']:
+            
+            return print(f'Method is not implemented for circular airfoils.')
         
         # Variables
         n_plies = self.parameters['n_plies']
@@ -814,8 +819,6 @@ class Section:
                 
                 t_bot_1[i][j] = [x for x in self.t['bot_plies'][i][j] if x < t]
                 t_bot_1[i][j] += [t]
-            
-            print(f'Ply {i}: {t_bot_1[i]}')
                 
             # XY Points
             # Outer Curve
@@ -848,8 +851,6 @@ class Section:
         t_bond[0][0] = [float(t_sta)] + [float(x) for x in np.arange(
             self.splines[n_plies]['u']) if x > t and x < t_end] + [float(t_end)]
         
-        print(t_bond[0][0])
-        
         u0 = splineIntersection(spline = c_offset[0], line = self.guides['chord'], u0 = 0)
         
         t_sta = splineIntersection(spline = c_offset[0],
@@ -860,8 +861,6 @@ class Section:
         
         t_bond[0][1] = [float(t_sta)] + [float(x) for x in np.arange(
             c_offset[0]['u']) if x > t and x < t_end] + [float(t_end)]
-        
-        print(t_bond[0][0])
         
         pts_bond = {x:{} for x in range(2)}
         
@@ -945,31 +944,22 @@ class Section:
 
 if __name__ == '__main__':
     
-    switch = 1
+    switch = 3
     
     # Debug (#3)
     if switch == 1:
     
         # Arguments
-        sta = Station(chord=1334,
-                    twist_angle=24.3,
-                    x_offset=-474.26,
-                    y_offset=255,
-                    z_offset=1500,
-                    y_multiplier=1.55,
-                    y_mirror=True,
-                    path=os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
-                    #   path=os.path.join(os.getcwd(),'airfoils','circle.txt'),
-                    )
-        
-        # sta = Station(chord=906.8,
-        #             twist_angle=6.7,
-        #             x_offset=-317.88,
-        #             y_offset=50,
-        #             z_offset=5000,
-        #             y_mirror=True,
-        #             path=os.path.join(os.getcwd(),'airfoils','NACA63417.txt'),
-        #             )
+        sta = Station(chord = 1334,
+                      twist_angle = 24.3,
+                      x_offset = -474.26,
+                      y_offset = 255,
+                      z_offset = 1500,
+                      y_multiplier = 1.55,
+                      y_mirror = True,
+                      path = os.path.join(os.getcwd(),'airfoils','NACA63430.txt'),
+                      #   path = os.path.join(os.getcwd(),'airfoils','circle.txt'),
+                     )
         
         offset_distance = 1
         n_plies = 8
@@ -977,31 +967,65 @@ if __name__ == '__main__':
         overlap_target = 44.022
         trailing_edge_thickness = 8 # mm
         
-        db = Section(station=sta, n_plies=n_plies, ply_thickness=offset_distance,
-                    overlap_target=overlap_target, te_thickness=trailing_edge_thickness,
-                    saveFig=saveFig)
+        db = Section(station = sta,
+                     n_plies = n_plies,
+                     ply_thickness = offset_distance,
+                     overlap_target = overlap_target,
+                     te_thickness = trailing_edge_thickness,
+                     saveFig = saveFig)
         
         db.jiggle(86.71, bond_thickness = 1)
-        db.figs['jiggle'].show()
+        # db.figs['jiggle'].show()
     
     # Debug (#8)
     elif switch == 2:
         
-        sta = Station(chord=768.7,
-                    twist_angle=5.2,
-                    x_offset=-270.03,
-                    y_offset=25,
-                    z_offset=6000,
-                    y_mirror=True,
-                    path=os.path.join(os.getcwd(),'airfoils','NACA63416.txt'),
-                    )
+        sta = Station(chord = 768.7,
+                      twist_angle = 5.2,
+                      x_offset = -270.03,
+                      y_offset = 25,
+                      z_offset = 6000,
+                      y_mirror = True,
+                      path = os.path.join(os.getcwd(),'airfoils','NACA63416.txt'),
+                     )
         
-        db = Section(station=sta,
-                    n_plies=8,
-                    ply_thickness=1,
-                    overlap_target=38.1787666667,
-                    te_thickness=8,
-                    saveFig=False)
+        db = Section(station = sta,
+                     n_plies = 8,
+                     ply_thickness = 1,
+                     overlap_target = 38.1787666667,
+                     te_thickness = 8,
+                     saveFig = False)
         
         db.jiggle(overlap_dist = 40, bond_thickness = 1)
-        db.figs['jiggle'].show()
+        # db.figs['jiggle'].show()
+        
+    elif switch == 3:
+        
+        data = ['NACA63416',739,4.8,-260,20,6250,1,1,1,False,True]
+        data_sec = [8,1,38.178766667,8,1,True,False,6]
+        
+        sta = Station(chord = data[1],
+                      twist_angle = data[2],
+                      x_offset = data[3],
+                      y_offset = data[4],
+                      z_offset = data[5],
+                      x_multiplier = data[6],
+                      y_multiplier = data[7],
+                      z_multiplier = data[8],
+                      x_mirror = data[9],
+                      y_mirror = data[10],
+                      path=os.path.join(os.getcwd(),'airfoils',f'{data[0]}.txt'),
+                     )
+        
+        sec = Section(station = sta,
+                      n_plies = data_sec[0],
+                      ply_thickness = data_sec[1],
+                      overlap_target = data_sec[2],
+                      te_thickness = data_sec[3],
+                      bond_thickness = data_sec[4],
+                      genFig = data_sec[5],
+                      saveFig = data_sec[6],
+                      tolerance = data_sec[7],
+                     )
+        
+        sec.jiggle(overlap_dist = 40, bond_thickness = 1)
