@@ -46,6 +46,7 @@ class Section:
                  ply_thickness:float,
                  overlap_target:float,
                  te_thickness:float = 8,
+                 bond_thickness:float = 1,
                  genFig:bool = True,
                  saveFig:bool = False,
                  tolerance:int = 6, # Tolerance for decimal places ACIS
@@ -56,6 +57,7 @@ class Section:
                            'ply_thickness': ply_thickness,
                            'overlap_target': overlap_target,
                            'te_thickness': te_thickness,
+                           'bond_thickness': bond_thickness,
                            'saveFig': saveFig,
                            'base_airfoil': station.airfoil,
                            'z':station.parameters['offset'][2],
@@ -66,11 +68,11 @@ class Section:
         self.points = {}
         self.guides = {}
         self.indexes = {}
-        self.indexes['idx_ply_cut_bot'] = {}
-        self.indexes['idx_ply_cut_top'] = {}
+        self.indexes['ply_cut_bot'] = {}
+        self.indexes['ply_cut_top'] = {}
         
-        self.t = {x:{} for x in ['t_bot','t_splines_bot','t_plies_bot',
-                                 't_top','t_splines_top','t_plies_top']}
+        self.t = {x:{} for x in ['bot_ref','bot_splines','bot_plies',
+                                 'top_ref','top_splines','top_plies']}
         
         self.figs = {}
         self.name = 'skin_' + str(station.parameters['offset'][2])
@@ -89,7 +91,7 @@ class Section:
         # Chord line
         chord_line = lineConstructor(p0 = station.xy[0],
             p1 = station.xy[int(np.floor(len(station.xy)/2))])
-        self.guides['line_chord'] = chord_line
+        self.guides['chord'] = chord_line
         
         # Splines
         splines = {x:splineConstructor(curves_offset[x]) for x in range(n_plies+1)}
@@ -98,7 +100,7 @@ class Section:
         # Index LE
         idx_LE = {x:round(splineIntersection(spline = splines[x],
             line =chord_line, u0 = 21),tolerance) for x in range(n_plies+1)}
-        self.indexes['idx_LE'] = idx_LE
+        self.indexes['LE'] = idx_LE
         
         # Full skin graph
         if genFig:
@@ -129,8 +131,8 @@ class Section:
             idx_olp_sta = {x:{0:idx_LE[x]} for x in range(n_plies+1)}
             idx_top_sta = {x:idx_LE[x] for x in range(n_plies+1)}
             overlap_line = chord_line
-            self.indexes['idx_olp_sta'] = idx_olp_sta
-            self.indexes['idx_top_sta'] = idx_top_sta
+            self.indexes['olp_sta'] = idx_olp_sta
+            self.indexes['top_sta'] = idx_top_sta
             
         else:
             
@@ -152,7 +154,7 @@ class Section:
             overlap_line = lineConstructor(p0 = tuple(p0), p1 = tuple(p1))
             
             # Offset overlap line
-            self.guides['line_overlap_offset'] = {}
+            self.guides['overlap_offset'] = {}
             idx_olp_sta = {}
             idx_top_sta = {i:splineIntersection(spline = splines[i], 
                 line = overlap_line, u0 = idx_LE[i]) for i in range(n_plies+1)}
@@ -163,25 +165,25 @@ class Section:
                 idx_olp_sta[i] = {}
                 
                 # +1 here is constant for now (bonding thickness)
-                x0 = (ply_thickness * i + 1) * np.cos(overlap_line['nor']) + overlap_line['p'][0]
-                y0 = (ply_thickness * i + 1) * np.sin(overlap_line['nor']) + overlap_line['p'][1]
+                x0 = (ply_thickness * i + bond_thickness) * np.cos(overlap_line['nor']) + overlap_line['p'][0]
+                y0 = (ply_thickness * i + bond_thickness) * np.sin(overlap_line['nor']) + overlap_line['p'][1]
                 p0 = tuple([x0, y0])
                 
                 offset_olp_line = lineConstructor(p0 = p0, ang = overlap_line['tan'])
-                self.guides['line_overlap_offset'][i] = offset_olp_line
+                self.guides['overlap_offset'][i] = offset_olp_line
                 
                 idx_olp_sta[i][0] = splineIntersection(spline = splines[i],
-                    line = offset_olp_line, u0 = idx_LE[i])
+                    line = self.guides['overlap_offset'][0], u0 = idx_LE[i])
                 
                 if i < n_plies:
                     
                     idx_olp_sta[i][1] = splineIntersection(spline = splines[i+1],
-                        line = offset_olp_line, u0 = idx_LE[i+1])
+                        line = self.guides['overlap_offset'][0], u0 = idx_LE[i+1])
                 
             # Store variables
-            self.guides['line_overlap_start'] = overlap_line
-            self.indexes['idx_olp_sta'] = idx_olp_sta
-            self.indexes['idx_top_sta'] = idx_top_sta
+            self.guides['overlap_start'] = overlap_line
+            self.indexes['olp_sta'] = idx_olp_sta
+            self.indexes['top_sta'] = idx_top_sta
         
         # Bottom skin t-parameter
         
@@ -192,7 +194,7 @@ class Section:
             if idx_olp_sta[i][0] % int(idx_olp_sta[i][0]) != 0:
                 t += [idx_olp_sta[i][0]]
                 
-            self.t['t_bot'][i] = t
+            self.t['bot_ref'][i] = t
         
         # Bottom skin FIGURE
         
@@ -202,7 +204,7 @@ class Section:
             
             for i in range(n_plies+1):
                 
-                t = self.t['t_bot'][i]
+                t = self.t['bot_ref'][i]
                 
                 ax.plot(splines[i]['x'](t),splines[i]['y'](t), 
                         label = f'Curve {i}', linewidth = 0.5)
@@ -244,7 +246,7 @@ class Section:
                 line = te_line) for x in range(n_plies+1)}
         
         # Store variables
-        self.guides['line_te'] = te_line
+        self.guides['TE'] = te_line
         
 
         for i in range(n_plies+1):
@@ -258,10 +260,10 @@ class Section:
             t += np.arange(np.ceil(idx_te_bot[i]),np.ceil(idx_olp_sta[i][0])).tolist()
             t += [idx_olp_sta[i][0]]
             
-            self.t['t_splines_bot'][i] = t
+            self.t['bot_splines'][i] = t
             
         # Store variables
-        self.indexes['idx_te_bot'] = idx_te_bot
+        self.indexes['te_bot'] = idx_te_bot
             
         # Bottom graph with te trimmed
         
@@ -271,7 +273,7 @@ class Section:
             
             for i in range(n_plies+1):
                 
-                t = self.t['t_splines_bot'][i]
+                t = self.t['bot_splines'][i]
                 x_curve = splines[i]['x'](t)
                 y_curve = splines[i]['y'](t)
 
@@ -307,7 +309,7 @@ class Section:
         
         if station.parameters['isCircle']:
             
-            self.indexes['idx_ply_cut_bot'] = {}
+            self.indexes['ply_cut_bot'] = {}
             
         else:
             
@@ -327,7 +329,7 @@ class Section:
                     line_cut = lineConstructor(p0 = (splines[i+1]['x'](idx_te_bot[i+1]),
                         splines[i+1]['y'](idx_te_bot[i+1])), ang = te_line['tan'])
                     
-                    self.indexes['idx_ply_cut_bot'][i] = splineIntersection(
+                    self.indexes['ply_cut_bot'][i] = splineIntersection(
                         spline = splines[i], line = line_cut, u0 = idx_te_bot[i])
                 
         # Ply curves
@@ -337,19 +339,19 @@ class Section:
             
             t_plies_bot[i+1] = {}
             
-            if i not in self.indexes['idx_ply_cut_bot'].keys():
+            if i not in self.indexes['ply_cut_bot'].keys():
                 
-                t_plies_bot[i+1][i] = self.t['t_splines_bot'][i]
+                t_plies_bot[i+1][i] = self.t['bot_splines'][i]
                 
             else:
                 
-                t_plies_bot[i+1][i] = [self.indexes['idx_ply_cut_bot'][i]] + \
-                    [x for x in self.t['t_splines_bot'][i] if
-                     x > self.indexes['idx_ply_cut_bot'][i]]
+                t_plies_bot[i+1][i] = [self.indexes['ply_cut_bot'][i]] + \
+                    [x for x in self.t['bot_splines'][i] if
+                     x > self.indexes['ply_cut_bot'][i]]
                 
             if station.parameters['isCircle']:
             
-                t_plies_bot[i+1][i+1] = self.t['t_splines_bot'][i+1]
+                t_plies_bot[i+1][i+1] = self.t['bot_splines'][i+1]
                 
             else:
             
@@ -367,7 +369,7 @@ class Section:
                 t_plies_bot[i+1][i+1] = t
         
         # Store variables
-        self.t['t_plies_bot'] = t_plies_bot
+        self.t['bot_plies'] = t_plies_bot
             
         # Generate ply points
         pts_bot_1 = {}
@@ -420,7 +422,7 @@ class Section:
                 
             t += np.arange(np.ceil(idx_top_sta[i]), splines[i]['u'] + 1).tolist()
             
-            self.t['t_top'][i] = t
+            self.t['top_ref'][i] = t
             
         if genFig:
         
@@ -428,7 +430,7 @@ class Section:
             
             for i in range(n_plies+1):
                 
-                t = self.t['t_top'][i]
+                t = self.t['top_ref'][i]
                 
                 ax.plot(splines[i]['x'](t), splines[i]['y'](t), label = f'Curve {i}')
                 
@@ -472,7 +474,7 @@ class Section:
                 t += np.arange(np.ceil(idx_top_sta[i]), np.ceil(idx_te_top[i])).tolist()
                 t += [idx_te_top[i]]
             
-            self.t['t_splines_top'][i] = t
+            self.t['top_splines'][i] = t
         
         if genFig:
         
@@ -480,7 +482,7 @@ class Section:
             
             for i in range(n_plies+1):
                 
-                t = self.t['t_splines_top'][i]
+                t = self.t['top_splines'][i]
                 
                 ax.plot(splines[i]['x'](t), splines[i]['y'](t), label = f'Curve {i}')
             
@@ -522,7 +524,7 @@ class Section:
                     line_cut = lineConstructor(p0 = (splines[i+1]['x'](idx_te_top[i+1]),
                         splines[i+1]['y'](idx_te_top[i+1])), ang = te_line['tan'])
                     
-                    self.indexes['idx_ply_cut_top'][i] = splineIntersection(
+                    self.indexes['ply_cut_top'][i] = splineIntersection(
                         spline = splines[i], line = line_cut, u0 = idx_top_sta[i])
         
         # Store variables
@@ -535,19 +537,19 @@ class Section:
             
             t_plies_top[i+1] = {}
             
-            if i not in self.indexes['idx_ply_cut_top'].keys():
+            if i not in self.indexes['ply_cut_top'].keys():
                 
-                t_plies_top[i+1][i] = self.t['t_splines_top'][i]
+                t_plies_top[i+1][i] = self.t['top_splines'][i]
                 
             else:
                 
-                t_plies_top[i+1][i] = [x for x in self.t['t_splines_top'][i] if 
-                    x < self.indexes['idx_ply_cut_top'][i]] + [self.indexes['idx_ply_cut_top'][i]]
+                t_plies_top[i+1][i] = [x for x in self.t['top_splines'][i] if 
+                    x < self.indexes['ply_cut_top'][i]] + [self.indexes['ply_cut_top'][i]]
                 
-            t_plies_top[i+1][i+1] = self.t['t_splines_top'][i+1]
+            t_plies_top[i+1][i+1] = self.t['top_splines'][i+1]
             
         # Store variables
-        self.t['t_plies_top'] = t_plies_top
+        self.t['top_plies'] = t_plies_top
         
         # Generate top plies
         pts_top_1 = {}
@@ -620,14 +622,13 @@ class Section:
             
         plt.close(fig)
             
-    def jiggle(self, overlap_dist:float) -> None:
+    def jiggle(self, overlap_dist:float, bond_thickness:float=2.0) -> None:
         
         # Variables
         n_plies = self.parameters['n_plies']
         base_spline = self.splines[0]
         
         # Inner spline data
-        # lspl_t = np.arange(np.floor(self.indexes['idx_LE'][n_plies]), base_spline['u']+1)
         lspl_t = np.arange(0, base_spline['u']+1)
         lspl_x = base_spline['x'](lspl_t)
         lspl_y = base_spline['y'](lspl_t)
@@ -639,16 +640,16 @@ class Section:
         
         for i in range(n_plies+1):
             
-            thk = round(self.parameters['ply_thickness']*(i+n_plies) +1, 2)
+            thk = round(self.parameters['ply_thickness']*(i+n_plies) + bond_thickness, 2)
             c_buffer = curve_0.buffer(-thk)
             c_simplified = c_buffer.simplify(tolerance = 0.01)
             c_offset[i] = splineConstructor(np.array(c_simplified.exterior.coords))
         
         # Overlap end guide
-        p_olp_sta = self.guides['line_overlap_start']['p']
+        p_olp_sta = self.guides['overlap_start']['p']
         
         u0 = splineIntersection(spline = c_offset[0], 
-            line = self.guides['line_chord'], u0 = 0)
+            line = self.guides['chord'], u0 = 0)
         
         t_target = skinOverlapLocator(d_target = overlap_dist, p0 = p_olp_sta,
             twist_ang = self.parameters['twist_angle'], spline = c_offset[0], u0 = u0)
@@ -661,6 +662,7 @@ class Section:
                             c_offset[0]['x'](t_target,1)])
         
         line_olp_end = lineConstructor(p0 = tuple(p0), p1 = tuple(p1))
+        self.guides['overlap_end'] = line_olp_end
         
         # Finding t-parameter (per ply)
         t_target = {}
@@ -669,12 +671,12 @@ class Section:
             
             t_target[i] = {}
             
-            line_start = self.guides['line_overlap_offset'][i]
+            line_start = self.guides['overlap_offset'][i]
             line_end = line_olp_end
             
             # First curve of ply
             u0 = splineIntersection(spline = c_offset[i-1],
-                line = self.guides['line_chord'], u0 = 0)
+                line = self.guides['chord'], u0 = 0)
             
             t_target[i][i-1] = {}
             t_target[i][i-1][0] = splineIntersection(spline = c_offset[i-1], 
@@ -684,7 +686,7 @@ class Section:
             
             # Second curve of ply
             u0 = splineIntersection(spline = c_offset[i],
-                line = self.guides['line_chord'], u0 = 0)
+                line = self.guides['chord'], u0 = 0)
             
             t_target[i][i] = {}
             t_target[i][i][0] = splineIntersection(spline = c_offset[i],
@@ -724,22 +726,18 @@ class Section:
             y_bot_2[i] = []
             
             # Point 1
-            if i < n_plies:
-                
-                x_bot_2[i].append(self.splines[i]['x'](self.t['t_plies_bot'][i+1][i][-1]))
-                y_bot_2[i].append(self.splines[i]['y'](self.t['t_plies_bot'][i+1][i][-1]))
-                
-            else:
-                
-                t_target = splineIntersection(spline=self.splines[i], 
-                    line=self.guides['line_overlap_offset'][i], u0=self.indexes['idx_LE'][i])
-                
-                x_bot_2[i].append(self.splines[i]['x'](t_target))
-                y_bot_2[i].append(self.splines[i]['y'](t_target))
+            t_target = splineIntersection(spline=self.splines[i], 
+                line=self.guides['overlap_offset'][i], u0=self.indexes['LE'][i])
+            
+            x_bot_2[i].append(self.splines[i]['x'](t_target))
+            y_bot_2[i].append(self.splines[i]['y'](t_target))
             
             # Point 2
-            x_bot_2[i].append(self.splines[i]['x'](self.t['t_plies_bot'][i][i][-1]))
-            y_bot_2[i].append(self.splines[i]['y'](self.t['t_plies_bot'][i][i][-1]))
+            t_target = splineIntersection(spline=self.splines[i], 
+                line=self.guides['overlap_offset'][i-1], u0=self.indexes['LE'][i])
+            
+            x_bot_2[i].append(self.splines[i]['x'](t_target))
+            y_bot_2[i].append(self.splines[i]['y'](t_target))
             
             # Point 3
             if i > 1:
@@ -750,7 +748,7 @@ class Section:
             else:
                 
                 t_target = splineIntersection(spline=c_offset[i],
-                    line=self.guides['line_overlap_offset'][i-1], u0=t_bot_3[i][i-1][0])
+                    line=self.guides['overlap_offset'][i-1], u0=t_bot_3[i][i-1][0])
                 
                 x_bot_2[i].append(c_offset[i-1]['x'](t_target))
                 y_bot_2[i].append(c_offset[i-1]['y'](t_target))
@@ -800,6 +798,94 @@ class Section:
             
         self.points['bot_3'] = pts_bot_3
         
+        # Modify BOT_1
+        t_bot_1 = {}
+        pts_bot_1 = {}
+        
+        for i in range(1, n_plies+1):
+            t_bot_1[i] = {}
+            pts_bot_1[i] = {}
+            
+            for j in [i-1, i]:
+            
+                t = splineIntersection(spline = self.splines[j],
+                    line = self.guides['overlap_offset'][i-1],
+                    u0 = self.indexes['LE'][j])
+                
+                t_bot_1[i][j] = [x for x in self.t['bot_plies'][i][j] if x < t]
+                t_bot_1[i][j] += [t]
+            
+            print(f'Ply {i}: {t_bot_1[i]}')
+                
+            # XY Points
+            # Outer Curve
+            pts_bot_1[i][0] = {axis:self.splines[i-1][axis](t_bot_1[i][i-1]) for axis in ['x','y']}
+            
+            # Inner Curve
+            pts_bot_1[i][1] = {axis:self.splines[i][axis](t_bot_1[i][i]) for axis in ['x','y']}
+            
+            # TE Edge
+            pts_bot_1[i][2] = {'x':[pts_bot_1[i][c]['x'][0] for c in range(2)],
+                               'y':[pts_bot_1[i][c]['y'][0] for c in range(2)]}
+            
+            # Jig Edge
+            pts_bot_1[i][3] = {'x':[pts_bot_1[i][c]['x'][-1] for c in range(2)],
+                               'y':[pts_bot_1[i][c]['y'][-1] for c in range(2)]}
+            
+        # Updating properties
+        self.t['bot_1'] = t_bot_1
+        self.points['bot_1'] = pts_bot_1
+        
+        # Bonding t-parameter
+        t_bond = {x:{} for x in range(2)}
+        
+        t_sta = splineIntersection(spline = self.splines[n_plies],
+            line = self.guides['overlap_offset'][0], u0 = self.indexes['LE'][n_plies])
+        
+        t_end = splineIntersection(spline = self.splines[n_plies],
+            line = self.guides['overlap_end'], u0 = t_sta)
+        
+        t_bond[0][0] = [float(t_sta)] + [float(x) for x in np.arange(
+            self.splines[n_plies]['u']) if x > t and x < t_end] + [float(t_end)]
+        
+        print(t_bond[0][0])
+        
+        u0 = splineIntersection(spline = c_offset[0], line = self.guides['chord'], u0 = 0)
+        
+        t_sta = splineIntersection(spline = c_offset[0],
+            line = self.guides['overlap_offset'][0], u0 = u0)
+        
+        t_end = splineIntersection(spline = c_offset[0],
+            line = self.guides['overlap_end'], u0 = t_sta)
+        
+        t_bond[0][1] = [float(t_sta)] + [float(x) for x in np.arange(
+            c_offset[0]['u']) if x > t and x < t_end] + [float(t_end)]
+        
+        print(t_bond[0][0])
+        
+        pts_bond = {x:{} for x in range(2)}
+        
+        # Outer Curve
+        pts_bond[0][0] = {axis:self.splines[n_plies][axis](t_bond[0][0]) for axis in ['x','y']}
+        
+        # Inner Curve
+        pts_bond[0][1] = {axis:c_offset[0][axis](t_bond[0][1]) for axis in ['x','y']}
+        
+        # Left Edge
+        pts_bond[0][2] = {'x':[pts_bond[0][c]['x'][0] for c in range(2)],
+                          'y':[pts_bond[0][c]['y'][0] for c in range(2)]}
+        
+        # Right Edge
+        pts_bond[0][3] = {'x':[pts_bond[0][c]['x'][-1] for c in range(2)],
+                          'y':[pts_bond[0][c]['y'][-1] for c in range(2)]}
+        
+        # Vertical bond
+        pts_bond[1] = {axis: [self.points['bot_1'][1][0][axis][-1],
+            self.points['top_1'][1][0][axis][0],
+            self.points['top_1'][n_plies][1][axis][0],
+            pts_bond[0][0][axis][0], self.points['bot_1'][1][0][axis][-1]] 
+            for axis in ['x','y']}
+        
         # Plot
         fig, ax = plt.subplots(figsize = (10,6))
         
@@ -811,18 +897,26 @@ class Section:
             # BOT_2 - JIGGLE
             ax.plot(x_bot_2[i], y_bot_2[i], label = f'Ply {i}', c = colours[i-1])
             
-            # BOT_3
             for j in range(4):
-            
+                
+                # BOT_1
+                ax.plot(pts_bot_1[i][j]['x'], pts_bot_1[i][j]['y'],
+                        c = colours[i-1], label = None)            
+                
+                # BOT_3
                 ax.plot(pts_bot_3[i][j]['x'], pts_bot_3[i][j]['y'],
                         c = colours[i-1], label = None)
-            
-            # BOT_1 AND TOP_1 - SKIN
-                for side in ['bot_1', 'top_1']:
-                    
-                    ax.plot(self.points[side][i][j]['x'],
-                        self.points[side][i][j]['y'], label = None, 
-                        c = colours[i-1])
+                
+                # TOP_1 
+                ax.plot(self.points['top_1'][i][j]['x'],
+                    self.points['top_1'][i][j]['y'], label = None, c = colours[i-1])
+                
+        # BOND
+        ax.plot(pts_bond[1]['x'], pts_bond[1]['y'], label = f'Bond', c = 'black')
+        
+        for i in range(4):
+            ax.plot(pts_bond[0][i]['x'], pts_bond[0][i]['y'],
+                    c = 'black', label = None)
         
         figProperties(ax = ax, title = f'Jiggle')
         
@@ -851,7 +945,7 @@ class Section:
 
 if __name__ == '__main__':
     
-    switch = 2
+    switch = 1
     
     # Debug (#3)
     if switch == 1:
@@ -880,14 +974,15 @@ if __name__ == '__main__':
         offset_distance = 1
         n_plies = 8
         saveFig = False
-        overlap_target = 44.022 #200
+        overlap_target = 44.022
         trailing_edge_thickness = 8 # mm
         
         db = Section(station=sta, n_plies=n_plies, ply_thickness=offset_distance,
                     overlap_target=overlap_target, te_thickness=trailing_edge_thickness,
                     saveFig=saveFig)
         
-        db.jiggle(86.71)
+        db.jiggle(86.71, bond_thickness = 1)
+        db.figs['jiggle'].show()
     
     # Debug (#8)
     elif switch == 2:
@@ -908,5 +1003,5 @@ if __name__ == '__main__':
                     te_thickness=8,
                     saveFig=False)
         
-        db.jiggle(40)
+        db.jiggle(overlap_dist = 40, bond_thickness = 1)
         db.figs['jiggle'].show()
