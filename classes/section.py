@@ -743,54 +743,49 @@ class Section:
         self.t['bot_3'] = t_bot_3
         
         # Jiggle PART 2 (Vertical part)
-        x_bot_2 = {}
-        y_bot_2 = {}
+        pts_bot_2 = {}
         
         for i in range(1, n_plies+1):
             
-            x_bot_2[i] = []
-            y_bot_2[i] = []
+            x = []
+            y = []
             
             # Point 1
-            t_target = splineIntersection(spline=self.splines[i], 
+            t0 = splineIntersection(spline=self.splines[i], 
                 line=self.guides['overlap_offset'][i], u0=self.indexes['LE'][i])
             
-            x_bot_2[i].append(self.splines[i]['x'](t_target))
-            y_bot_2[i].append(self.splines[i]['y'](t_target))
+            x.append(self.splines[i]['x'](t0).tolist())
+            y.append(self.splines[i]['y'](t0).tolist())
             
             # Point 2
-            t_target = splineIntersection(spline=self.splines[i], 
+            t1 = splineIntersection(spline=self.splines[i], 
                 line=self.guides['overlap_offset'][i-1], u0=self.indexes['LE'][i])
             
-            x_bot_2[i].append(self.splines[i]['x'](t_target))
-            y_bot_2[i].append(self.splines[i]['y'](t_target))
+            x.append(self.splines[i]['x'](t1).tolist())
+            y.append(self.splines[i]['y'](t1).tolist())
             
             # Point 3
             if i > 1:
                 
-                x_bot_2[i].append(c_offset[i-1]['x'](t_bot_3[i-1][i-1][0]))
-                y_bot_2[i].append(c_offset[i-1]['y'](t_bot_3[i-1][i-1][0]))
+                x.append(c_offset[i-1]['x'](t_bot_3[i-1][i-1][0]).tolist())
+                y.append(c_offset[i-1]['y'](t_bot_3[i-1][i-1][0]).tolist())
                 
             else:
                 
-                t_target = splineIntersection(spline=c_offset[i-1],
+                t3 = splineIntersection(spline=c_offset[i-1],
                     line=self.guides['overlap_offset'][i-1], u0=t_bot_3[i][i-1][0])
                 
-                x_bot_2[i].append(c_offset[i-1]['x'](t_target))
-                y_bot_2[i].append(c_offset[i-1]['y'](t_target))
+                x.append(c_offset[i-1]['x'](t3).tolist())
+                y.append(c_offset[i-1]['y'](t3).tolist())
                 
             # # Point 4
-            x_bot_2[i].append(c_offset[i-1]['x'](t_bot_3[i][i-1][0]))
-            y_bot_2[i].append(c_offset[i-1]['y'](t_bot_3[i][i-1][0]))
+            x.append(c_offset[i-1]['x'](t_bot_3[i][i-1][0]).tolist())
+            y.append(c_offset[i-1]['y'](t_bot_3[i][i-1][0]).tolist())
             
             # Repeating Point 1 to make closed shape
-            x_bot_2[i].append(x_bot_2[i][0])
-            y_bot_2[i].append(y_bot_2[i][0])
+            pts_bot_2[i] = {'x':x + [x[0]], 'y':y + [y[0]]}
         
-        x_bot_2 = {ply:[float(x) for x in values] for ply,values in x_bot_2.items()}
-        y_bot_2 = {ply:[float(y) for y in values] for ply,values in y_bot_2.items()}
-        
-        self.points['bot_2'] = {'x':x_bot_2,'y':y_bot_2}
+        self.points['bot_2'] = pts_bot_2
         
         # BOT_3 - OVERLAP
         pts_bot_3 = {}
@@ -917,7 +912,7 @@ class Section:
         for i in range(1, n_plies+1):
             
             # BOT_2 - JIGGLE
-            ax.plot(x_bot_2[i], y_bot_2[i], label = f'Ply {i}', c = colours[i-1])
+            ax.plot(pts_bot_2[i]['x'], pts_bot_2[i]['y'], label = f'Ply {i}', c = colours[i-1])
             
             for j in range(4):
                 
@@ -955,60 +950,9 @@ class Section:
         
         # Variables
         n_plies = self.parameters['n_plies']
-        
-        # TE spar guide
-        cl = self.guides['chord']
-        p = [float(self.splines[0][axis](0)) for axis in ['x','y']]
-        
-        self.guides['te_spar'] = {}
-        
-        for i in range(n_tePlies*2 + 1):
-            
-            p1 = ((i*thickness) + te_distance) * np.array([np.cos(cl['tan']), np.sin(cl['tan'])]) + np.array(p)
-            self.guides['te_spar'][i] = lineConstructor(p0 = p1.tolist(), ang = cl['nor'])
-        
-        # T[0]
-        t_b = {part:{side:{} for side in range(2)} for part in range(2)}
-        
-        # Part [0][0]
-        
-        ## t_b paremeter bot
-        t_b[0][0][0] = splineIntersection(spline = self.splines[n_plies],
-            line = self.guides['te_spar'][0], u0 = 0)
-        
-        for i in range(1,n_tePlies+1):
-            
-            t_b[0][0][i] = splineIntersection(spline = self.splines[n_plies],
-                line = self.guides['te_spar'][i], u0 = t_b[0][0][i-1])
-        
-        ## t_b parameter top
-        t_b[0][1][0] = splineIntersection(spline = self.splines[n_plies],
-            line = self.guides['te_spar'][n_tePlies], u0 = self.indexes['LE'][n_plies])
-        
-        for i in range(1,n_tePlies+1):
-            
-            t_b[0][1][i] = splineIntersection(spline = self.splines[n_plies],
-                line = self.guides['te_spar'][n_tePlies-i], u0 = t_b[0][1][i-1])
-        
-        # POINTS
-        pts_te_spar = {side:{part:{ply:{} for ply in range(1,n_tePlies+1)} for
-            part in range(2)} for side in range(2)}
-        
-        _spline = self.splines[n_plies]
-        _bot = [[float(_spline[axis](t_b[0][0][ply])) for axis in ['x','y']] for ply in range(n_tePlies+1)]
-        _top = [[float(_spline[axis](t_b[0][1][ply])) for axis in ['x','y']] for ply in range(n_tePlies+1)][::-1]
-        
-        for i in range(1, n_tePlies+1):
-            
-            x = [x[0] for x in _bot[i-1:i+1]] + [x[0] for x in _top[i-1:i+1][::-1]]
-            y = [x[1] for x in _bot[i-1:i+1]] + [x[1] for x in _top[i-1:i+1][::-1]]
-            
-            pts_te_spar[0][0][i] = {'x':x+[x[0]], 'y':y+[y[0]]}
-        
-        # Part [0][1]
-        
-        ## Offset spline based on number of te plies
-        base_spline = self.splines[0]
+        cl = self.guides['chord'] # chordline guide
+        base_spline = self.splines[0] # Base spline (original airfoil)
+        p = [float(self.splines[0][axis](0)) for axis in ['x','y']] # Reference point
         
         # Base spline data
         basespl_t = np.arange(0, base_spline['u']+1)
@@ -1028,113 +972,194 @@ class Section:
             coords = reorder_coordinates(polygon = c_simplified, reference_point = p)
             # c_offset[i] = splineConstructor(np.array(c_simplified.exterior.coords))
             c_offset[i] = splineConstructor(coords)
+        
+        # Create vertical guides (for plies and parts)
+        self.guides['te_spar'] = {}
+        
+        for i in range(n_tePlies*2 + 1):
             
-        # Find t-parameter close to TE
-        t = {}
+            p1 = ((i*thickness) + te_distance) * np.array([np.cos(cl['tan']), np.sin(cl['tan'])]) + np.array(p)
+            self.guides['te_spar'][i] = lineConstructor(p0 = p1.tolist(), ang = cl['nor'])
         
-        t[0] = {curve: splineIntersection(spline = c_offset[curve], 
-            line = self.guides['te_spar'][n_tePlies], u0 = 0) for curve in range(n_tePlies+1)}
-        
-        # Find t-parameter at the end of flange
+        # Create vertical guide (end of flange)
         p1 = ((n_tePlies*2*thickness) + te_distance + flange_distance) * np.array(
             [np.cos(cl['tan']), np.sin(cl['tan'])]) + np.array(p)
         
         self.guides['te_spar_flange'] = lineConstructor(p0 = p1.tolist(), ang = cl['nor'])
         
-        t[1] = {curve: splineIntersection(spline = c_offset[curve], 
-            line = self.guides['te_spar_flange'], u0 = 0) for curve in range(n_tePlies+1)}
+        # Main t-parameter dictionary
+        t = {side:{part:{ply:{} for ply in range(1,n_tePlies+1)} for
+            part in range(2)} for side in range(2)}
         
-        # print(t)
+        # Main points dictionary
+        pts = {side:{part:{ply:{} for ply in range(1,n_tePlies+1)} for
+            part in range(2)} for side in range(2)}
         
-        # Generate points for each ply of part[0][1]
+        # Part [0][0]
         
-        for i in range(1, n_tePlies+1):
+        ## t-paremeter
+        for ply in range(1, n_tePlies+1):
             
-            _a = [t[0][i-1]] + [u for u in np.arange(0,c_offset[i-1]['u']+1) if
-                u > t[0][i-1] and u < t[1][i-1]] + [t[1][i-1]]
+            t0 = splineIntersection(spline = c_offset[ply-1],
+                line = self.guides['te_spar'][ply-1], u0 = 0)
             
-            _b = [t[0][i]] + [u for u in np.arange(0,c_offset[i]['u']+1) if
-                u > t[0][i] and u < t[1][i]] + [t[1][i]]
+            t1 = splineIntersection(spline = c_offset[ply-1],
+                line = self.guides['te_spar'][ply], u0 = t0)
             
-            x = c_offset[i-1]['x'](_a).tolist()
-            x += c_offset[i]['x'](_b).tolist()[::-1]
+            t2 = splineIntersection(spline = c_offset[0],
+                line = self.guides['te_spar'][ply], u0 = self.indexes['LE'][n_plies]) # Possible bug as it's not technically the same polygon
             
-            # print(f'x_{i}: {x}')
+            t3 = splineIntersection(spline = c_offset[0],
+                line = self.guides['te_spar'][ply-1], u0 = t2)
             
-            y = c_offset[i-1]['y'](_a).tolist()
-            y += c_offset[i]['y'](_b).tolist()[::-1]
+            t[0][0][ply] = [t0, t1, t2, t3]
             
-            # print(f'y_{i}: {y}')
+            print(f't[0][0][{ply}] = {t[0][0][ply]}')
+        
+        ## Points
+        _spline = [[x,0] for x in range(n_tePlies+1)]
+        
+        for ply in range(1,n_tePlies+1):
             
-            pts_te_spar[0][1][i] = {'x':x+[x[0]], 'y':y+[y[0]]}
+            for axis in ['x','y']:
+                    
+                pts1 = c_offset[_spline[ply-1][0]][axis](t[0][0][ply][:2]).tolist()
+                pts2 = c_offset[_spline[ply-1][1]][axis](t[0][0][ply][2:]).tolist()
+                
+                pts[0][0][ply][axis] = pts1 + pts2 + [pts1[0]]
+                
+                print(f'pts[0][0][{ply}][x] = {pts[0][0][ply]['x']}')
+        
+        # Part [0][1]
+            
+        ## t-parameter
+        for ply in range(1, n_tePlies+1):
+            
+            t0 = splineIntersection(spline = c_offset[ply-1],
+                line = self.guides['te_spar'][ply], u0 = 0)
+            
+            t1 = splineIntersection(spline = c_offset[ply-1],
+                line = self.guides['te_spar_flange'], u0 = t0)
+            
+            t2 = splineIntersection(spline = c_offset[ply],
+                line = self.guides['te_spar'][ply], u0 = 0)
+            
+            t3 = splineIntersection(spline = c_offset[ply],
+                line = self.guides['te_spar_flange'], u0 = t2)
+            
+            t[0][1][ply] = [t0, t1, t2, t3]
+            
+            print(f't[0][1][{ply}] = {t[0][1][ply]}')
+        
+        ## Points
+        for ply in range(1, n_tePlies+1):
+            
+            u0 = [t[0][1][ply][0]] + [u for u in np.arange(0,c_offset[ply-1]['u']+1) if 
+                u > t[0][1][ply][0] and u < t[0][1][ply][1]] + [t[0][1][ply][1]]
+            
+            u1 = [t[0][1][ply][2]] + [u for u in np.arange(0,c_offset[ply]['u']+1) if 
+                u > t[0][1][ply][2] and u < t[0][1][ply][3]] + [t[0][1][ply][3]]
+            
+            x0 = c_offset[ply-1]['x'](u0).tolist()
+            y0 = c_offset[ply-1]['y'](u0).tolist()
+            
+            x1 = c_offset[ply]['x'](u1).tolist()
+            y1 = c_offset[ply]['y'](u1).tolist()
+            
+            pts[0][1][ply] = {}
+            
+            pts[0][1][ply][0] = {'x':x0, 'y':y0}
+            pts[0][1][ply][1] = {'x':x1, 'y':y1}
+            pts[0][1][ply][2] = {'x':[x0[0]] + [x1[0]], 'y':[y0[0]] + [y1[0]]}
+            pts[0][1][ply][3] = {'x':[x0[-1]] + [x1[-1]], 'y':[y0[-1]] + [y1[-1]]}
+            
+            print(f'pts[0][1][{ply}] = {pts[0][1][ply]}')
         
         # Part [1][0]
         
-        # Find t-parameter at bot side (last offset spline from method)
-        t = {}
-        
-        t[0] = [splineIntersection(spline = c_offset[n_tePlies], line = 
-            self.guides['te_spar'][line + n_tePlies], u0 = 0) for line in range(n_tePlies+1)]
-        
-        # Find t-parameter at top side (last offset spline from method)
-        t[1] = [splineIntersection(spline = _spline, line = self.guides['te_spar']
-            [line + n_tePlies], u0 = self.indexes['LE'][n_plies]) for line in
-            range(n_tePlies+1)]
-        
-        print(t)
-        
-        # Generate points for part[1][0]
-        
-        for i in range(1, n_tePlies+1):
+        ## t-parameter
+        for ply in range(1, n_tePlies+1):
             
-            x = c_offset[n_tePlies]['x'](t[0][i-1:i+1]).tolist()
-            x += self.splines[n_plies]['x'](t[1][i-1:i+1]).tolist()[::-1]
+            t0 = splineIntersection(spline = c_offset[n_tePlies], line = 
+                self.guides['te_spar'][n_tePlies + ply - 1], u0 = 0)
             
-            y = c_offset[n_tePlies]['y'](t[0][i-1:i+1]).tolist()
-            y += self.splines[n_plies]['y'](t[1][i-1:i+1]).tolist()[::-1]
+            t1 = splineIntersection(spline = c_offset[n_tePlies], line = 
+                self.guides['te_spar'][n_tePlies + ply], u0 = t0)
             
-            pts_te_spar[1][0][i] = {'x':x+[x[0]], 'y':y+[y[0]]}
+            t2 = splineIntersection(spline = c_offset[ply - 1], line = 
+                self.guides['te_spar'][n_tePlies + ply], u0 = self.indexes['LE'][n_plies])
+            
+            t3 = splineIntersection(spline = c_offset[ply - 1], line = 
+                self.guides['te_spar'][n_tePlies + ply - 1], u0 = t2)
+            
+            t[1][0][ply] = [t0, t1, t2, t3]
+            
+            print(f't[1][0][{ply}] = {t[1][0][ply]}')
+            
+        ## Points
+        _spline = [[n_tePlies,x] for x in range(n_tePlies+1)]
+        
+        for ply in range(1,n_tePlies+1):
+            
+            for axis in ['x','y']:
+                    
+                pts1 = c_offset[_spline[ply-1][0]][axis](t[1][0][ply][:2]).tolist()
+                pts2 = c_offset[_spline[ply-1][1]][axis](t[1][0][ply][2:]).tolist()
+                
+                pts[1][0][ply][axis] = pts1 + pts2 + [pts1[0]]
+                
+            print(f'pts[1][0][{ply}][x] = {pts[1][0][ply]['x']}')
             
         # Part [1][1]
         
-        # Find t-parameter at left side (all to the same guide)
-        t ={}
-        
-        _u0 = [splineIntersection(spline = c_offset[curve], line = self.guides['chord'],
+        ## t-parameter
+        u = [splineIntersection(spline = c_offset[curve], line = self.guides['chord'],
             u0 = 0) for curve in range(n_tePlies+1)]
         
-        t[0] = {curve: splineIntersection(spline = c_offset[curve], 
-            line = self.guides['te_spar_flange'], u0 = _u0[curve]) for curve in range(n_tePlies+1)}
-        
-        t[1] = {curve: splineIntersection(spline = c_offset[curve], 
-            line = self.guides['te_spar'][n_tePlies*2], u0 = t[0][curve]) for curve in range(n_tePlies+1)}
-        
-        print(t)
-        
-        # Generate points for part[1][1]
-        
-        for i in range(1, n_tePlies+1):
+        for ply in range(1, n_tePlies+1):
             
-            _a = [t[0][i-1]] + [u for u in np.arange(0,c_offset[i-1]['u']+1) if
-                u > t[0][i-1] and u < t[1][i-1]] + [t[1][i-1]]
+            t0 = splineIntersection(spline = c_offset[ply - 1],
+                line = self.guides['te_spar_flange'], u0 = u[ply - 1])
             
-            _b = [t[0][i]] + [u for u in np.arange(0,c_offset[i]['u']+1) if
-                u > t[0][i] and u < t[1][i]] + [t[1][i]]
+            t1 = splineIntersection(spline = c_offset[ply - 1],
+                line = self.guides['te_spar'][n_tePlies + ply], u0 = t0)
             
-            x = c_offset[i-1]['x'](_a).tolist()
-            x += c_offset[i]['x'](_b).tolist()[::-1]
+            t2 = splineIntersection(spline = c_offset[ply],
+                line = self.guides['te_spar_flange'], u0 = u[ply])
             
-            # print(f'x_{i}: {x}')
+            t3 = splineIntersection(spline = c_offset[ply],
+                line = self.guides['te_spar'][n_tePlies + ply], u0 = t2)
             
-            y = c_offset[i-1]['y'](_a).tolist()
-            y += c_offset[i]['y'](_b).tolist()[::-1]
+            t[1][1][ply] = [t0, t1, t2, t3]
             
-            # print(f'y_{i}: {y}')
+            print(f't[1][1][{ply}] = {t[1][1][ply]}')
             
-            pts_te_spar[1][1][i] = {'x':x+[x[0]], 'y':y+[y[0]]}
+        ## Points
+        for ply in range(1, n_tePlies+1):
+            
+            u0 = [t[1][1][ply][0]] + [u for u in np.arange(0,c_offset[ply-1]['u']+1) if 
+                u > t[1][1][ply][0] and u < t[1][1][ply][1]] + [t[1][1][ply][1]]
+            
+            u1 = [t[1][1][ply][2]] + [u for u in np.arange(0,c_offset[ply]['u']+1) if 
+                u > t[1][1][ply][2] and u < t[1][1][ply][3]] + [t[1][1][ply][3]]
+            
+            x0 = c_offset[ply-1]['x'](u0).tolist()
+            y0 = c_offset[ply-1]['y'](u0).tolist()
+            
+            x1 = c_offset[ply]['x'](u1).tolist()
+            y1 = c_offset[ply]['y'](u1).tolist()
+            
+            pts[1][1][ply] = {}
+            
+            pts[1][1][ply][0] = {'x':x0, 'y':y0}
+            pts[1][1][ply][1] = {'x':x1, 'y':y1}
+            pts[1][1][ply][2] = {'x':[x0[0]] + [x1[0]], 'y':[y0[0]] + [y1[0]]}
+            pts[1][1][ply][3] = {'x':[x0[-1]] + [x1[-1]], 'y':[y0[-1]] + [y1[-1]]}
+            
+            print(f'pts[1][1][{ply}] = {pts[1][1][ply]}')
         
         # Store Variables
-        self.points['te_spar'] = pts_te_spar
+        self.points['te_spar'] = pts
         
         # Plot
         fig, ax = plt.subplots(figsize = (10,6))
@@ -1145,7 +1170,7 @@ class Section:
         for i in range(1, n_plies+1):
             
             # BOT_2 - JIGGLE
-            ax.plot(pts['bot_2']['x'][i], pts['bot_2']['y'][i], label = f'Ply {i}', c = colours[i-1])
+            ax.plot(pts['bot_2'][i]['x'], pts['bot_2'][i]['y'], label = f'Ply {i}', c = colours[i-1])
             
             for j in range(4):
                 
@@ -1170,28 +1195,24 @@ class Section:
                     c = 'black', label = None)
             
         # TE SPAR Part[0]
-        for i in range(1, n_tePlies+1):
+        for ply in range(1, n_tePlies+1):
             
-            ax.plot(pts_te_spar[0][0][i]['x'], pts_te_spar[0][0][i]['y'],
+            ax.plot(pts['te_spar'][0][0][ply]['x'], pts['te_spar'][0][0][ply]['y'],
                 c = 'grey', label = None)
             
-            ax.plot(pts_te_spar[0][1][i]['x'], pts_te_spar[0][1][i]['y'],
-                c = 'grey', label = None)
+            for curve in range(4):
+                ax.plot(pts['te_spar'][0][1][ply][curve]['x'], pts['te_spar'][0][1][ply][curve]['y'],
+                    c = 'grey', label = None)
             
         # TE SPAR Part[1]
-        ax.plot(pts_te_spar[1][0][1]['x'], pts_te_spar[1][0][1]['y'],
-                c = 'pink', label = 'TE Spar [1]')
-        
-        ax.plot(pts_te_spar[1][1][1]['x'], pts_te_spar[1][1][1]['y'],
-                c = 'pink', label = None)
-        
-        for i in range(2, n_tePlies+1):
+        for ply in range(1, n_tePlies+1):
             
-            ax.plot(pts_te_spar[1][0][i]['x'], pts_te_spar[1][0][i]['y'],
+            ax.plot(pts['te_spar'][1][0][ply]['x'], pts['te_spar'][1][0][ply]['y'],
                 c = 'pink', label = None)
             
-            ax.plot(pts_te_spar[1][1][i]['x'], pts_te_spar[1][1][i]['y'],
-                c = 'pink', label = None)
+            for curve in range(4):
+                ax.plot(pts['te_spar'][1][1][ply][curve]['x'], pts['te_spar'][1][1][ply][curve]['y'],
+                    c = 'pink', label = None)
         
         figProperties(ax = ax, title = f'TE_Spar')
         
