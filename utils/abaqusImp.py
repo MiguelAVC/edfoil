@@ -23,57 +23,6 @@ def importData(filepath):
     
     return data
 
-def importDatav2(filepath):
-    # For now is for just one single section!!!!!
-    
-    with open(filepath, 'r') as file:
-        
-        data = json.load(file)
-        
-    # Convert most keys to integers and lists of lists to tuples of tuples
-        
-    # bot_1 and top_1
-    skin = {side:{int(ply):{int(curve):tuple(zip(value_3['x'],value_3['y'])) 
-        for curve, value_3 in value_2.items()} for ply, value_2 in 
-        value_1.items()} for side, value_1 in data.items() if side[-1] == '1'}
-    
-    # bot_2
-    jigg = {int(ply):tuple(zip(values['x'],values['y'])) for ply, values in 
-        data['bot_2'].items()}
-    
-    # bot_3
-    ovlp = {side:{int(ply):{int(curve):tuple(zip(value_3['x'],value_3['y'])) 
-        for curve, value_3 in value_2.items()} for ply, value_2 in 
-        value_1.items()} for side, value_1 in data.items() if side[-1] == '3'}
-    
-    # bond
-    bond = {}
-    
-    bond[0] = {int(curve):tuple(zip(value['x'],value['y'])) for curve, value in
-        data['bond']['0'].items()}
-    
-    bond[1] = tuple(zip(data['bond']['1']['x'],data['bond']['1']['y']))
-    
-    
-    # te_spar
-    tesp = {}
-    
-    tesp[0] = {int(ply):tuple(zip(value['x'],value['y'])) for ply, value in 
-        data['te_spar']['0']['0'].items()}
-    
-    tesp[1] = {int(ply):{int(curve):tuple(zip(value_2['x'],value_2['y'])) for 
-        curve, value_2 in value_1.items()} for ply, value_1 in data['te_spar']['0']['1'].items()}
-        
-    tesp[2] = {int(ply):tuple(zip(value['x'],value['y'])) for ply, value in 
-        data['te_spar']['1']['0'].items()}
-    
-    tesp[3] = {int(ply):{int(curve):tuple(zip(value_2['x'],value_2['y'])) for 
-        curve, value_2 in value_1.items()} for ply, value_1 in data['te_spar']['1']['1'].items()}
-            
-    data = {'bot':skin['bot_1'], 'top':skin['top_1'], 'jigg':jigg, 'ovlp':ovlp, 'tesp':tesp}
-    data = {0:data, 5250:data}
-    
-    return data
 
 def generateSkinSketches(data, model='Model-1'):
     m = mdb.models[model]
@@ -210,6 +159,197 @@ def MeshSkin(part,seedSize=10, m=mdb.models['Model-1']):
     # generate mesh
     p.generateMesh()
             
+def importDatav2(filepath):
+    # For now is for just one single section!!!!!
+    
+    with open(filepath, 'r') as file:
+        
+        data = json.load(file)
+        
+    # bot_1 and top_1
+    skin = {side:{int(ply):{int(curve):tuple(zip(value_3['x'],value_3['y'])) 
+        for curve, value_3 in value_2.items()} for ply, value_2 in 
+        value_1.items()} for side, value_1 in data.items() if side[-1] == '1'}
+    
+    # bot_2
+    jigg = {int(ply):tuple(zip(values['x'],values['y'])) for ply, values in 
+        data['bot_2'].items()}
+    
+    # bot_3
+    ovlp = {int(ply):{int(curve):tuple(zip(value_3['x'],value_3['y'])) 
+        for curve, value_3 in value_2.items()} for ply, value_2 in 
+        data['bot_3'].items()}
+    
+    # bond
+    bond = {}
+    
+    bond[0] = {int(curve):tuple(zip(value['x'],value['y'])) for curve, value in
+        data['bond']['0'].items()}
+    
+    bond[1] = tuple(zip(data['bond']['1']['x'],data['bond']['1']['y']))
+    
+    
+    # te_spar
+    tesp = {}
+    
+    tesp[0] = {int(ply):tuple(zip(value['x'],value['y'])) for ply, value in 
+        data['te_spar']['0']['0'].items()}
+    
+    tesp[1] = {int(ply):{int(curve):tuple(zip(value_2['x'],value_2['y'])) for 
+        curve, value_2 in value_1.items()} for ply, value_1 in data['te_spar']['0']['1'].items()}
+        
+    tesp[2] = {int(ply):tuple(zip(value['x'],value['y'])) for ply, value in 
+        data['te_spar']['1']['0'].items()}
+    
+    tesp[3] = {int(ply):{int(curve):tuple(zip(value_2['x'],value_2['y'])) for 
+        curve, value_2 in value_1.items()} for ply, value_1 in data['te_spar']['1']['1'].items()}
+            
+    data = {'bot':skin['bot_1'], 'top':skin['top_1'], 'jigg':jigg, 'ovlp':ovlp, 'tesp':tesp, 'bond':bond}
+    
+    return 
+
+def genSkinS(data, name, model='Model-1'):
+    
+    m = mdb.models[model]
+    
+    for i in range(1,9):
+        part_name = '{0}_{1}'.format(name, str(i))
+        
+        m.ConstrainedSketch(name='__profile__', sheetSize=2000.0)
+        
+        s = m.sketches['__profile__']
+        
+        s.Spline(points=(data[i][0]), constrainPoints=False)
+        s.Spline(points=(data[i][1]), constrainPoints=False)
+        s.Line(point1=data[i][2][0], point2=data[i][2][1])
+        s.Line(point1=data[i][3][0], point2=data[i][3][1])
+        
+        m.Part(dimensionality=THREE_D, name=part_name, type= DEFORMABLE_BODY)
+        
+        m.parts[part_name].BaseSolidExtrude(depth=5250.0, sketch=s)
+        
+        del mdb.models['Model-1'].sketches['__profile__']
+        
+def genJiggS(data, name, model='Model-1'):
+    
+    m = mdb.models[model]
+    
+    for i in range(1,9):
+        part_name = '{0}_{1}'.format(name, str(i))
+        
+        m.ConstrainedSketch(name='__profile__', sheetSize=2000.0)
+        
+        s = m.sketches['__profile__']
+        
+        for j in range(4):
+        
+            s.Line(point1=data[i][j], point2=data[i][j+1])
+        
+        m.Part(dimensionality=THREE_D, name=part_name, type= DEFORMABLE_BODY)
+        
+        m.parts[part_name].BaseSolidExtrude(depth=5250.0, sketch=s)
+        
+        del mdb.models['Model-1'].sketches['__profile__']
+
+def genBond1(data, name, model='Model-1'):
+    
+    m = mdb.models[model]
+    
+    part_name = name
+    
+    m.ConstrainedSketch(name='__profile__', sheetSize=2000.0)
+    
+    s = m.sketches['__profile__']
+    
+    for j in range(4):
+    
+        s.Line(point1=data[j], point2=data[j+1])
+    
+    m.Part(dimensionality=THREE_D, name=part_name, type= DEFORMABLE_BODY)
+    
+    m.parts[part_name].BaseSolidExtrude(depth=5250.0, sketch=s)
+    
+    del mdb.models['Model-1'].sketches['__profile__']
+        
+def genBond2(data, name, model='Model-1'):
+    
+    m = mdb.models[model]
+    
+    part_name = name
+    
+    m.ConstrainedSketch(name='__profile__', sheetSize=2000.0)
+    
+    s = m.sketches['__profile__']
+    
+    s.Spline(points=(data[0]), constrainPoints=False)
+    s.Spline(points=(data[1]), constrainPoints=False)
+    s.Line(point1=data[2][0], point2=data[2][1])
+    s.Line(point1=data[3][0], point2=data[3][1])
+    
+    m.Part(dimensionality=THREE_D, name=part_name, type= DEFORMABLE_BODY)
+    
+    m.parts[part_name].BaseSolidExtrude(depth=5250.0, sketch=s)
+    
+    del mdb.models['Model-1'].sketches['__profile__']
+    
+def genTeSp1v1(data, name, model='Model-1'):
+    
+    m = mdb.models[model]
+    
+    for i in range(1,4):
+    
+        part_name = '{0}_{1}'.format(name, str(i))
+    
+        m.ConstrainedSketch(name='__profile__', sheetSize=2000.0)
+        
+        s = m.sketches['__profile__']
+        
+        for j in range(4):
+        
+            s.Line(point1=data[i][j], point2=data[i][j+1])
+        
+        m.Part(dimensionality=THREE_D, name=part_name, type= DEFORMABLE_BODY)
+        
+        m.parts[part_name].BaseSolidExtrude(depth=5250.0, sketch=s)
+        
+        del mdb.models['Model-1'].sketches['__profile__']
+        
+def genTeSp2v1(data, name, model='Model-1'):
+    
+    m = mdb.models[model]
+    
+    for i in range(1,4):
+        
+        part_name = '{0}_{1}'.format(name,str(i))
+    
+        m.ConstrainedSketch(name='__profile__', sheetSize=2000.0)
+        
+        s = m.sketches['__profile__']
+        
+        s.Spline(points=(data[i][0]), constrainPoints=False)
+        s.Spline(points=(data[i][1]), constrainPoints=False)
+        s.Line(point1=data[i][2][0], point2=data[i][2][1])
+        s.Line(point1=data[i][3][0], point2=data[i][3][1])
+        
+        m.Part(dimensionality=THREE_D, name=part_name, type= DEFORMABLE_BODY)
+        
+        m.parts[part_name].BaseSolidExtrude(depth=5250.0, sketch=s)
+        
+        del mdb.models['Model-1'].sketches['__profile__']
+
+def meshAll(seedSize=10, m=mdb.models['Model-1']):
+    
+    # define local variables
+    for i in m.parts.keys():
+        
+        p = m.parts[i]
+        
+        # seed part
+        p.seedPart(size=seedSize, deviationFactor=0.1, minSizeFactor=0.1)
+        
+        # generate mesh
+        p.generateMesh()
+
 # %% Example
 
 if __name__ == '__main__':
