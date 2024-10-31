@@ -1301,7 +1301,7 @@ if __name__ == '__main__':
     elif switch == 3:
         
         data = ['NACA63416',739,4.8,-260,20,6250,1,1,1,False,True]
-        data_sec = [8,1,38.178766667,8,1,True,False,6]
+        data_sec = [2,1,38.178766667,2,1,True,False,6]
         
         sta = Station(chord = data[1],
                       twist_angle = data[2],
@@ -1328,4 +1328,4 @@ if __name__ == '__main__':
                      )
         
         sec.jiggle(overlap_dist = 40, bond_thickness = 1)
-        sec.teSpar(te_distance=140, thickness=1, flange_distance=50, n_tePlies=3)
+        sec.teSpar(te_distance=140, thickness=1, flange_distance=50, n_tePlies=2)
