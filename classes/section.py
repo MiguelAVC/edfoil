@@ -17,13 +17,14 @@ from utils.utils import (splineConstructor, lineConstructor, skinOverlapLocator,
 from classes.station import Station
 
 # functions
-def figProperties(ax,
-                  title:str,
-                  xlabel:str ='x [-]',
-                  ylabel:str ='y [-]',
-                  labelsize:str ='large',
-                  legend:bool = True,
-                  ) -> None:
+def figProperties(
+    ax,
+    title:str,
+    xlabel:str ='x [-]',
+    ylabel:str ='y [-]',
+    labelsize:str ='large',
+    legend:bool = True,
+) -> None:
     
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -37,7 +38,10 @@ def figProperties(ax,
     ax.set_title(title)
     plt.tight_layout()
 
-def reorder_coordinates(polygon:Polygon, reference_point:list[float,float]):
+def reorder_coordinates(
+    polygon:Polygon,
+    reference_point:list[float,float]
+):
     
     coords = list(polygon.exterior.coords)
     
@@ -56,30 +60,32 @@ def reorder_coordinates(polygon:Polygon, reference_point:list[float,float]):
 # Main Class
 @progressTime
 class Section:
-    def __init__(self,
-                 station:Station,
-                 n_plies:int,
-                 ply_thickness:float,
-                 overlap_target:float,
-                 te_thickness:float = 8,
-                 bond_thickness:float = 1,
-                 genFig:bool = True,
-                 saveFig:bool = False,
-                 tolerance:int = 6, # Tolerance for decimal places ACIS
-                ) -> None:
+    def __init__(
+        self,
+        station:Station,
+        n_plies:int,
+        ply_thickness:float,
+        overlap_target:float,
+        te_thickness:float = 8,
+        bond_thickness:float = 1,
+        genFig:bool = True,
+        saveFig:bool = False,
+        tolerance:int = 6, # Tolerance for decimal places ACIS
+    ) -> None:
         
         # Parameters
-        self.parameters = {'n_plies': n_plies,
-                           'ply_thickness': ply_thickness,
-                           'overlap_target': overlap_target,
-                           'te_thickness': te_thickness,
-                           'bond_thickness': bond_thickness,
-                           'saveFig': saveFig,
-                           'base_airfoil': station.airfoil,
-                           'z':station.parameters['offset'][2],
-                           'twist_angle': station.parameters['twist_angle'],
-                           'isCircle': station.parameters['isCircle']
-                           }
+        self.parameters = {
+            'n_plies': n_plies,
+            'ply_thickness': ply_thickness,
+            'overlap_target': overlap_target,
+            'te_thickness': te_thickness,
+            'bond_thickness': bond_thickness,
+            'saveFig': saveFig,
+            'base_airfoil': station.airfoil,
+            'z':station.parameters['offset'][2],
+            'twist_angle': station.parameters['twist_angle'],
+            'isCircle': station.parameters['isCircle'],
+        }
         
         # self.splines = {} defined later
         self.points = {}
@@ -1014,7 +1020,7 @@ class Section:
             
             t[0][0][ply] = [t0, t1, t2, t3]
             
-            print(f't[0][0][{ply}] = {t[0][0][ply]}')
+            # print(f't[0][0][{ply}] = {t[0][0][ply]}')
         
         ## Points
         _spline = [[x,0] for x in range(n_tePlies+1)]
@@ -1028,7 +1034,7 @@ class Section:
                 
                 pts[0][0][ply][axis] = pts1 + pts2 + [pts1[0]]
                 
-                print(f'pts[0][0][{ply}][x] = {pts[0][0][ply]['x']}')
+                # print(f'pts[0][0][{ply}][x] = {pts[0][0][ply]['x']}')
         
         # Part [0][1]
             
@@ -1049,7 +1055,7 @@ class Section:
             
             t[0][1][ply] = [t0, t1, t2, t3]
             
-            print(f't[0][1][{ply}] = {t[0][1][ply]}')
+            # print(f't[0][1][{ply}] = {t[0][1][ply]}')
         
         ## Points
         for ply in range(1, n_tePlies+1):
@@ -1073,7 +1079,7 @@ class Section:
             pts[0][1][ply][2] = {'x':[x0[0]] + [x1[0]], 'y':[y0[0]] + [y1[0]]}
             pts[0][1][ply][3] = {'x':[x0[-1]] + [x1[-1]], 'y':[y0[-1]] + [y1[-1]]}
             
-            print(f'pts[0][1][{ply}] = {pts[0][1][ply]}')
+            # print(f'pts[0][1][{ply}] = {pts[0][1][ply]}')
         
         # Part [1][0]
         
@@ -1094,7 +1100,7 @@ class Section:
             
             t[1][0][ply] = [t0, t1, t2, t3]
             
-            print(f't[1][0][{ply}] = {t[1][0][ply]}')
+            # print(f't[1][0][{ply}] = {t[1][0][ply]}')
             
         ## Points
         _spline = [[n_tePlies,x] for x in range(n_tePlies+1)]
@@ -1108,7 +1114,7 @@ class Section:
                 
                 pts[1][0][ply][axis] = pts1 + pts2 + [pts1[0]]
                 
-            print(f'pts[1][0][{ply}][x] = {pts[1][0][ply]['x']}')
+            # print(f'pts[1][0][{ply}][x] = {pts[1][0][ply]['x']}')
             
         # Part [1][1]
         
@@ -1132,7 +1138,7 @@ class Section:
             
             t[1][1][ply] = [t0, t1, t2, t3]
             
-            print(f't[1][1][{ply}] = {t[1][1][ply]}')
+            # print(f't[1][1][{ply}] = {t[1][1][ply]}')
             
         ## Points
         for ply in range(1, n_tePlies+1):
@@ -1156,7 +1162,7 @@ class Section:
             pts[1][1][ply][2] = {'x':[x0[0]] + [x1[0]], 'y':[y0[0]] + [y1[0]]}
             pts[1][1][ply][3] = {'x':[x0[-1]] + [x1[-1]], 'y':[y0[-1]] + [y1[-1]]}
             
-            print(f'pts[1][1][{ply}] = {pts[1][1][ply]}')
+            # print(f'pts[1][1][{ply}] = {pts[1][1][ply]}')
         
         # Store Variables
         self.points['te_spar'] = pts
@@ -1300,32 +1306,39 @@ if __name__ == '__main__':
     # Data from csv 
     elif switch == 3:
         
+        # First station
+        # data = ['NACA63430',1334,24.3,-474.26,255,1500,1,1.55,1,False,True]
+        # data_sec = [2,1,44.022,2,1,True,False,6]
+        
+        # Last station
         data = ['NACA63416',739,4.8,-260,20,6250,1,1,1,False,True]
         data_sec = [2,1,38.178766667,2,1,True,False,6]
         
-        sta = Station(chord = data[1],
-                      twist_angle = data[2],
-                      x_offset = data[3],
-                      y_offset = data[4],
-                      z_offset = data[5],
-                      x_multiplier = data[6],
-                      y_multiplier = data[7],
-                      z_multiplier = data[8],
-                      x_mirror = data[9],
-                      y_mirror = data[10],
-                      path=os.path.join(os.getcwd(),'airfoils',f'{data[0]}.txt'),
-                     )
+        sta = Station(
+            chord = data[1],
+            twist_angle = data[2],
+            x_offset = data[3],
+            y_offset = data[4],
+            z_offset = data[5],
+            x_multiplier = data[6],
+            y_multiplier = data[7],
+            z_multiplier = data[8],
+            x_mirror = data[9],
+            y_mirror = data[10],
+            path=os.path.join(os.getcwd(),'airfoils',f'{data[0]}.txt'),
+        )
         
-        sec = Section(station = sta,
-                      n_plies = data_sec[0],
-                      ply_thickness = data_sec[1],
-                      overlap_target = data_sec[2],
-                      te_thickness = data_sec[3],
-                      bond_thickness = data_sec[4],
-                      genFig = data_sec[5],
-                      saveFig = data_sec[6],
-                      tolerance = data_sec[7],
-                     )
+        sec = Section(
+            station = sta,
+            n_plies = data_sec[0],
+            ply_thickness = data_sec[1],
+            overlap_target = data_sec[2],
+            te_thickness = data_sec[3],
+            bond_thickness = data_sec[4],
+            genFig = data_sec[5],
+            saveFig = data_sec[6],
+            tolerance = data_sec[7],
+        )
         
-        sec.jiggle(overlap_dist = 40, bond_thickness = 1)
+        sec.jiggle(overlap_dist = 72.422, bond_thickness = 1)
         sec.teSpar(te_distance=140, thickness=1, flange_distance=50, n_tePlies=2)
