@@ -32,26 +32,41 @@ if __name__ == '__main__':
     )
     
     # List of x-values to extrapolate
-    x_values_to_extrapolate = [1200,
-    1300,
-    1500,
-    1600,
-    1800,
-    2000,
-    3000,
-    4000,
-    5000,
-    6000,
-    6250,
+    x_values_to_extrapolate = [
+        1200,
+        1300,
+        1500,
+        1600,
+        1800,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        6250,
     ]
     
+    olp_sta = norm_olp(
+        coords = coords_overlap_start, 
+        x_target = x_values_to_extrapolate,
+        order = 2,
+    )
     print('Overlap start:')
-    print(norm_olp(coords=coords_overlap_start, x_target=x_values_to_extrapolate,
-                   order=2))
+    print('- Linear')
+    print(olp_sta[0][0])
+    print('- Quadratic')
+    print(olp_sta[0][1])
     
+    olp_len = norm_olp(
+        coords = coords_overlap_length,
+        x_target = x_values_to_extrapolate,
+        order = 2,
+    )
     print('Overlap length:')
-    print(norm_olp(coords=coords_overlap_length, x_target=x_values_to_extrapolate,
-                   order=2))
+    print('- Linear')
+    print(olp_len[0][0])
+    print('- Quadratic')
+    print(olp_len[0][1])
     
 # # Separate the tuple of tuples into two lists: x and y coordinates
 # x, y = zip(*coordinates)
