@@ -565,10 +565,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 colours = self.generate_colours(num_curves=n_plies, cmap_name='viridis')
                 
                 # Plots
-                plies = list(data.t['t_plies_bot'].keys())
+                plies = list(data.t['bot_plies'].keys())
                 ply_series = {}
                 for i in (plies):
-                    ply = data.t['t_plies_bot'][i]
+                    ply = data.t['bot_plies'][i]
                     ply_series[i] = {x:QLineSeries() for x in list(ply.keys())}
                 
                     for j in list(ply.keys()):
