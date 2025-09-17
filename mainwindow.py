@@ -7,10 +7,12 @@ from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
 from PySide6.QtCore import QTimer, Qt, QDir, QPointF, QSizeF, QRectF
 
 
+from edfoil.classes.airfoil import Airfoil
 from edfoil.classes.station import Station
 from edfoil.classes.section import Section
 from edfoil.utils.bladeparams import norm_olp
 from edfoil.utils.abaqusExp import *
+from edfoil.utils.dev import resource_path
 
 import os
 import numpy as np
@@ -35,7 +37,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_msg.setSingleShot(True)
         
         # Project start
-        self.db = db()
+        self.db = db() # Class db [not a dictionary]
         self.edits = {}
         self.handle_msgbar(message='New database created.')
         
@@ -66,9 +68,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # ---------------------------------------------------------------------
         # Page 1 (Airfoil Creator)
         
+        # List of airfoils
+        self.paths_airfoils = {}
+        for i in [x for x in os.listdir(resource_path('edfoil/airfoils'))]:
+            airfoil_path = resource_path(f'edfoil/airfoils/{i}')
+            self.db.airfoils[i[:-4]] = np.genfromtxt(airfoil_path)
+            self.paths_airfoils[i[:-4]] = airfoil_path
+        self.airfoil_listairfoils_widget.addItems(list(self.db.airfoils.keys()))
+        
+        # Main chart
         self.airfoil_chart = self.graph_template()
         self.airfoil_chartview.setChart(self.airfoil_chart)
         self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
+        
+        # Signals
+        self.airfoil_listairfoils_widget.itemClicked.connect(self.update_naca_chart)
         
         # ---------------------------------------------------------------------
         # Page 2 (Station Generator)
@@ -79,10 +93,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_station.timeout.connect(self.update_airfoil_chart)
         
         # Initial airfoil list (from 'airfoils' folder)
-        self.paths_airfoils = {}
-        for i in [x for x in os.listdir('edfoil/airfoils')]:
-            self.db.airfoils[i[:-4]] = np.genfromtxt(f'edfoil/airfoils/{i}')
-            self.paths_airfoils[i[:-4]] = f'edfoil/airfoils/{i}'
         self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
         
         # Upload additional airfoils
@@ -191,6 +201,68 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.currentChanged.connect(self.update_sectionList)
         self.abaqus_export_button.clicked.connect(self.exportSections)
         
+    ### AIRFOIL METHODS (Page 1)
+    def update_naca_chart(self):
+        airfoil_name = self.airfoil_listairfoils_widget.currentItem().text()
+        airfoil = Airfoil(airfoil_name)
+        airfoil.importCoords(self.paths_airfoils[airfoil_name])
+        data = airfoil
+        # Clear the current series data and update with new values
+        series = QLineSeries()
+        for i in data.xy:
+            series.append(float(i[0]),float(i[1]))
+        
+        # Create new chart
+        chart = QChart()
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+        chart.legend().hide()
+        chart.addSeries(series)
+        
+        # x_axis = QValueAxis()
+        # y_axis = QValueAxis()
+        # aspect_ratio = QSizeF(16,9)
+        
+        xy_range = data.xy
+        # print(xy_range)
+        x_min, x_max = xy_range[0]
+        y_min, y_max = xy_range[1]
+        
+        # dx = x_max - x_min
+        # dy = y_max - y_min
+        # # print(f'dx: {dx}, dy: {dy}')
+        
+        # aspect_ratio.scale(dx,dy,Qt.KeepAspectRatioByExpanding)
+        # # print(f'Scaled aspect ratio: {aspect_ratio}')
+        
+        # height = aspect_ratio.height()
+        # width = aspect_ratio.width()
+        # # print(f'height: {height}, width: {width}')
+        
+        # x_mid = (x_min + x_max) / 2
+        # y_mid = (y_min + y_max) / 2
+        
+        # new_x_min = x_mid - width * 0.5 * 1.1
+        # new_x_max = x_mid + width * 0.5 * 1.1
+        
+        # new_y_min = y_mid - height * 0.5 * 1.1
+        # new_y_max = y_mid + height * 0.5 * 1.1
+        
+        # x_axis.setRange(new_x_min, new_x_max)
+        # y_axis.setRange(new_y_min, new_y_max)
+        
+        # x_axis.setTitleText("x/c [-]")
+        # y_axis.setTitleText("y/c [-]")
+        
+        # chart.addAxis(x_axis, Qt.AlignBottom)
+        # chart.addAxis(y_axis, Qt.AlignLeft)
+        # series.attachAxis(x_axis)
+        # series.attachAxis(y_axis)
+        
+        self.equal_axes(chart, [[x_min, x_max], [y_min, y_max]])
+        self.airfoil_chartview.setChart(chart)
+        
+        # Store it as an unsaved airfoil
+        self.edits['__airfoil__'] = data
     
     ### STATION METHODS (Page 2a)
     
@@ -695,86 +767,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         return qcolours
     
-    def equal_axes(self, chart:QChart, range_values:list[list[float,float]]) -> None:
-        
-        # Determine aspect ratio
+    def equal_axes(self, chart: QChart, range_values: list[list[float, float]]) -> None:
+        # Unpack min/max correctly
+        x_min, x_max = range_values[0]
+        y_min, y_max = range_values[1]
+
+        # Determine aspect ratio of the plot area
         height = chart.plotArea().height()
         width = chart.plotArea().width()
-        
-        print(f'Heigh: {height}, width: {width}')
-        
-        aspect_ratio = width / height
-        
-        # New axes
-        x_axis = QValueAxis()
-        y_axis = QValueAxis()
-        
-        # set ranges
-        x_max, x_min = range_values[0]
-        y_max, y_min = range_values[1]
-        x_range = range_values[0][1] - range_values[0][0]
-        y_range = range_values[1][1] - range_values[1][0]
-        # x_range = chart.axisX().max() - chart.axisX().min()
-        # y_range = chart.axisY().max() - chart.axisY().min()
-        
+        aspect_ratio = width / height if height != 0 else 1
+
+        x_range = x_max - x_min
+        y_range = y_max - y_min
+
+        # Adjust ranges to enforce 1:1 aspect ratio
         if x_range > y_range * aspect_ratio:
-            # Adjust y-axis to match x-axis scale
-            # mid_y = (chart.axisY().max() + chart.axisY().min()) / 2
             mid_y = (y_max + y_min) / 2
             new_y_range = x_range / aspect_ratio
             y_min = mid_y - new_y_range / 2
             y_max = mid_y + new_y_range / 2
-            
-            # x_axis.setRange(chart.axisX().min(),chart.axisX().max())
-            # y_axis.setRange(mid_y - new_y_range / 2, mid_y + new_y_range / 2)
         else:
-            # Adjust x-axis to match y-axis scale
-            # mid_x = (chart.axisX().max() + chart.axisX().min()) / 2
-            # new_x_range = y_range * aspect_ratio
             mid_x = (x_max + x_min) / 2
             new_x_range = y_range * aspect_ratio
             x_min = mid_x - new_x_range / 2
             x_max = mid_x + new_x_range / 2
-            
-            
-            # x_axis.setRange(mid_x - new_x_range / 2, mid_x + new_x_range / 2)
-            # y_axis.setRange(chart.axisY().min(),chart.axisY().max())
-        
-        # Save the series so we can reattach them later
-        # series_list = chart.series()
-        
+
         # Remove current axes
-        # axes = chart.axes()
-        # for axis in axes:
-        #     chart.removeAxis(axis)
-        
-        # Add new axes
-        # chart.addAxis(x_axis, Qt.AlignBottom)
-        # chart.addAxis(y_axis, Qt.AlignLeft)
-        
-        # Reattach series to new axes
-        # for series in series_list:
-        #     series.attachAxis(x_axis)
-        #     series.attachAxis(y_axis)
-        
-        # Update current axes
-        # chart.axes(Qt.Horizontal)[0].setRange(x_axis.min(),x_axis.max())
-        # chart.axes(Qt.Vertical)[0].setRange(y_axis.min(),y_axis.max())
-        # chart.axes(Qt.Horizontal)[0].setRange(x_min,x_max)
-        # chart.axes(Qt.Vertical)[0].setRange(y_min,y_max)
-        
-        # Remove current axes and add new ones if axes don't exist
-        axes = chart.axes()
-        for axis in axes:
+        for axis in chart.axes():
             chart.removeAxis(axis)
 
-        # Create new axes
+        # Create new axes with labels
         x_axis = QValueAxis()
         y_axis = QValueAxis()
         x_axis.setRange(x_min, x_max)
         y_axis.setRange(y_min, y_max)
+        x_axis.setTitleText("x/c [-]")
+        y_axis.setTitleText("y/c [-]")
 
-        # Add new axes to the chart
         chart.addAxis(x_axis, Qt.AlignBottom)
         chart.addAxis(y_axis, Qt.AlignLeft)
 
