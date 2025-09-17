@@ -7,10 +7,10 @@ from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
 from PySide6.QtCore import QTimer, Qt, QDir, QPointF, QSizeF, QRectF
 
 
-from classes.station import Station
-from classes.section import Section
-from utils.bladeparams import norm_olp
-from utils.abaqusExp import *
+from edfoil.classes.station import Station
+from edfoil.classes.section import Section
+from edfoil.utils.bladeparams import norm_olp
+from edfoil.utils.abaqusExp import *
 
 import os
 import numpy as np
@@ -80,9 +80,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Initial airfoil list (from 'airfoils' folder)
         self.paths_airfoils = {}
-        for i in [x for x in os.listdir('./airfoils')]:
-            self.db.airfoils[i[:-4]] = np.genfromtxt(f'./airfoils/{i}')
-            self.paths_airfoils[i[:-4]] = f'./airfoils/{i}'
+        for i in [x for x in os.listdir('edfoil/airfoils')]:
+            self.db.airfoils[i[:-4]] = np.genfromtxt(f'edfoil/airfoils/{i}')
+            self.paths_airfoils[i[:-4]] = f'edfoil/airfoils/{i}'
         self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
         
         # Upload additional airfoils
