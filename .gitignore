@@ -18,3 +18,9 @@ dist/
 
 # Ignore EdFoil build artifacts
 EdFoil.spec
+
+# Ignore tests
+tests/blade_03/
+tests/blade_04/
+tests/blade_05/
+tests/blade_06/
