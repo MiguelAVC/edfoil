@@ -627,7 +627,7 @@ QPushButton{
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="home_page">
              <property name="styleSheet">
@@ -917,53 +917,6 @@ QLineEdit{
                   <number>9</number>
                  </property>
                  <item row="0" column="0">
-                  <widget class="QPushButton" name="airfoil_uploadcoords_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>125</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::LayoutDirection::LeftToRight</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton:hover{
-	background-color:rgba(255,255,255,0.5);
-	border-radius:5px;
-}</string>
-                   </property>
-                   <property name="text">
-                    <string>Upload coordinates:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="airfoil_coord_name">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>File</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignCenter</set>
-                   </property>
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
                   <widget class="QLabel" name="label_9">
                    <property name="minimumSize">
                     <size>
@@ -988,7 +941,23 @@ QLineEdit{
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0">
+                 <item row="0" column="1">
+                  <widget class="QSpinBox" name="airfoil_firstdigit_input">
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+                   </property>
+                   <property name="minimum">
+                    <number>5</number>
+                   </property>
+                   <property name="maximum">
+                    <number>6</number>
+                   </property>
+                   <property name="value">
+                    <number>6</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
                   <widget class="QLabel" name="label_10">
                    <property name="minimumSize">
                     <size>
@@ -1013,7 +982,17 @@ QLineEdit{
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="0">
+                 <item row="1" column="1">
+                  <widget class="QSpinBox" name="airfoil_seconddigit_input">
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+                   </property>
+                   <property name="value">
+                    <number>3</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
                   <widget class="QLabel" name="label_11">
                    <property name="minimumSize">
                     <size>
@@ -1038,7 +1017,17 @@ QLineEdit{
                    </property>
                   </widget>
                  </item>
-                 <item row="5" column="0">
+                 <item row="2" column="1">
+                  <widget class="QSpinBox" name="airfoil_thirddigit_input">
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+                   </property>
+                   <property name="value">
+                    <number>4</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
                   <widget class="QLabel" name="label_12">
                    <property name="minimumSize">
                     <size>
@@ -1063,7 +1052,17 @@ QLineEdit{
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="0">
+                 <item row="3" column="1">
+                  <widget class="QSpinBox" name="airfoil_lasttwodigits_input">
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+                   </property>
+                   <property name="value">
+                    <number>30</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
                   <widget class="QLabel" name="label_13">
                    <property name="minimumSize">
                     <size>
@@ -1088,53 +1087,7 @@ QLineEdit{
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="1">
-                  <widget class="QSpinBox" name="airfoil_firstdigit_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="minimum">
-                    <number>5</number>
-                   </property>
-                   <property name="maximum">
-                    <number>6</number>
-                   </property>
-                   <property name="value">
-                    <number>6</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QSpinBox" name="airfoil_seconddigit_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="value">
-                    <number>3</number>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="4" column="1">
-                  <widget class="QSpinBox" name="airfoil_thirddigit_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="value">
-                    <number>4</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="1">
-                  <widget class="QSpinBox" name="airfoil_lasttwodigits_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="value">
-                    <number>30</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="1">
                   <widget class="QSpinBox" name="airfoil_npoints_input">
                    <property name="buttonSymbols">
                     <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
@@ -1149,22 +1102,6 @@ QLineEdit{
                     <number>100</number>
                    </property>
                   </widget>
-                 </item>
-                 <item row="1" column="0" colspan="2">
-                  <spacer name="verticalSpacer_5">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Vertical</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Policy::Maximum</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
                  </item>
                 </layout>
                </widget>
@@ -3409,8 +3346,6 @@ QPushButton:hover{
   <tabstop>loadproject_button</tabstop>
   <tabstop>airfoil_saveairfoil_button</tabstop>
   <tabstop>airfoil_delairfoil_button</tabstop>
-  <tabstop>airfoil_uploadcoords_button</tabstop>
-  <tabstop>airfoil_coord_name</tabstop>
   <tabstop>airfoil_firstdigit_input</tabstop>
   <tabstop>airfoil_seconddigit_input</tabstop>
   <tabstop>airfoil_thirddigit_input</tabstop>
