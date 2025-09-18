@@ -15,7 +15,7 @@ except ImportError:
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(os.path.join(basedir, 'resources', 'icon.ico')))
+    app.setWindowIcon(QIcon(os.path.join(basedir, 'resources', 'icons', 'icon.ico')))
     window = MainWindow(app)
     window.show()
 

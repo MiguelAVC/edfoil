@@ -12,5 +12,9 @@ __pycache__/
 # Ignore other common files
 .DS_Store
 
-# Ignore build directory
+# Ignore build and distribution directories
 build/
+dist/
+
+# Ignore EdFoil build artifacts
+EdFoil.spec

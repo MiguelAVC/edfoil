@@ -30,7 +30,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # color_text = palette.property('text')
         
         self.setupUi(self)
-        self.setWindowTitle('TDesigner')
+        self.setWindowTitle('EdFoil')
         
         # Messagebar
         self.timer_msg = QTimer(parent=self)
