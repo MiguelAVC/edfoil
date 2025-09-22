@@ -34,7 +34,11 @@ Sub importCoords()
     Dim x As Double, y As Double, z As Double
     
     ' Folder containing text files
-    folderPath = "D:\Github\TBlade-Designer\tests\blade_03\solidworks\" ' IMPORTANT: Change to your folder path
+    folderPath = BrowseForFolder("Select the folder containing your text files:")
+    If folderPath = "" Then
+        MsgBox "No folder selected. Exiting macro."
+        Exit Sub
+    End If
     
     ' Initialize File System Object
     Set fso = CreateObject("Scripting.FileSystemObject")
@@ -88,3 +92,15 @@ Sub importCoords()
     MsgBox "Points imported successfully from all text files."
 
 End Sub
+
+Function BrowseForFolder(prompt As String) As String
+    Dim shellApp As Object
+    Set shellApp = CreateObject("Shell.Application")
+    Dim folder As Object
+    Set folder = shellApp.BrowseForFolder(0, prompt, 0, 0)
+    If Not folder Is Nothing Then
+        BrowseForFolder = folder.Items().Item().Path
+    Else
+        BrowseForFolder = ""
+    End If
+End Function

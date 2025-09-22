@@ -14,7 +14,7 @@ from edfoil.utils.bladeparams import norm_olp
 from edfoil.utils.abaqusExp import *
 from edfoil.utils.dev import resource_path
 
-import os
+import os, math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import splev
@@ -35,9 +35,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Messagebar
         self.timer_msg = QTimer(parent=self)
         self.timer_msg.setSingleShot(True)
+        self.timer_msg.timeout.connect(self.show_def_msg)
         
         # Project start
-        self.db = db() # Class db [not a dictionary]
+        self.db = session() # Class db [not a dictionary]
         self.edits = {}
         self.handle_msgbar(message='New database created.')
         
@@ -48,7 +49,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.blade_page_button.clicked.connect(self.switch_to_bladePage)
         self.skin_page_button.clicked.connect(self.switch_to_skinPage)
         self.spar_page_button.clicked.connect(self.switch_to_sparPage)
-        self.abaqus_page_button.clicked.connect(self.switch_to_abaqusPage)
+        self.export_page_button.clicked.connect(self.switch_to_exportPage)
         
         # Lower sidebar buttons
         self.info_button.clicked.connect(self.info_message)
@@ -69,12 +70,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Page 1 (Airfoil Creator)
         
         # List of airfoils
-        self.paths_airfoils = {}
-        for i in [x for x in os.listdir(resource_path('edfoil/airfoils'))]:
-            airfoil_path = resource_path(f'edfoil/airfoils/{i}')
-            self.db.airfoils[i[:-4]] = np.genfromtxt(airfoil_path)
-            self.paths_airfoils[i[:-4]] = airfoil_path
-        self.airfoil_listairfoils_widget.addItems(list(self.db.airfoils.keys()))
+        self.load_default_airfoils()
         
         # Main chart
         self.airfoil_chart = self.graph_template()
@@ -82,7 +78,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
         
         # Signals
-        self.airfoil_listairfoils_widget.itemClicked.connect(self.update_naca_chart)
+        self.airfoil_nacaseries_input.currentTextChanged.connect(self.update_parameters)
+        self.airfoil_calculateairfoil_button.clicked.connect(self.calculate_airfoil)
+        self.airfoil_saveairfoil_button.clicked.connect(self.save_airfoil)
+        self.airfoil_listairfoils_widget.currentRowChanged.connect(self.update_naca_chart)
+        self.airfoil_delAirfoil_button.clicked.connect(self.delete_airfoil)
         
         # ---------------------------------------------------------------------
         # Page 2 (Station Generator)
@@ -92,7 +92,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_station.setSingleShot(True)
         self.timer_station.timeout.connect(self.update_airfoil_chart)
         
-        # Initial airfoil list (from 'airfoils' folder)
+        # Airfoil list
         self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
         
         # Upload additional airfoils
@@ -199,70 +199,168 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # ---------------------------------------------------------------------
         # Page 6 (ABAQUS EXPORT)
         self.stackedWidget.currentChanged.connect(self.update_sectionList)
-        self.abaqus_export_button.clicked.connect(self.exportSections)
+        self.export_export_button.clicked.connect(self.exportSections)
         
     ### AIRFOIL METHODS (Page 1)
-    def update_naca_chart(self):
-        airfoil_name = self.airfoil_listairfoils_widget.currentItem().text()
+    def update_parameters(self):
+        naca_series = self.airfoil_nacaseries_input.currentText()
+        if naca_series == 'NACA 4-digit':
+            self.label_10.setText('1st digit (max camber):')
+            self.label_11.setText('2nd digit (pos max camber):')
+            self.label_12.setText('Last two digits (thickness):')
+        else:
+            self.label_10.setText('2nd digit:')
+            self.label_11.setText('3rd digit:')
+            self.label_12.setText('Last two digits (thickness):')
+    
+    def calculate_airfoil(self):
+        
+        naca_series = self.airfoil_nacaseries_input.currentText()
+        digits = self.airfoil_seconddigit_input.text() + \
+            self.airfoil_thirddigit_input.text()
+        
+        last_two = int(self.airfoil_lasttwodigits_input.text())
+        last_two = f'{last_two:02d}' # Ensure two digits
+        
+        digits += last_two
+        
+        if naca_series == 'NACA 4-digit':
+            airfoil_name = digits
+        elif naca_series == 'NACA 6-series':
+            airfoil_name = '6' + digits
+        else: # NACA 6A-series
+            airfoil_name = '6' + digits[0] + 'A' + digits[1:]
+        
+        # Check if airfoil already exists
+        if f'NACA{airfoil_name}' in self.db.airfoils.keys():
+            self.handle_msgbar(f'Airfoil NACA {airfoil_name} already exists.')
+            raise ValueError('Airfoil already exists.')
+        
+        print(f'Creating airfoil: {airfoil_name}')
+        
         airfoil = Airfoil(airfoil_name)
-        airfoil.importCoords(self.paths_airfoils[airfoil_name])
-        data = airfoil
+        name_input = Airfoil.nameinput(airfoil_name)
+        airfoil.naca456(name_input)
+        
+        self.edits['__airfoil__'] = airfoil
+        
+        # Replace unsaved airfoil in the list (if exists)
+        last_row = self.airfoil_listairfoils_widget.count() - 1      
+        if '*' in self.airfoil_listairfoils_widget.item(last_row).text():
+            self.airfoil_listairfoils_widget.takeItem(last_row)
+        
+        # Insert new unsaved airfoil in the list
+        self.airfoil_listairfoils_widget.addItem(f'{airfoil.family} {airfoil.profile}*')
+        last_row = self.airfoil_listairfoils_widget.count() - 1  
+        self.airfoil_listairfoils_widget.setCurrentRow(last_row)
+    
+    def save_airfoil(self):
+        
+        # Save the airfoil in the session database
+        try:
+            airfoil = self.edits['__airfoil__']
+        except KeyError:
+            self.handle_msgbar('No airfoil to save.')
+            return
+        
+        self.db.airfoils[airfoil.name] = airfoil
+        del self.edits['__airfoil__']
+        
+        # Update airfoil list (remove asterisk)
+        items = [self.airfoil_listairfoils_widget.item(i).text() 
+            for i in range(self.airfoil_listairfoils_widget.count())]
+        index = items.index(f'{airfoil.family} {airfoil.profile}*')
+        new_text = f'{airfoil.family} {airfoil.profile}'
+        self.airfoil_listairfoils_widget.item(index).setText(new_text)
+        
+        # Print message
+        self.handle_msgbar(f'Airfoil {airfoil.name} saved.')
+        # print(self.db.airfoils.keys())
+                
+    def update_naca_chart(self):
+        
+        try:
+            airfoil_name = self.airfoil_listairfoils_widget.currentItem().text()
+            
+        except AttributeError:
+            empty_chart = self.graph_template()
+            self.airfoil_chartview.setChart(empty_chart)
+            return
+        
+        # Debug
+        # print(f'Selected airfoil: {airfoil_name}')
+        
+        if '*' in airfoil_name:
+            airfoil = self.edits['__airfoil__']
+        else:
+            airfoil = self.db.airfoils[airfoil_name.replace(' ','')]
+        
         # Clear the current series data and update with new values
         series = QLineSeries()
-        for i in data.xy:
+        for i in airfoil.xy:
             series.append(float(i[0]),float(i[1]))
         
         # Create new chart
         chart = QChart()
         chart.setAnimationOptions(QChart.SeriesAnimations)
-        chart.legend().hide()
+        # chart.legend().hide()
         chart.addSeries(series)
         
-        # x_axis = QValueAxis()
-        # y_axis = QValueAxis()
-        # aspect_ratio = QSizeF(16,9)
+        xy_range = np.array(airfoil.xy)
         
-        xy_range = data.xy
-        # print(xy_range)
-        x_min, x_max = xy_range[0]
-        y_min, y_max = xy_range[1]
+        x_min = np.min(xy_range[:,0])
+        x_max = np.max(xy_range[:,0])
+        y_min = np.min(xy_range[:,1])
+        y_max = np.max(xy_range[:,1])
         
-        # dx = x_max - x_min
-        # dy = y_max - y_min
-        # # print(f'dx: {dx}, dy: {dy}')
+        # Chord line
+        cl = QLineSeries()
+        cl.append(x_min, 0)
+        cl.append(x_max, 0)
+        chart.addSeries(cl)
         
-        # aspect_ratio.scale(dx,dy,Qt.KeepAspectRatioByExpanding)
-        # # print(f'Scaled aspect ratio: {aspect_ratio}')
+        # Legend
+        series.setName(airfoil_name)
+        cl.setName('Chord line')
+        cl.setColor(QColor(150,150,150))
+        cl.setPen(QPen(QBrush(QColor(150,150,150)), 2, Qt.DashLine))
+        chart.legend().setVisible(True)
+        chart.legend().setAlignment(Qt.AlignBottom)
         
-        # height = aspect_ratio.height()
-        # width = aspect_ratio.width()
-        # # print(f'height: {height}, width: {width}')
+        chart.createDefaultAxes()
+        x_axis = chart.axes(Qt.Horizontal)[0]
+        y_axis = chart.axes(Qt.Vertical)[0]
+        x_axis.setTitleText('x/c [-]')
+        y_axis.setTitleText('y/c [-]')
+        x_axis.setTitleFont(QFont('Helvetica',14))
+        y_axis.setTitleFont(QFont('Helvetica',14))
         
-        # x_mid = (x_min + x_max) / 2
-        # y_mid = (y_min + y_max) / 2
-        
-        # new_x_min = x_mid - width * 0.5 * 1.1
-        # new_x_max = x_mid + width * 0.5 * 1.1
-        
-        # new_y_min = y_mid - height * 0.5 * 1.1
-        # new_y_max = y_mid + height * 0.5 * 1.1
-        
-        # x_axis.setRange(new_x_min, new_x_max)
-        # y_axis.setRange(new_y_min, new_y_max)
-        
-        # x_axis.setTitleText("x/c [-]")
-        # y_axis.setTitleText("y/c [-]")
-        
-        # chart.addAxis(x_axis, Qt.AlignBottom)
-        # chart.addAxis(y_axis, Qt.AlignLeft)
-        # series.attachAxis(x_axis)
-        # series.attachAxis(y_axis)
-        
-        self.equal_axes(chart, [[x_min, x_max], [y_min, y_max]])
         self.airfoil_chartview.setChart(chart)
+        self.equal_axes(chart, [[x_min, x_max], [y_min, y_max]])
+    
+    def delete_airfoil(self):
+        airfoil_name = self.airfoil_listairfoils_widget.currentItem().text()
+        airfoil_id = airfoil_name.replace(' ','')
         
-        # Store it as an unsaved airfoil
-        self.edits['__airfoil__'] = data
+        if '*' in airfoil_id:
+            self.handle_msgbar('Airfoil not saved yet.')
+            return
+        
+        if airfoil_id in self.db.airfoils.keys():
+            del self.db.airfoils[airfoil_id]
+            self.handle_msgbar(f'Airfoil {airfoil_name} deleted.')
+            
+            # Update airfoil list
+            items = [self.airfoil_listairfoils_widget.item(i).text() 
+                for i in range(self.airfoil_listairfoils_widget.count())]
+            index = items.index(airfoil_name)
+            self.airfoil_listairfoils_widget.takeItem(index)
+            
+            # Clear chart
+            # empty_chart = self.graph_template()
+            # self.airfoil_chartview.setChart(empty_chart)
+        else:
+            self.handle_msgbar('Airfoil not found in database.')
     
     ### STATION METHODS (Page 2a)
     
@@ -293,17 +391,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             # Calculate new values
             airfoil_selected:str = self.station_listairfoils_box.currentText()
-            data = Station(chord=chord_length,
-                           twist_angle=twist_angle,
-                           x_offset=x_offset,
-                           y_offset=y_offset,
-                           z_offset=z_offset,
-                           x_multiplier=x_multiplier,
-                           y_multiplier=y_multiplier,
-                           z_multiplier=z_multiplier,
-                           path=self.paths_airfoils[airfoil_selected],
-                           x_mirror=x_mirror,
-                           y_mirror=y_mirror)
+            data = Station(
+                airfoil=self.db.airfoils[airfoil_selected],
+                chord=chord_length,
+                twist_angle=twist_angle,
+                x_offset=x_offset,
+                y_offset=y_offset,
+                z_offset=z_offset,
+                x_multiplier=x_multiplier,
+                y_multiplier=y_multiplier,
+                z_multiplier=z_multiplier,
+                x_mirror=x_mirror,
+                y_mirror=y_mirror,
+                # path=self.paths_airfoils[airfoil_selected],
+            )
             
             # Clear the current series data and update with new values
             airfoil_series = QLineSeries()
@@ -430,17 +531,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     sta_data[col] = self.station_tableStations_input.cellWidget(row, col).isChecked()
             
-            station = Station(chord=float(sta_data[1]),
-                              twist_angle=float(sta_data[2]),
-                              x_offset=float(sta_data[3]),
-                              y_offset=float(sta_data[4]),
-                              z_offset=float(sta_data[5]),
-                              x_multiplier=float(sta_data[6]),
-                              y_multiplier=float(sta_data[7]),
-                              z_multiplier=float(sta_data[8]),
-                              x_mirror=bool(sta_data[9]),
-                              y_mirror=bool(sta_data[10]),
-                              path=self.paths_airfoils[sta_data[0]])
+            station = Station(
+                airfoil=self.db.airfoils[sta_data[0]],
+                chord=float(sta_data[1]),
+                twist_angle=float(sta_data[2]),
+                x_offset=float(sta_data[3]),
+                y_offset=float(sta_data[4]),
+                z_offset=float(sta_data[5]),
+                x_multiplier=float(sta_data[6]),
+                y_multiplier=float(sta_data[7]),
+                z_multiplier=float(sta_data[8]),
+                x_mirror=bool(sta_data[9]),
+                y_mirror=bool(sta_data[10]),
+                # path=self.paths_airfoils[sta_data[0]],
+            )
             
             station_name = f'sta_{int(sta_data[5])}'
             
@@ -587,9 +691,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         idx_olp_len = self.blade_skinolplen_selected.currentIndex()
         
         self.db.blade['olp_sta'] = self.edits['__olp_sta__'][idx_olp_sta]
-        print(self.db.blade['olp_sta'])
+        # print(self.db.blade['olp_sta'])
         self.db.blade['olp_len'] = self.edits['__olp_len__'][idx_olp_len]
-        print(self.db.blade['olp_len'])
+        # print(self.db.blade['olp_len'])
         
         self.handle_msgbar(f'Parameters saved.')
     
@@ -631,7 +735,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             te_thickness = te_thkn,
                             saveFig = saveFig,
                             )
-                print('section generated')
+                print('Section generated.')
                 
                 # Generate colours
                 colours = self.generate_colours(num_curves=n_plies, cmap_name='viridis')
@@ -683,15 +787,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def update_sectionList(self):
         if self.stackedWidget.currentIndex() == 6:
-            self.abaqus_sectionsList.clear()
+            self.export_sectionsList.clear()
             list_sections = list(self.db.sections.keys())
-            self.abaqus_sectionsList.insertItems(0,list_sections)
+            self.export_sectionsList.insertItems(0,list_sections)
             
     def exportSections(self):
-        if len(self.abaqus_sectionsList.selectedItems()) > 0:
-            items = self.abaqus_sectionsList.selectedItems()
+        if len(self.export_sectionsList.selectedItems()) > 0:
+            items = self.export_sectionsList.selectedItems()
             dict_sections = {int(sec.text()[4:]):skinSection(self.db.sections[sec.text()]) for sec in items}
-            filename = f'{self.abaqus_expFileName_input.text()}'
+            filename = f'{self.export_expFileName_input.text()}'
             skinPart(sections=dict_sections, filename=filename)
             
             self.handle_msgbar(f'File "{filename}.json" exported succesfully.')
@@ -700,21 +804,57 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     ### GENERAL UI METHODS
     
-    def airfoil_mousecoords(self, event: QMouseEvent) -> str:
-        coords = event.position()
-        x,y = coords.x(), coords.y()
-        coord_lims = self.airfoil_chart.plotArea().getCoords()
+    def load_default_airfoils(self):
         
-        if (x >= coord_lims[0] and x <= coord_lims[2] and
-            y >= coord_lims[1] and y <= coord_lims[3]):
+        self.paths_airfoils = {}
+        for i in [x for x in os.listdir(resource_path('edfoil/airfoils'))]:
+            airfoil_path = resource_path(f'edfoil/airfoils/{i}')
+            airfoil = Airfoil()
+            airfoil.importCoords(airfoil_path)
+            self.db.airfoils[airfoil.name] = airfoil
+            # TODO: Get rid of path airfoils
+            self.paths_airfoils[airfoil.name] = airfoil_path
             
-            coords_scaled = self.airfoil_chart.mapToValue(coords)
-            x_scaled = coords_scaled.x()
-            y_scaled = coords_scaled.y()
+            # Debug
+            # print(list(self.db.airfoils.keys()))
+        
+        names = [f'{x.family} {x.profile}' for x in self.db.airfoils.values()]
+        self.airfoil_listairfoils_widget.clear()
+        self.airfoil_listairfoils_widget.addItems(names)
+    
+    def airfoil_mousecoords(self, event: QMouseEvent) -> None:
+        # coords = event.position()
+        # x,y = coords.x(), coords.y()
+        # coord_lims = self.airfoil_chart.plotArea().getCoords()
+        
+        # if (x >= coord_lims[0] and x <= coord_lims[2] and
+        #     y >= coord_lims[1] and y <= coord_lims[3]):
             
-            self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
+        #     coords_scaled = self.airfoil_chart.mapToValue(coords)
+        #     x_scaled = coords_scaled.x()
+        #     y_scaled = coords_scaled.y()
             
-    def station_mousecoords(self, event: QMouseEvent) -> str:
+        #     self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
+        
+        chart = self.airfoil_chartview.chart()
+        if chart is None or not chart.series():
+            return
+          
+        series = chart.series()[0]  # or find the one you want
+        pos = event.position()      # QChartView coords
+
+        # Map to data using the series-aware overload
+        value_pt = chart.mapToValue(pos, series)
+
+        # Check that the mapped point is inside the plotArea by re-mapping back
+        back = chart.mapToPosition(value_pt, series)  # chart coords
+        if chart.plotArea().contains(back):
+            self.airfoil_xy_current.setText(f'({value_pt.x():.2f}, {value_pt.y():.2f})')
+        else:
+            # Optional: clear or ignore when outside
+            pass
+            
+    def station_mousecoords(self, event: QMouseEvent) -> None:
         coords = event.position()
         x,y = coords.x(), coords.y()
         coord_lims = self.station_chartview.chart().plotArea().getCoords()
@@ -728,7 +868,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             self.station_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
     
-    def graph_template(self):
+    def graph_template(self) -> QChart:
         """Empty graph template.
 
         Returns:
@@ -742,11 +882,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         axisX = QValueAxis()
         axisY = QValueAxis()
-        # axisX.setTitleText('x [-]')
-        # axisY.setTitleText('y [-]')
         chart.addAxis(axisX, Qt.AlignBottom)
         chart.addAxis(axisY, Qt.AlignLeft)
-        # chart.setLocalizeNumbers(True)
         data.attachAxis(axisX)
         data.attachAxis(axisY)
         
@@ -775,42 +912,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Determine aspect ratio of the plot area
         height = chart.plotArea().height()
         width = chart.plotArea().width()
-        aspect_ratio = width / height if height != 0 else 1
+        aspect_ratio = width / height if height > 0 else 1.
 
-        x_range = x_max - x_min
-        y_range = y_max - y_min
+        x_mid = (x_max + x_min) / 2
+        y_mid = (y_max + y_min) / 2
 
-        # Adjust ranges to enforce 1:1 aspect ratio
-        if x_range > y_range * aspect_ratio:
-            mid_y = (y_max + y_min) / 2
-            new_y_range = x_range / aspect_ratio
-            y_min = mid_y - new_y_range / 2
-            y_max = mid_y + new_y_range / 2
+        x_span = x_max - x_min or 1e-12  # Prevent division by zero
+        y_span = y_max - y_min or 1e-12  # Prevent division by zero
+
+        # Adjust spans to make them visually equal
+        if x_span / y_span > aspect_ratio:
+            # x dominates → expand y range
+            new_y_span = x_span / aspect_ratio
+            y_min = y_mid - new_y_span / 2
+            y_max = y_mid + new_y_span / 2
+            x_min = x_mid - x_span / 2
+            x_max = x_mid + x_span / 2
         else:
-            mid_x = (x_max + x_min) / 2
-            new_x_range = y_range * aspect_ratio
-            x_min = mid_x - new_x_range / 2
-            x_max = mid_x + new_x_range / 2
+            # y dominates → expand x range
+            new_x_span = y_span * aspect_ratio
+            x_min = x_mid - new_x_span / 2
+            x_max = x_mid + new_x_span / 2
+            y_min = y_mid - y_span / 2
+            y_max = y_mid + y_span / 2
+            
+        # Padding
+        pad = 0.05  # 5% padding
+        px = (x_max - x_min) * pad
+        py = (y_max - y_min) * pad
+        x_min -= px; x_max += px
+        y_min -= py; y_max += py
 
-        # Remove current axes
-        for axis in chart.axes():
-            chart.removeAxis(axis)
-
-        # Create new axes with labels
-        x_axis = QValueAxis()
-        y_axis = QValueAxis()
-        x_axis.setRange(x_min, x_max)
-        y_axis.setRange(y_min, y_max)
-        x_axis.setTitleText("x/c [-]")
-        y_axis.setTitleText("y/c [-]")
-
-        chart.addAxis(x_axis, Qt.AlignBottom)
-        chart.addAxis(y_axis, Qt.AlignLeft)
-
-        # Reattach the series to the new axes
-        for series in chart.series():
-            series.attachAxis(x_axis)
-            series.attachAxis(y_axis)
+        # Apply to axes
+        for axis in chart.axes(Qt.Horizontal):
+            axis.setRange(x_min, x_max)
+        for axis in chart.axes(Qt.Vertical):
+            axis.setRange(y_min, y_max)   
     
     def change_work_directory(self) -> None:
         dialog = QFileDialog(self)
@@ -830,7 +967,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # TODO: decode tbd or json file into db class dictionary.
             
     def new_db(self) -> None:
-        self.db = db()
+        self.db = session()
+        self.load_default_airfoils()
         self.handle_msgbar('New session started.')
         
     def mouse_coords(self,label,event):
@@ -848,6 +986,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(2)
         self.page_title_label.setText(self.station_page_button.text())
         
+        # Update airfoil list in station page
+        names_airfoils = list(self.db.airfoils.keys())
+        self.station_listairfoils_box.clear()
+        self.station_listairfoils_box.addItems(names_airfoils)
+        
+        # Update dropwn menu in advanced tab
+        n_rows = self.station_tableStations_input.rowCount()
+        for row in range(n_rows):
+            list_airfoils = QComboBox()
+            list_airfoils.addItems(list(self.db.airfoils.keys()))
+            self.station_tableStations_input.setCellWidget(row,0,list_airfoils)
+        
     def switch_to_bladePage(self):
         self.stackedWidget.setCurrentIndex(3)
         self.page_title_label.setText(self.blade_page_button.text())
@@ -860,9 +1010,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(5)
         self.page_title_label.setText(self.spar_page_button.text())
     
-    def switch_to_abaqusPage(self):
+    def switch_to_exportPage(self):
         self.stackedWidget.setCurrentIndex(6)
-        self.page_title_label.setText(self.abaqus_page_button.text())
+        self.page_title_label.setText(self.export_page_button.text())
     
     def upload_airfoil_file(self):
         dialog = QFileDialog(self)
@@ -909,7 +1059,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             with open(file_path, 'w') as file:
                 file.write(content)
-            QMessageBox.Information(self, 'Success', f'File saved successfully: {file_path}')
+            QMessageBox.information(self, 'Success', f'File saved successfully: {file_path}')
         
         except Exception as e:
             QMessageBox.critical(self, 'Error', f'An error occurred: {str(e)}')
@@ -925,6 +1075,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.main_path, 'TBlade Files (*.tbd);;All Files (*)', 
             options=QFileDialog.Options())
         
+        # TODO: encode db class dictionary into tbd file.
         if file_path:
             self.database_file(file_path,'Hello')
             
@@ -932,10 +1083,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         msgBox = QMessageBox()
         about_text = 'This open source software, has been developed in ' \
         'the School of Engineering, in the University of Edinburgh.\n\n' \
-        'The current version is version 0.1'
+        'The current version is version 0.2'
         
-        #TODO: Need to add Software Icon
-        msgBox.about(self, 'About TBlade Designer', about_text)
+        msgBox.about(self, 'About EdFoil', about_text)
     
     ### MESSAGE BAR METHODS
     
@@ -945,14 +1095,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.def_msgbar.hide()
             self.msgbar.setText(message)
             self.msgbar.show()
-            self.timer_msg.timeout.connect(self.show_def_msg)
             
     def show_def_msg(self):
             self.def_msgbar.show()
             self.msgbar.hide()
         
         
-class db():
+class session():
     def __init__(self):
         self.airfoils = {}
         self.stations = {}

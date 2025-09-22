@@ -33,6 +33,14 @@ QPushButton:hover{
 	font-weight:bold;
 }
 
+QPushButton:pressed {
+    background-color: rgba(0,0,0,0.2);
+	color:rgb(35, 46, 47);
+	font:700 9pt;
+    padding-bottom: 0.22em;      /* keeps total height similar */
+    border: 3px solid #0b2232;   /* subtle inner edge */
+}
+
 QLabel{
 	color:white;
 }
@@ -334,7 +342,7 @@ QPushButton{
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="abaqus_page_button">
+        <widget class="QPushButton" name="export_page_button">
          <property name="minimumSize">
           <size>
            <width>150</width>
@@ -355,7 +363,7 @@ QPushButton{
 }</string>
          </property>
          <property name="text">
-          <string>Abaqus Export</string>
+          <string>Blade Export</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -464,6 +472,9 @@ QPushButton{
     </item>
     <item row="0" column="1">
      <widget class="QWidget" name="main_widget" native="true">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="leftMargin">
         <number>0</number>
@@ -627,7 +638,7 @@ QPushButton{
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="home_page">
              <property name="styleSheet">
@@ -636,17 +647,25 @@ QPushButton{
 }
 
 QPushButton{
-	font:700 10pt;
-	background-color: #0B212E;
+	font:700 12pt;
+	background-color:#193d4e;
 	border-radius:5px;
 	color:white;
-	padding:0.25em 3em;
+	padding:0.25em 2em;
 }
 
 QPushButton:hover{
 	background-color: rgba(0,0,0,0.2);
 	color:rgb(35, 46, 47);
 	font: 700;
+}
+
+QPushButton:pressed {
+    background-color: rgba(0,0,0,0.2);
+	color:rgb(35, 46, 47);
+	font:700 9pt;
+    padding-bottom: 0.22em;      /* keeps total height similar */
+    border: 3px solid #0b2232;   /* subtle inner edge */
 }</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
@@ -828,285 +847,33 @@ QPushButton:hover{
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item row="2" column="0" colspan="3">
-               <widget class="QWidget" name="horizontalWidget_2" native="true">
+              <item row="3" column="0" colspan="3">
+               <widget class="QLabel" name="label_14">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                  <italic>false</italic>
+                  <bold>true</bold>
+                 </font>
+                </property>
                 <property name="styleSheet">
-                 <string notr="true">QPushButton{
-	font:700 10pt;
-	background-color:#193d4e;
-	border-radius:5px;
+                 <string notr="true">QLabel{
+	font:700 12pt;
+	background-color: #193d4e;
+	border-radius:10px;
 	color:white;
 	padding:0.25em 1em;
-}
-
-QPushButton:hover{
-	background-color: rgba(0,0,0,0.2);
-	color:rgb(35, 46, 47);
-	font: 700;
 }</string>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
-                  <widget class="QPushButton" name="airfoil_saveairfoil_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Save airfoil</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_5">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Policy::Preferred</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>10</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="airfoil_delairfoil_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Delete airfoil</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="3">
-               <widget class="QWidget" name="airfoil_parameters_widget" native="true">
-                <property name="styleSheet">
-                 <string notr="true">QWidget{
-	background-color:#193d4e;
-	color:white;
-	border-radius:10px;
-}
-
-QSpinBox{
-	background-color:white;
-	color: #193d4e;
-	border-radius:5px;
-}
-
-QLineEdit{
-	background-color:white;
-	color:#193d4e;
-	border-radius:5px;
-}</string>
+                <property name="text">
+                 <string>Airfoils available:</string>
                 </property>
-                <layout class="QFormLayout" name="formLayout_2">
-                 <property name="verticalSpacing">
-                  <number>9</number>
-                 </property>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_9">
-                   <property name="minimumSize">
-                    <size>
-                     <width>125</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>150</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>NACA series:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>airfoil_firstdigit_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QSpinBox" name="airfoil_firstdigit_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="minimum">
-                    <number>5</number>
-                   </property>
-                   <property name="maximum">
-                    <number>6</number>
-                   </property>
-                   <property name="value">
-                    <number>6</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_10">
-                   <property name="minimumSize">
-                    <size>
-                     <width>125</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>150</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Second digit:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>airfoil_seconddigit_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QSpinBox" name="airfoil_seconddigit_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="value">
-                    <number>3</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_11">
-                   <property name="minimumSize">
-                    <size>
-                     <width>125</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>150</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Third digit:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>airfoil_thirddigit_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QSpinBox" name="airfoil_thirddigit_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="value">
-                    <number>4</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="label_12">
-                   <property name="minimumSize">
-                    <size>
-                     <width>125</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>150</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Last two digits:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>airfoil_lasttwodigits_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QSpinBox" name="airfoil_lasttwodigits_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="value">
-                    <number>30</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="label_13">
-                   <property name="minimumSize">
-                    <size>
-                     <width>125</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>150</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Number of points:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                   <property name="buddy">
-                    <cstring>airfoil_npoints_input</cstring>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <widget class="QSpinBox" name="airfoil_npoints_input">
-                   <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
-                   </property>
-                   <property name="minimum">
-                    <number>50</number>
-                   </property>
-                   <property name="maximum">
-                    <number>200</number>
-                   </property>
-                   <property name="value">
-                    <number>100</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
                </widget>
               </item>
-              <item row="0" column="3" rowspan="5">
+              <item row="0" column="3" rowspan="7">
                <widget class="QWidget" name="airfoil_graph_widget" native="true">
                 <property name="minimumSize">
                  <size>
@@ -1197,32 +964,6 @@ QLineEdit{
                 </layout>
                </widget>
               </item>
-              <item row="3" column="0" colspan="3">
-               <widget class="QLabel" name="label_14">
-                <property name="font">
-                 <font>
-                  <pointsize>12</pointsize>
-                  <italic>false</italic>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QLabel{
-	font:700 12pt;
-	background-color: #193d4e;
-	border-radius:10px;
-	color:white;
-	padding:0.25em 1em;
-}</string>
-                </property>
-                <property name="text">
-                 <string>Airfoils available:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0" colspan="3">
                <widget class="QLabel" name="label_8">
                 <property name="maximumSize">
@@ -1255,14 +996,388 @@ QLineEdit{
                 </property>
                </widget>
               </item>
-              <item row="4" column="0" colspan="3">
+              <item row="2" column="0" colspan="3">
+               <widget class="QWidget" name="horizontalWidget_2" native="true">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+	font:700 10pt;
+	background-color:#193d4e;
+	border-radius:5px;
+	color:white;
+	padding:0.25em 1em;
+}
+
+QPushButton:hover{
+	background-color: rgba(0,0,0,0.2);
+	color:rgb(35, 46, 47);
+	font: 700;
+}
+
+QPushButton:pressed {
+    background-color: rgba(0,0,0,0.2);
+	color:rgb(35, 46, 47);
+	font:700 9pt;
+    padding-bottom: 0.22em;      /* keeps total height similar */
+    border: 3px solid #0b2232;   /* subtle inner edge */
+}</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QPushButton" name="airfoil_calculateairfoil_button">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Calculate</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="airfoil_saveairfoil_button">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Save</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QPushButton" name="airfoil_delAirfoil_button">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+	font:700 10pt;
+	background-color:#193d4e;
+	border-radius:5px;
+	color:white;
+	padding:0.25em 1em;
+}
+
+QPushButton:hover{
+	background-color: rgba(0,0,0,0.2);
+	color:rgb(35, 46, 47);
+	font: 700;
+}
+
+QPushButton:pressed {
+    background-color: rgba(0,0,0,0.2);
+	color:rgb(35, 46, 47);
+	font:700 9pt;
+    padding-bottom: 0.22em;      /* keeps total height similar */
+    border: 3px solid #0b2232;   /* subtle inner edge */
+}</string>
+                </property>
+                <property name="text">
+                 <string>Delete airfoil</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="3">
+               <widget class="QWidget" name="airfoil_parameters_widget" native="true">
+                <property name="styleSheet">
+                 <string notr="true">QWidget{
+	background-color:#193d4e;
+	color:white;
+	border-radius:10px;
+}
+
+QSpinBox{
+	background-color:white;
+	color: #193d4e;
+	border-radius:5px;
+}
+
+QLineEdit{
+	background-color:white;
+	color:#193d4e;
+	border-radius:5px;
+}</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_18">
+                 <property name="verticalSpacing">
+                  <number>9</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_9">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>125</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>150</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>NACA series:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="airfoil_nacaseries_input">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QComboBox{
+	background-color:white;
+	border-radius:5px;
+	color:#0B212E;
+	padding-left:0.5em;
+}</string>
+                   </property>
+                   <property name="editable">
+                    <bool>false</bool>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>NACA 4-digit</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>NACA 6-series</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>NACA 6A-series</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_10">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>125</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>150</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string>1st digit (max camber):</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buddy">
+                    <cstring>airfoil_seconddigit_input</cstring>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QSpinBox" name="airfoil_seconddigit_input">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignJustify|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+                   </property>
+                   <property name="showGroupSeparator" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                   <property name="value">
+                    <number>3</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_11">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>125</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>150</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string>2nd digit (pos max camber)</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buddy">
+                    <cstring>airfoil_thirddigit_input</cstring>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QSpinBox" name="airfoil_thirddigit_input">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignJustify|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+                   </property>
+                   <property name="showGroupSeparator" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                   <property name="value">
+                    <number>4</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_12">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>125</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>150</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string>Last two digits (thickness):</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buddy">
+                    <cstring>airfoil_lasttwodigits_input</cstring>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QSpinBox" name="airfoil_lasttwodigits_input">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignJustify|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+                   </property>
+                   <property name="showGroupSeparator" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                   <property name="value">
+                    <number>30</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="4" column="1">
                <widget class="QListWidget" name="airfoil_listairfoils_widget">
                 <property name="styleSheet">
-                 <string notr="true">QListWidget{
-	border-color:yellow;
-	background-color:#193d4e;
-	border-radius:10px;
-	color:white;
+                 <string notr="true">/* Widget frame */
+QListWidget {
+    background: white;                 /* or background-color: white; */
+    border: 3px solid #193d4e;         /* width + style + color */
+    border-radius: 10px;
+    color: #193d4e;                    /* text colour for unselected items */
+    outline: 0;                        /* optional: remove focus dotted outline */
+}
+
+/* Item text padding so it isn’t glued to the border */
+QListWidget::item,
+QListWidget::item:selected,
+QListWidget::item:hover {
+    padding: 2px 10px;   /* top/bottom 6, left/right 10 */
+}
+
+/* Selection colours */
+QListWidget::item:selected {
+    background: #e6f2f7;
+    color: #0B212E;
+}
+
+/* Optional: hover feedback */
+QListWidget::item:hover {
+    background: #f5f9fc;
 }</string>
                 </property>
                 <property name="spacing">
@@ -1304,7 +1419,7 @@ QPushButton:hover{
               <item row="0" column="0" colspan="2">
                <widget class="QTabWidget" name="station_tab_widget">
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="station_tab1">
                  <attribute name="title">
@@ -1780,6 +1895,14 @@ QPushButton:hover{
 	background-color: rgba(0,0,0,0.2);
 	color:#0B212E;
 	font: 700;
+}
+
+QPushButton:pressed {
+    background-color: rgba(0,0,0,0.2);
+	color:rgb(35, 46, 47);
+	font:700 9pt;
+    padding-bottom: 0.22em;      /* keeps total height similar */
+    border: 3px solid #0b2232;   /* subtle inner edge */
 }</string>
                     </property>
                     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -1863,13 +1986,6 @@ QPushButton:hover{
 	background-color:#0B212E;
 	border-radius:10px;
 	color:white;
-}
-
-QComboBox{
-	background-color:white;
-	border-radius:5px;
-	color:#0B212E;
-	padding-left:0.5em;
 }</string>
                        </property>
                        <layout class="QFormLayout" name="formLayout">
@@ -1893,6 +2009,14 @@ QComboBox{
                             <width>100</width>
                             <height>0</height>
                            </size>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">QComboBox{
+	background-color:white;
+	border-radius:5px;
+	color:#0B212E;
+	padding-left:0.5em;
+}</string>
                           </property>
                           <property name="sizeAdjustPolicy">
                            <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
@@ -2336,7 +2460,11 @@ QGraphicsView{
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">QWidget#widget_2 {
+    border: 3px solid #193d4e;         /* width + style + color */
+    border-radius: 10px;
+}
+</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_4">
                  <item>
@@ -2396,19 +2524,6 @@ QGraphicsView{
                    </column>
                   </widget>
                  </item>
-                 <item>
-                  <spacer name="verticalSpacer_14">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
                 </layout>
                </widget>
               </item>
@@ -2427,7 +2542,11 @@ QGraphicsView{
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">QWidget#widget_6 {
+    border: 3px solid #193d4e;         /* width + style + color */
+    border-radius: 10px;
+}
+</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_5">
                  <item>
@@ -2487,24 +2606,18 @@ QGraphicsView{
                    </column>
                   </widget>
                  </item>
-                 <item>
-                  <spacer name="verticalSpacer_15">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
                 </layout>
                </widget>
               </item>
               <item row="1" column="0">
                <widget class="QWidget" name="widget_9" native="true">
+                <property name="styleSheet">
+                 <string notr="true">QWidget#widget_9 {
+    border: 3px solid #193d4e;         /* width + style + color */
+    border-radius: 10px;
+}
+</string>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_6">
                  <item>
                   <widget class="QPushButton" name="blade_interpolate_button">
@@ -3060,7 +3173,7 @@ QPushButton:hover{
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="abaqus_page">
+            <widget class="QWidget" name="export_page">
              <layout class="QGridLayout" name="gridLayout_3">
               <property name="leftMargin">
                <number>0</number>
@@ -3078,7 +3191,7 @@ QPushButton:hover{
                <number>15</number>
               </property>
               <item row="3" column="1">
-               <widget class="QLineEdit" name="abaqus_expFileName_input">
+               <widget class="QLineEdit" name="export_expFileName_input">
                 <property name="maximumSize">
                  <size>
                   <width>200</width>
@@ -3118,7 +3231,7 @@ QPushButton:hover{
                  <string>Export file name:</string>
                 </property>
                 <property name="buddy">
-                 <cstring>abaqus_expFileName_input</cstring>
+                 <cstring>export_expFileName_input</cstring>
                 </property>
                </widget>
               </item>
@@ -3130,7 +3243,7 @@ QPushButton:hover{
                </widget>
               </item>
               <item row="3" column="3">
-               <widget class="QPushButton" name="abaqus_export_button">
+               <widget class="QPushButton" name="export_export_button">
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
 	font:700 10pt;
@@ -3168,7 +3281,7 @@ QPushButton:hover{
                </widget>
               </item>
               <item row="2" column="0" colspan="4">
-               <widget class="QListWidget" name="abaqus_sectionsList">
+               <widget class="QListWidget" name="export_sectionsList">
                 <property name="styleSheet">
                  <string notr="true">QListWidget{
 	border: 2px solid #0B212E;
@@ -3176,14 +3289,63 @@ QPushButton:hover{
 	padding-bottom: 1em;
 	padding-left:1em;
 	border-radius:10px;
+	font: 12pt;
+}
+
+/* Item text padding so it isn’t glued to the border */
+QListWidget::item,
+QListWidget::item:selected,
+QListWidget::item:hover {
+    padding: 2px 10px;   /* top/bottom 6, left/right 10 */
+}
+
+/* Selection colours */
+QListWidget::item:selected {
+    background: #e6f2f7;
+    color: #0B212E;
+}
+
+/* Optional: hover feedback */
+QListWidget::item:hover {
+    background: #f5f9fc;
 }</string>
                 </property>
                 <property name="editTriggers">
                  <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
                 </property>
                 <property name="selectionMode">
-                 <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
+                 <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
                 </property>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item row="1" column="0" colspan="4">
@@ -3336,7 +3498,7 @@ QPushButton:hover{
   <tabstop>parts_button</tabstop>
   <tabstop>skin_page_button</tabstop>
   <tabstop>spar_page_button</tabstop>
-  <tabstop>abaqus_page_button</tabstop>
+  <tabstop>export_page_button</tabstop>
   <tabstop>settings_button</tabstop>
   <tabstop>info_button</tabstop>
   <tabstop>quit_button</tabstop>
@@ -3344,16 +3506,12 @@ QPushButton:hover{
   <tabstop>changedir_button</tabstop>
   <tabstop>newproject_button</tabstop>
   <tabstop>loadproject_button</tabstop>
-  <tabstop>airfoil_saveairfoil_button</tabstop>
-  <tabstop>airfoil_delairfoil_button</tabstop>
-  <tabstop>airfoil_firstdigit_input</tabstop>
+  <tabstop>airfoil_calculateairfoil_button</tabstop>
   <tabstop>airfoil_seconddigit_input</tabstop>
   <tabstop>airfoil_thirddigit_input</tabstop>
   <tabstop>airfoil_lasttwodigits_input</tabstop>
-  <tabstop>airfoil_npoints_input</tabstop>
   <tabstop>airfoil_resetzoom_button</tabstop>
   <tabstop>airfoil_chartview</tabstop>
-  <tabstop>airfoil_listairfoils_widget</tabstop>
   <tabstop>station_uploadairfoil_button</tabstop>
   <tabstop>station_listairfoils_box</tabstop>
   <tabstop>station_chordlength_input</tabstop>
