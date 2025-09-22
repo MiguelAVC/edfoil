@@ -1,0 +1,9 @@
+&NACA
+  name    = 'NACA 63-206',
+  camber  = '6',
+  profile = '63',
+  cl      = 0.2,
+  toc     = 0.06,
+  a       = 0.8,
+  chord   = 1.0,
+  dencode = 2/

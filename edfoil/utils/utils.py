@@ -468,3 +468,11 @@ def splineIntersection(spline,line,u0=0):
         # elif i == range(len(t_range) - 1):
         #     return i
     
+# -----------------------------------
+# 14) Cosine spacing function
+# -----------------------------------
+
+# Cosine spacing for better point distribution
+def cosSpacing(xmin, xmax, n):
+    beta = np.linspace(0, np.pi, n)
+    return 0.5 * (xmin + xmax) + 0.5 * (xmax - xmin) * np.cos(beta)

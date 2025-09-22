@@ -44,6 +44,14 @@ class Ui_MainWindow(object):
 "	font-weight:bold;\n"
 "}\n"
 "\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font:700 9pt;\n"
+"    padding-bottom: 0.22em;      /* keeps total height similar */\n"
+"    border: 3px solid #0b2232;   /* subtle inner edge */\n"
+"}\n"
+"\n"
 "QLabel{\n"
 "	color:white;\n"
 "}\n"
@@ -195,19 +203,19 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.spar_page_button)
 
-        self.abaqus_page_button = QPushButton(self.sidebar_widget)
-        self.abaqus_page_button.setObjectName(u"abaqus_page_button")
-        self.abaqus_page_button.setMinimumSize(QSize(150, 0))
-        self.abaqus_page_button.setMaximumSize(QSize(200, 16777215))
-        self.abaqus_page_button.setStyleSheet(u"QPushButton:checked{\n"
+        self.export_page_button = QPushButton(self.sidebar_widget)
+        self.export_page_button.setObjectName(u"export_page_button")
+        self.export_page_button.setMinimumSize(QSize(150, 0))
+        self.export_page_button.setMaximumSize(QSize(200, 16777215))
+        self.export_page_button.setStyleSheet(u"QPushButton:checked{\n"
 "	color: rgb(35, 46, 47);\n"
 "	background-color: white;\n"
 "	font-weight:bold;\n"
 "}")
-        self.abaqus_page_button.setCheckable(True)
-        self.abaqus_page_button.setAutoExclusive(True)
+        self.export_page_button.setCheckable(True)
+        self.export_page_button.setAutoExclusive(True)
 
-        self.verticalLayout.addWidget(self.abaqus_page_button)
+        self.verticalLayout.addWidget(self.export_page_button)
 
         self.verticalSpacer_2 = QSpacerItem(150, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -245,6 +253,7 @@ class Ui_MainWindow(object):
 
         self.main_widget = QWidget(self.centralwidget)
         self.main_widget.setObjectName(u"main_widget")
+        self.main_widget.setStyleSheet(u"")
         self.verticalLayout_2 = QVBoxLayout(self.main_widget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, -1, -1, -1)
@@ -354,17 +363,25 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QPushButton{\n"
-"	font:700 10pt;\n"
-"	background-color: #0B212E;\n"
+"	font:700 12pt;\n"
+"	background-color:#193d4e;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
-"	padding:0.25em 3em;\n"
+"	padding:0.25em 2em;\n"
 "}\n"
 "\n"
 "QPushButton:hover{\n"
 "	background-color: rgba(0,0,0,0.2);\n"
 "	color:rgb(35, 46, 47);\n"
 "	font: 700;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font:700 9pt;\n"
+"    padding-bottom: 0.22em;      /* keeps total height similar */\n"
+"    border: 3px solid #0b2232;   /* subtle inner edge */\n"
 "}")
         self.gridLayout_5 = QGridLayout(self.home_page)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
@@ -436,179 +453,23 @@ class Ui_MainWindow(object):
         self.gridLayout_6 = QGridLayout(self.airfoil_page)
         self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
-        self.horizontalWidget_2 = QWidget(self.airfoil_page)
-        self.horizontalWidget_2.setObjectName(u"horizontalWidget_2")
-        self.horizontalWidget_2.setStyleSheet(u"QPushButton{\n"
-"	font:700 10pt;\n"
-"	background-color:#193d4e;\n"
-"	border-radius:5px;\n"
+        self.label_14 = QLabel(self.airfoil_page)
+        self.label_14.setObjectName(u"label_14")
+        font1 = QFont()
+        font1.setPointSize(12)
+        font1.setBold(True)
+        font1.setItalic(False)
+        self.label_14.setFont(font1)
+        self.label_14.setStyleSheet(u"QLabel{\n"
+"	font:700 12pt;\n"
+"	background-color: #193d4e;\n"
+"	border-radius:10px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
-"}\n"
-"\n"
-"QPushButton:hover{\n"
-"	background-color: rgba(0,0,0,0.2);\n"
-"	color:rgb(35, 46, 47);\n"
-"	font: 700;\n"
 "}")
-        self.horizontalLayout_4 = QHBoxLayout(self.horizontalWidget_2)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.airfoil_saveairfoil_button = QPushButton(self.horizontalWidget_2)
-        self.airfoil_saveairfoil_button.setObjectName(u"airfoil_saveairfoil_button")
-        sizePolicy2.setHeightForWidth(self.airfoil_saveairfoil_button.sizePolicy().hasHeightForWidth())
-        self.airfoil_saveairfoil_button.setSizePolicy(sizePolicy2)
+        self.label_14.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.horizontalLayout_4.addWidget(self.airfoil_saveairfoil_button)
-
-        self.horizontalSpacer_5 = QSpacerItem(10, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
-
-        self.airfoil_delairfoil_button = QPushButton(self.horizontalWidget_2)
-        self.airfoil_delairfoil_button.setObjectName(u"airfoil_delairfoil_button")
-        sizePolicy2.setHeightForWidth(self.airfoil_delairfoil_button.sizePolicy().hasHeightForWidth())
-        self.airfoil_delairfoil_button.setSizePolicy(sizePolicy2)
-
-        self.horizontalLayout_4.addWidget(self.airfoil_delairfoil_button)
-
-
-        self.gridLayout_6.addWidget(self.horizontalWidget_2, 2, 0, 1, 3)
-
-        self.airfoil_parameters_widget = QWidget(self.airfoil_page)
-        self.airfoil_parameters_widget.setObjectName(u"airfoil_parameters_widget")
-        self.airfoil_parameters_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:#193d4e;\n"
-"	color:white;\n"
-"	border-radius:10px;\n"
-"}\n"
-"\n"
-"QSpinBox{\n"
-"	background-color:white;\n"
-"	color: #193d4e;\n"
-"	border-radius:5px;\n"
-"}\n"
-"\n"
-"QLineEdit{\n"
-"	background-color:white;\n"
-"	color:#193d4e;\n"
-"	border-radius:5px;\n"
-"}")
-        self.formLayout_2 = QFormLayout(self.airfoil_parameters_widget)
-        self.formLayout_2.setObjectName(u"formLayout_2")
-        self.formLayout_2.setVerticalSpacing(9)
-        self.airfoil_uploadcoords_button = QPushButton(self.airfoil_parameters_widget)
-        self.airfoil_uploadcoords_button.setObjectName(u"airfoil_uploadcoords_button")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy6.setHorizontalStretch(0)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.airfoil_uploadcoords_button.sizePolicy().hasHeightForWidth())
-        self.airfoil_uploadcoords_button.setSizePolicy(sizePolicy6)
-        self.airfoil_uploadcoords_button.setMinimumSize(QSize(125, 0))
-        self.airfoil_uploadcoords_button.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.airfoil_uploadcoords_button.setStyleSheet(u"QPushButton:hover{\n"
-"	background-color:rgba(255,255,255,0.5);\n"
-"	border-radius:5px;\n"
-"}")
-
-        self.formLayout_2.setWidget(0, QFormLayout.LabelRole, self.airfoil_uploadcoords_button)
-
-        self.airfoil_coord_name = QLineEdit(self.airfoil_parameters_widget)
-        self.airfoil_coord_name.setObjectName(u"airfoil_coord_name")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        sizePolicy7.setHorizontalStretch(0)
-        sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.airfoil_coord_name.sizePolicy().hasHeightForWidth())
-        self.airfoil_coord_name.setSizePolicy(sizePolicy7)
-        self.airfoil_coord_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.airfoil_coord_name.setReadOnly(True)
-
-        self.formLayout_2.setWidget(0, QFormLayout.FieldRole, self.airfoil_coord_name)
-
-        self.label_9 = QLabel(self.airfoil_parameters_widget)
-        self.label_9.setObjectName(u"label_9")
-        self.label_9.setMinimumSize(QSize(125, 0))
-        self.label_9.setMaximumSize(QSize(150, 16777215))
-        self.label_9.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.formLayout_2.setWidget(2, QFormLayout.LabelRole, self.label_9)
-
-        self.label_10 = QLabel(self.airfoil_parameters_widget)
-        self.label_10.setObjectName(u"label_10")
-        self.label_10.setMinimumSize(QSize(125, 0))
-        self.label_10.setMaximumSize(QSize(150, 16777215))
-        self.label_10.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.formLayout_2.setWidget(3, QFormLayout.LabelRole, self.label_10)
-
-        self.label_11 = QLabel(self.airfoil_parameters_widget)
-        self.label_11.setObjectName(u"label_11")
-        self.label_11.setMinimumSize(QSize(125, 0))
-        self.label_11.setMaximumSize(QSize(150, 16777215))
-        self.label_11.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.formLayout_2.setWidget(4, QFormLayout.LabelRole, self.label_11)
-
-        self.label_12 = QLabel(self.airfoil_parameters_widget)
-        self.label_12.setObjectName(u"label_12")
-        self.label_12.setMinimumSize(QSize(125, 0))
-        self.label_12.setMaximumSize(QSize(150, 16777215))
-        self.label_12.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.formLayout_2.setWidget(5, QFormLayout.LabelRole, self.label_12)
-
-        self.label_13 = QLabel(self.airfoil_parameters_widget)
-        self.label_13.setObjectName(u"label_13")
-        self.label_13.setMinimumSize(QSize(125, 0))
-        self.label_13.setMaximumSize(QSize(150, 16777215))
-        self.label_13.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.formLayout_2.setWidget(6, QFormLayout.LabelRole, self.label_13)
-
-        self.airfoil_firstdigit_input = QSpinBox(self.airfoil_parameters_widget)
-        self.airfoil_firstdigit_input.setObjectName(u"airfoil_firstdigit_input")
-        self.airfoil_firstdigit_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
-        self.airfoil_firstdigit_input.setMinimum(5)
-        self.airfoil_firstdigit_input.setMaximum(6)
-        self.airfoil_firstdigit_input.setValue(6)
-
-        self.formLayout_2.setWidget(2, QFormLayout.FieldRole, self.airfoil_firstdigit_input)
-
-        self.airfoil_seconddigit_input = QSpinBox(self.airfoil_parameters_widget)
-        self.airfoil_seconddigit_input.setObjectName(u"airfoil_seconddigit_input")
-        self.airfoil_seconddigit_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
-        self.airfoil_seconddigit_input.setValue(3)
-
-        self.formLayout_2.setWidget(3, QFormLayout.FieldRole, self.airfoil_seconddigit_input)
-
-        self.airfoil_thirddigit_input = QSpinBox(self.airfoil_parameters_widget)
-        self.airfoil_thirddigit_input.setObjectName(u"airfoil_thirddigit_input")
-        self.airfoil_thirddigit_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
-        self.airfoil_thirddigit_input.setValue(4)
-
-        self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.airfoil_thirddigit_input)
-
-        self.airfoil_lasttwodigits_input = QSpinBox(self.airfoil_parameters_widget)
-        self.airfoil_lasttwodigits_input.setObjectName(u"airfoil_lasttwodigits_input")
-        self.airfoil_lasttwodigits_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
-        self.airfoil_lasttwodigits_input.setValue(30)
-
-        self.formLayout_2.setWidget(5, QFormLayout.FieldRole, self.airfoil_lasttwodigits_input)
-
-        self.airfoil_npoints_input = QSpinBox(self.airfoil_parameters_widget)
-        self.airfoil_npoints_input.setObjectName(u"airfoil_npoints_input")
-        self.airfoil_npoints_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
-        self.airfoil_npoints_input.setMinimum(50)
-        self.airfoil_npoints_input.setMaximum(200)
-        self.airfoil_npoints_input.setValue(100)
-
-        self.formLayout_2.setWidget(6, QFormLayout.FieldRole, self.airfoil_npoints_input)
-
-        self.verticalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Maximum)
-
-        self.formLayout_2.setItem(1, QFormLayout.SpanningRole, self.verticalSpacer_5)
-
-
-        self.gridLayout_6.addWidget(self.airfoil_parameters_widget, 1, 0, 1, 3)
+        self.gridLayout_6.addWidget(self.label_14, 3, 0, 1, 3)
 
         self.airfoil_graph_widget = QWidget(self.airfoil_page)
         self.airfoil_graph_widget.setObjectName(u"airfoil_graph_widget")
@@ -623,11 +484,11 @@ class Ui_MainWindow(object):
         self.gridLayout_12.setContentsMargins(20, 20, 20, 20)
         self.airfoil_resetzoom_button = QPushButton(self.airfoil_graph_widget)
         self.airfoil_resetzoom_button.setObjectName(u"airfoil_resetzoom_button")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.airfoil_resetzoom_button.sizePolicy().hasHeightForWidth())
-        self.airfoil_resetzoom_button.setSizePolicy(sizePolicy8)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.airfoil_resetzoom_button.sizePolicy().hasHeightForWidth())
+        self.airfoil_resetzoom_button.setSizePolicy(sizePolicy6)
 
         self.gridLayout_12.addWidget(self.airfoil_resetzoom_button, 0, 2, 1, 1)
 
@@ -655,25 +516,7 @@ class Ui_MainWindow(object):
         self.gridLayout_12.addWidget(self.airfoil_chartview, 1, 0, 1, 3)
 
 
-        self.gridLayout_6.addWidget(self.airfoil_graph_widget, 0, 3, 5, 1)
-
-        self.label_14 = QLabel(self.airfoil_page)
-        self.label_14.setObjectName(u"label_14")
-        font1 = QFont()
-        font1.setPointSize(12)
-        font1.setBold(True)
-        font1.setItalic(False)
-        self.label_14.setFont(font1)
-        self.label_14.setStyleSheet(u"QLabel{\n"
-"	font:700 12pt;\n"
-"	background-color: #193d4e;\n"
-"	border-radius:10px;\n"
-"	color:white;\n"
-"	padding:0.25em 1em;\n"
-"}")
-        self.label_14.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout_6.addWidget(self.label_14, 3, 0, 1, 3)
+        self.gridLayout_6.addWidget(self.airfoil_graph_widget, 0, 3, 7, 1)
 
         self.label_8 = QLabel(self.airfoil_page)
         self.label_8.setObjectName(u"label_8")
@@ -690,17 +533,232 @@ class Ui_MainWindow(object):
 
         self.gridLayout_6.addWidget(self.label_8, 0, 0, 1, 3)
 
+        self.horizontalWidget_2 = QWidget(self.airfoil_page)
+        self.horizontalWidget_2.setObjectName(u"horizontalWidget_2")
+        self.horizontalWidget_2.setStyleSheet(u"QPushButton{\n"
+"	font:700 10pt;\n"
+"	background-color:#193d4e;\n"
+"	border-radius:5px;\n"
+"	color:white;\n"
+"	padding:0.25em 1em;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font: 700;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font:700 9pt;\n"
+"    padding-bottom: 0.22em;      /* keeps total height similar */\n"
+"    border: 3px solid #0b2232;   /* subtle inner edge */\n"
+"}")
+        self.horizontalLayout_4 = QHBoxLayout(self.horizontalWidget_2)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.airfoil_calculateairfoil_button = QPushButton(self.horizontalWidget_2)
+        self.airfoil_calculateairfoil_button.setObjectName(u"airfoil_calculateairfoil_button")
+        sizePolicy2.setHeightForWidth(self.airfoil_calculateairfoil_button.sizePolicy().hasHeightForWidth())
+        self.airfoil_calculateairfoil_button.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_4.addWidget(self.airfoil_calculateairfoil_button)
+
+        self.airfoil_saveairfoil_button = QPushButton(self.horizontalWidget_2)
+        self.airfoil_saveairfoil_button.setObjectName(u"airfoil_saveairfoil_button")
+        sizePolicy2.setHeightForWidth(self.airfoil_saveairfoil_button.sizePolicy().hasHeightForWidth())
+        self.airfoil_saveairfoil_button.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_4.addWidget(self.airfoil_saveairfoil_button)
+
+
+        self.gridLayout_6.addWidget(self.horizontalWidget_2, 2, 0, 1, 3)
+
+        self.airfoil_delAirfoil_button = QPushButton(self.airfoil_page)
+        self.airfoil_delAirfoil_button.setObjectName(u"airfoil_delAirfoil_button")
+        self.airfoil_delAirfoil_button.setStyleSheet(u"QPushButton{\n"
+"	font:700 10pt;\n"
+"	background-color:#193d4e;\n"
+"	border-radius:5px;\n"
+"	color:white;\n"
+"	padding:0.25em 1em;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font: 700;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font:700 9pt;\n"
+"    padding-bottom: 0.22em;      /* keeps total height similar */\n"
+"    border: 3px solid #0b2232;   /* subtle inner edge */\n"
+"}")
+
+        self.gridLayout_6.addWidget(self.airfoil_delAirfoil_button, 5, 1, 1, 1)
+
+        self.airfoil_parameters_widget = QWidget(self.airfoil_page)
+        self.airfoil_parameters_widget.setObjectName(u"airfoil_parameters_widget")
+        self.airfoil_parameters_widget.setStyleSheet(u"QWidget{\n"
+"	background-color:#193d4e;\n"
+"	color:white;\n"
+"	border-radius:10px;\n"
+"}\n"
+"\n"
+"QSpinBox{\n"
+"	background-color:white;\n"
+"	color: #193d4e;\n"
+"	border-radius:5px;\n"
+"}\n"
+"\n"
+"QLineEdit{\n"
+"	background-color:white;\n"
+"	color:#193d4e;\n"
+"	border-radius:5px;\n"
+"}")
+        self.gridLayout_18 = QGridLayout(self.airfoil_parameters_widget)
+        self.gridLayout_18.setObjectName(u"gridLayout_18")
+        self.gridLayout_18.setVerticalSpacing(9)
+        self.label_9 = QLabel(self.airfoil_parameters_widget)
+        self.label_9.setObjectName(u"label_9")
+        sizePolicy.setHeightForWidth(self.label_9.sizePolicy().hasHeightForWidth())
+        self.label_9.setSizePolicy(sizePolicy)
+        self.label_9.setMinimumSize(QSize(125, 0))
+        self.label_9.setMaximumSize(QSize(150, 16777215))
+        self.label_9.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+
+        self.gridLayout_18.addWidget(self.label_9, 0, 0, 1, 1)
+
+        self.airfoil_nacaseries_input = QComboBox(self.airfoil_parameters_widget)
+        self.airfoil_nacaseries_input.addItem("")
+        self.airfoil_nacaseries_input.addItem("")
+        self.airfoil_nacaseries_input.addItem("")
+        self.airfoil_nacaseries_input.setObjectName(u"airfoil_nacaseries_input")
+        sizePolicy3.setHeightForWidth(self.airfoil_nacaseries_input.sizePolicy().hasHeightForWidth())
+        self.airfoil_nacaseries_input.setSizePolicy(sizePolicy3)
+        self.airfoil_nacaseries_input.setStyleSheet(u"QComboBox{\n"
+"	background-color:white;\n"
+"	border-radius:5px;\n"
+"	color:#0B212E;\n"
+"	padding-left:0.5em;\n"
+"}")
+        self.airfoil_nacaseries_input.setEditable(False)
+
+        self.gridLayout_18.addWidget(self.airfoil_nacaseries_input, 0, 1, 1, 1)
+
+        self.label_10 = QLabel(self.airfoil_parameters_widget)
+        self.label_10.setObjectName(u"label_10")
+        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.label_10.sizePolicy().hasHeightForWidth())
+        self.label_10.setSizePolicy(sizePolicy7)
+        self.label_10.setMinimumSize(QSize(125, 0))
+        self.label_10.setMaximumSize(QSize(150, 16777215))
+        self.label_10.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.label_10.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+
+        self.gridLayout_18.addWidget(self.label_10, 1, 0, 1, 1)
+
+        self.airfoil_seconddigit_input = QSpinBox(self.airfoil_parameters_widget)
+        self.airfoil_seconddigit_input.setObjectName(u"airfoil_seconddigit_input")
+        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.airfoil_seconddigit_input.sizePolicy().hasHeightForWidth())
+        self.airfoil_seconddigit_input.setSizePolicy(sizePolicy8)
+        self.airfoil_seconddigit_input.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.airfoil_seconddigit_input.setAlignment(Qt.AlignmentFlag.AlignJustify|Qt.AlignmentFlag.AlignVCenter)
+        self.airfoil_seconddigit_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.airfoil_seconddigit_input.setProperty("showGroupSeparator", False)
+        self.airfoil_seconddigit_input.setValue(3)
+
+        self.gridLayout_18.addWidget(self.airfoil_seconddigit_input, 1, 1, 1, 1)
+
+        self.label_11 = QLabel(self.airfoil_parameters_widget)
+        self.label_11.setObjectName(u"label_11")
+        sizePolicy7.setHeightForWidth(self.label_11.sizePolicy().hasHeightForWidth())
+        self.label_11.setSizePolicy(sizePolicy7)
+        self.label_11.setMinimumSize(QSize(125, 0))
+        self.label_11.setMaximumSize(QSize(150, 16777215))
+        self.label_11.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.label_11.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+
+        self.gridLayout_18.addWidget(self.label_11, 2, 0, 1, 1)
+
+        self.airfoil_thirddigit_input = QSpinBox(self.airfoil_parameters_widget)
+        self.airfoil_thirddigit_input.setObjectName(u"airfoil_thirddigit_input")
+        sizePolicy8.setHeightForWidth(self.airfoil_thirddigit_input.sizePolicy().hasHeightForWidth())
+        self.airfoil_thirddigit_input.setSizePolicy(sizePolicy8)
+        self.airfoil_thirddigit_input.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.airfoil_thirddigit_input.setAlignment(Qt.AlignmentFlag.AlignJustify|Qt.AlignmentFlag.AlignVCenter)
+        self.airfoil_thirddigit_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.airfoil_thirddigit_input.setProperty("showGroupSeparator", False)
+        self.airfoil_thirddigit_input.setValue(4)
+
+        self.gridLayout_18.addWidget(self.airfoil_thirddigit_input, 2, 1, 1, 1)
+
+        self.label_12 = QLabel(self.airfoil_parameters_widget)
+        self.label_12.setObjectName(u"label_12")
+        sizePolicy7.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
+        self.label_12.setSizePolicy(sizePolicy7)
+        self.label_12.setMinimumSize(QSize(125, 0))
+        self.label_12.setMaximumSize(QSize(150, 16777215))
+        self.label_12.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.label_12.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+
+        self.gridLayout_18.addWidget(self.label_12, 3, 0, 1, 1)
+
+        self.airfoil_lasttwodigits_input = QSpinBox(self.airfoil_parameters_widget)
+        self.airfoil_lasttwodigits_input.setObjectName(u"airfoil_lasttwodigits_input")
+        sizePolicy8.setHeightForWidth(self.airfoil_lasttwodigits_input.sizePolicy().hasHeightForWidth())
+        self.airfoil_lasttwodigits_input.setSizePolicy(sizePolicy8)
+        self.airfoil_lasttwodigits_input.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.airfoil_lasttwodigits_input.setAlignment(Qt.AlignmentFlag.AlignJustify|Qt.AlignmentFlag.AlignVCenter)
+        self.airfoil_lasttwodigits_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.airfoil_lasttwodigits_input.setProperty("showGroupSeparator", False)
+        self.airfoil_lasttwodigits_input.setValue(30)
+
+        self.gridLayout_18.addWidget(self.airfoil_lasttwodigits_input, 3, 1, 1, 1)
+
+
+        self.gridLayout_6.addWidget(self.airfoil_parameters_widget, 1, 0, 1, 3)
+
         self.airfoil_listairfoils_widget = QListWidget(self.airfoil_page)
         self.airfoil_listairfoils_widget.setObjectName(u"airfoil_listairfoils_widget")
-        self.airfoil_listairfoils_widget.setStyleSheet(u"QListWidget{\n"
-"	border-color:yellow;\n"
-"	background-color:#193d4e;\n"
-"	border-radius:10px;\n"
-"	color:white;\n"
+        self.airfoil_listairfoils_widget.setStyleSheet(u"/* Widget frame */\n"
+"QListWidget {\n"
+"    background: white;                 /* or background-color: white; */\n"
+"    border: 3px solid #193d4e;         /* width + style + color */\n"
+"    border-radius: 10px;\n"
+"    color: #193d4e;                    /* text colour for unselected items */\n"
+"    outline: 0;                        /* optional: remove focus dotted outline */\n"
+"}\n"
+"\n"
+"/* Item text padding so it isn\u2019t glued to the border */\n"
+"QListWidget::item,\n"
+"QListWidget::item:selected,\n"
+"QListWidget::item:hover {\n"
+"    padding: 2px 10px;   /* top/bottom 6, left/right 10 */\n"
+"}\n"
+"\n"
+"/* Selection colours */\n"
+"QListWidget::item:selected {\n"
+"    background: #e6f2f7;\n"
+"    color: #0B212E;\n"
+"}\n"
+"\n"
+"/* Optional: hover feedback */\n"
+"QListWidget::item:hover {\n"
+"    background: #f5f9fc;\n"
 "}")
         self.airfoil_listairfoils_widget.setSpacing(0)
 
-        self.gridLayout_6.addWidget(self.airfoil_listairfoils_widget, 4, 0, 1, 3)
+        self.gridLayout_6.addWidget(self.airfoil_listairfoils_widget, 4, 1, 1, 1)
 
         self.stackedWidget.addWidget(self.airfoil_page)
         self.station_page = QWidget()
@@ -961,6 +1019,14 @@ class Ui_MainWindow(object):
 "	background-color: rgba(0,0,0,0.2);\n"
 "	color:#0B212E;\n"
 "	font: 700;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0,0,0,0.2);\n"
+"	color:rgb(35, 46, 47);\n"
+"	font:700 9pt;\n"
+"    padding-bottom: 0.22em;      /* keeps total height similar */\n"
+"    border: 3px solid #0b2232;   /* subtle inner edge */\n"
 "}")
         self.horizontalLayout_5 = QHBoxLayout(self.widget_5)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
@@ -1001,13 +1067,6 @@ class Ui_MainWindow(object):
 "	background-color:#0B212E;\n"
 "	border-radius:10px;\n"
 "	color:white;\n"
-"}\n"
-"\n"
-"QComboBox{\n"
-"	background-color:white;\n"
-"	border-radius:5px;\n"
-"	color:#0B212E;\n"
-"	padding-left:0.5em;\n"
 "}")
         self.formLayout = QFormLayout(self.sta_list_widget)
         self.formLayout.setObjectName(u"formLayout")
@@ -1021,6 +1080,12 @@ class Ui_MainWindow(object):
         sizePolicy2.setHeightForWidth(self.station_liststation_box.sizePolicy().hasHeightForWidth())
         self.station_liststation_box.setSizePolicy(sizePolicy2)
         self.station_liststation_box.setMinimumSize(QSize(100, 0))
+        self.station_liststation_box.setStyleSheet(u"QComboBox{\n"
+"	background-color:white;\n"
+"	border-radius:5px;\n"
+"	color:#0B212E;\n"
+"	padding-left:0.5em;\n"
+"}")
         self.station_liststation_box.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
         self.formLayout.setWidget(0, QFormLayout.FieldRole, self.station_liststation_box)
@@ -1061,8 +1126,8 @@ class Ui_MainWindow(object):
 
         self.station_resetzoom_button = QPushButton(self.station_graph_widget)
         self.station_resetzoom_button.setObjectName(u"station_resetzoom_button")
-        sizePolicy8.setHeightForWidth(self.station_resetzoom_button.sizePolicy().hasHeightForWidth())
-        self.station_resetzoom_button.setSizePolicy(sizePolicy8)
+        sizePolicy6.setHeightForWidth(self.station_resetzoom_button.sizePolicy().hasHeightForWidth())
+        self.station_resetzoom_button.setSizePolicy(sizePolicy6)
 
         self.gridLayout_13.addWidget(self.station_resetzoom_button, 0, 3, 1, 1)
 
@@ -1262,7 +1327,11 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.widget_2.sizePolicy().hasHeightForWidth())
         self.widget_2.setSizePolicy(sizePolicy)
         self.widget_2.setMaximumSize(QSize(233, 16777215))
-        self.widget_2.setStyleSheet(u"")
+        self.widget_2.setStyleSheet(u"QWidget#widget_2 {\n"
+"    border: 3px solid #193d4e;         /* width + style + color */\n"
+"    border-radius: 10px;\n"
+"}\n"
+"")
         self.verticalLayout_4 = QVBoxLayout(self.widget_2)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.label_3 = QLabel(self.widget_2)
@@ -1299,10 +1368,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addWidget(self.blade_skinolpsta_table)
 
-        self.verticalSpacer_14 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_4.addItem(self.verticalSpacer_14)
-
 
         self.gridLayout_2.addWidget(self.widget_2, 0, 0, 1, 1)
 
@@ -1311,7 +1376,11 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.widget_6.sizePolicy().hasHeightForWidth())
         self.widget_6.setSizePolicy(sizePolicy)
         self.widget_6.setMaximumSize(QSize(233, 16777215))
-        self.widget_6.setStyleSheet(u"")
+        self.widget_6.setStyleSheet(u"QWidget#widget_6 {\n"
+"    border: 3px solid #193d4e;         /* width + style + color */\n"
+"    border-radius: 10px;\n"
+"}\n"
+"")
         self.verticalLayout_5 = QVBoxLayout(self.widget_6)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.label_37 = QLabel(self.widget_6)
@@ -1346,21 +1415,22 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.blade_skinolplen_table)
 
-        self.verticalSpacer_15 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_5.addItem(self.verticalSpacer_15)
-
 
         self.gridLayout_2.addWidget(self.widget_6, 0, 1, 1, 1)
 
         self.widget_9 = QWidget(self.blade_page)
         self.widget_9.setObjectName(u"widget_9")
+        self.widget_9.setStyleSheet(u"QWidget#widget_9 {\n"
+"    border: 3px solid #193d4e;         /* width + style + color */\n"
+"    border-radius: 10px;\n"
+"}\n"
+"")
         self.verticalLayout_6 = QVBoxLayout(self.widget_9)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.blade_interpolate_button = QPushButton(self.widget_9)
         self.blade_interpolate_button.setObjectName(u"blade_interpolate_button")
-        sizePolicy6.setHeightForWidth(self.blade_interpolate_button.sizePolicy().hasHeightForWidth())
-        self.blade_interpolate_button.setSizePolicy(sizePolicy6)
+        sizePolicy8.setHeightForWidth(self.blade_interpolate_button.sizePolicy().hasHeightForWidth())
+        self.blade_interpolate_button.setSizePolicy(sizePolicy8)
         self.blade_interpolate_button.setStyleSheet(u"")
         self.blade_interpolate_button.setCheckable(False)
 
@@ -1507,23 +1577,23 @@ class Ui_MainWindow(object):
         self.gridLayout_11.setObjectName(u"gridLayout_11")
         self.skin_tethickness_input = QLineEdit(self.widget_8)
         self.skin_tethickness_input.setObjectName(u"skin_tethickness_input")
-        sizePolicy8.setHeightForWidth(self.skin_tethickness_input.sizePolicy().hasHeightForWidth())
-        self.skin_tethickness_input.setSizePolicy(sizePolicy8)
+        sizePolicy6.setHeightForWidth(self.skin_tethickness_input.sizePolicy().hasHeightForWidth())
+        self.skin_tethickness_input.setSizePolicy(sizePolicy6)
 
         self.gridLayout_11.addWidget(self.skin_tethickness_input, 4, 2, 1, 2)
 
         self.skin_overlaptarget_input = QLineEdit(self.widget_8)
         self.skin_overlaptarget_input.setObjectName(u"skin_overlaptarget_input")
-        sizePolicy8.setHeightForWidth(self.skin_overlaptarget_input.sizePolicy().hasHeightForWidth())
-        self.skin_overlaptarget_input.setSizePolicy(sizePolicy8)
+        sizePolicy6.setHeightForWidth(self.skin_overlaptarget_input.sizePolicy().hasHeightForWidth())
+        self.skin_overlaptarget_input.setSizePolicy(sizePolicy6)
         self.skin_overlaptarget_input.setReadOnly(True)
 
         self.gridLayout_11.addWidget(self.skin_overlaptarget_input, 3, 2, 1, 2)
 
         self.skin_plythickness_input = QLineEdit(self.widget_8)
         self.skin_plythickness_input.setObjectName(u"skin_plythickness_input")
-        sizePolicy8.setHeightForWidth(self.skin_plythickness_input.sizePolicy().hasHeightForWidth())
-        self.skin_plythickness_input.setSizePolicy(sizePolicy8)
+        sizePolicy6.setHeightForWidth(self.skin_plythickness_input.sizePolicy().hasHeightForWidth())
+        self.skin_plythickness_input.setSizePolicy(sizePolicy6)
 
         self.gridLayout_11.addWidget(self.skin_plythickness_input, 2, 2, 1, 2)
 
@@ -1554,8 +1624,8 @@ class Ui_MainWindow(object):
 
         self.skin_savefig_input = QCheckBox(self.widget_8)
         self.skin_savefig_input.setObjectName(u"skin_savefig_input")
-        sizePolicy6.setHeightForWidth(self.skin_savefig_input.sizePolicy().hasHeightForWidth())
-        self.skin_savefig_input.setSizePolicy(sizePolicy6)
+        sizePolicy8.setHeightForWidth(self.skin_savefig_input.sizePolicy().hasHeightForWidth())
+        self.skin_savefig_input.setSizePolicy(sizePolicy8)
         self.skin_savefig_input.setMinimumSize(QSize(0, 0))
         self.skin_savefig_input.setMaximumSize(QSize(16777215, 16777215))
 
@@ -1581,8 +1651,8 @@ class Ui_MainWindow(object):
 
         self.skin_nplies_input = QLineEdit(self.widget_8)
         self.skin_nplies_input.setObjectName(u"skin_nplies_input")
-        sizePolicy8.setHeightForWidth(self.skin_nplies_input.sizePolicy().hasHeightForWidth())
-        self.skin_nplies_input.setSizePolicy(sizePolicy8)
+        sizePolicy6.setHeightForWidth(self.skin_nplies_input.sizePolicy().hasHeightForWidth())
+        self.skin_nplies_input.setSizePolicy(sizePolicy6)
 
         self.gridLayout_11.addWidget(self.skin_nplies_input, 1, 2, 1, 2)
 
@@ -1699,16 +1769,16 @@ class Ui_MainWindow(object):
         self.gridLayout_14.addWidget(self.label_43, 0, 0, 1, 1)
 
         self.stackedWidget.addWidget(self.spar_page)
-        self.abaqus_page = QWidget()
-        self.abaqus_page.setObjectName(u"abaqus_page")
-        self.gridLayout_3 = QGridLayout(self.abaqus_page)
+        self.export_page = QWidget()
+        self.export_page.setObjectName(u"export_page")
+        self.gridLayout_3 = QGridLayout(self.export_page)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.gridLayout_3.setVerticalSpacing(15)
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.abaqus_expFileName_input = QLineEdit(self.abaqus_page)
-        self.abaqus_expFileName_input.setObjectName(u"abaqus_expFileName_input")
-        self.abaqus_expFileName_input.setMaximumSize(QSize(200, 16777215))
-        self.abaqus_expFileName_input.setStyleSheet(u"QLineEdit{\n"
+        self.export_expFileName_input = QLineEdit(self.export_page)
+        self.export_expFileName_input.setObjectName(u"export_expFileName_input")
+        self.export_expFileName_input.setMaximumSize(QSize(200, 16777215))
+        self.export_expFileName_input.setStyleSheet(u"QLineEdit{\n"
 "	border: 2px solid #0B212E;\n"
 "	padding-top: 0.1em;\n"
 "	padding-bottom: 0.1em;\n"
@@ -1716,25 +1786,25 @@ class Ui_MainWindow(object):
 "	border-radius:5px;\n"
 "}")
 
-        self.gridLayout_3.addWidget(self.abaqus_expFileName_input, 3, 1, 1, 1)
+        self.gridLayout_3.addWidget(self.export_expFileName_input, 3, 1, 1, 1)
 
         self.horizontalSpacer_27 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.gridLayout_3.addItem(self.horizontalSpacer_27, 0, 4, 4, 1)
 
-        self.label_46 = QLabel(self.abaqus_page)
+        self.label_46 = QLabel(self.export_page)
         self.label_46.setObjectName(u"label_46")
 
         self.gridLayout_3.addWidget(self.label_46, 3, 0, 1, 1)
 
-        self.label_47 = QLabel(self.abaqus_page)
+        self.label_47 = QLabel(self.export_page)
         self.label_47.setObjectName(u"label_47")
 
         self.gridLayout_3.addWidget(self.label_47, 3, 2, 1, 1)
 
-        self.abaqus_export_button = QPushButton(self.abaqus_page)
-        self.abaqus_export_button.setObjectName(u"abaqus_export_button")
-        self.abaqus_export_button.setStyleSheet(u"QPushButton{\n"
+        self.export_export_button = QPushButton(self.export_page)
+        self.export_export_button.setObjectName(u"export_export_button")
+        self.export_export_button.setStyleSheet(u"QPushButton{\n"
 "	font:700 10pt;\n"
 "	background-color: #0B212E;\n"
 "	border-radius:5px;\n"
@@ -1748,9 +1818,9 @@ class Ui_MainWindow(object):
 "	font: 700;\n"
 "}")
 
-        self.gridLayout_3.addWidget(self.abaqus_export_button, 3, 3, 1, 1)
+        self.gridLayout_3.addWidget(self.export_export_button, 3, 3, 1, 1)
 
-        self.label_42 = QLabel(self.abaqus_page)
+        self.label_42 = QLabel(self.export_page)
         self.label_42.setObjectName(u"label_42")
         self.label_42.setStyleSheet(u"QLabel{\n"
 "	font:700 12pt;\n"
@@ -1762,26 +1832,51 @@ class Ui_MainWindow(object):
 
         self.gridLayout_3.addWidget(self.label_42, 0, 0, 1, 3)
 
-        self.abaqus_sectionsList = QListWidget(self.abaqus_page)
-        self.abaqus_sectionsList.setObjectName(u"abaqus_sectionsList")
-        self.abaqus_sectionsList.setStyleSheet(u"QListWidget{\n"
+        self.export_sectionsList = QListWidget(self.export_page)
+        QListWidgetItem(self.export_sectionsList)
+        QListWidgetItem(self.export_sectionsList)
+        QListWidgetItem(self.export_sectionsList)
+        QListWidgetItem(self.export_sectionsList)
+        QListWidgetItem(self.export_sectionsList)
+        QListWidgetItem(self.export_sectionsList)
+        self.export_sectionsList.setObjectName(u"export_sectionsList")
+        self.export_sectionsList.setStyleSheet(u"QListWidget{\n"
 "	border: 2px solid #0B212E;\n"
 "	padding-top:1em;\n"
 "	padding-bottom: 1em;\n"
 "	padding-left:1em;\n"
 "	border-radius:10px;\n"
+"	font: 12pt;\n"
+"}\n"
+"\n"
+"/* Item text padding so it isn\u2019t glued to the border */\n"
+"QListWidget::item,\n"
+"QListWidget::item:selected,\n"
+"QListWidget::item:hover {\n"
+"    padding: 2px 10px;   /* top/bottom 6, left/right 10 */\n"
+"}\n"
+"\n"
+"/* Selection colours */\n"
+"QListWidget::item:selected {\n"
+"    background: #e6f2f7;\n"
+"    color: #0B212E;\n"
+"}\n"
+"\n"
+"/* Optional: hover feedback */\n"
+"QListWidget::item:hover {\n"
+"    background: #f5f9fc;\n"
 "}")
-        self.abaqus_sectionsList.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked|QAbstractItemView.EditTrigger.EditKeyPressed|QAbstractItemView.EditTrigger.SelectedClicked)
-        self.abaqus_sectionsList.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        self.export_sectionsList.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked|QAbstractItemView.EditTrigger.EditKeyPressed|QAbstractItemView.EditTrigger.SelectedClicked)
+        self.export_sectionsList.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
-        self.gridLayout_3.addWidget(self.abaqus_sectionsList, 2, 0, 1, 4)
+        self.gridLayout_3.addWidget(self.export_sectionsList, 2, 0, 1, 4)
 
-        self.label_45 = QLabel(self.abaqus_page)
+        self.label_45 = QLabel(self.export_page)
         self.label_45.setObjectName(u"label_45")
 
         self.gridLayout_3.addWidget(self.label_45, 1, 0, 1, 4)
 
-        self.stackedWidget.addWidget(self.abaqus_page)
+        self.stackedWidget.addWidget(self.export_page)
 
         self.gridLayout_4.addWidget(self.stackedWidget, 0, 0, 1, 1)
 
@@ -1843,11 +1938,9 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.centralwidget)
 #if QT_CONFIG(shortcut)
-        self.label_9.setBuddy(self.airfoil_firstdigit_input)
         self.label_10.setBuddy(self.airfoil_seconddigit_input)
         self.label_11.setBuddy(self.airfoil_thirddigit_input)
         self.label_12.setBuddy(self.airfoil_lasttwodigits_input)
-        self.label_13.setBuddy(self.airfoil_npoints_input)
         self.label_16.setBuddy(self.station_uploadairfoil_button)
         self.label_17.setBuddy(self.station_listairfoils_box)
         self.label_22.setBuddy(self.station_offsety_input)
@@ -1867,7 +1960,7 @@ class Ui_MainWindow(object):
         self.label_31.setBuddy(self.skin_nplies_input)
         self.label_34.setBuddy(self.skin_tethickness_input)
         self.label_33.setBuddy(self.skin_overlaptarget_input)
-        self.label_46.setBuddy(self.abaqus_expFileName_input)
+        self.label_46.setBuddy(self.export_expFileName_input)
 #endif // QT_CONFIG(shortcut)
         QWidget.setTabOrder(self.home_page_button, self.airfoil_page_button)
         QWidget.setTabOrder(self.airfoil_page_button, self.station_page_button)
@@ -1875,27 +1968,21 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.blade_page_button, self.parts_button)
         QWidget.setTabOrder(self.parts_button, self.skin_page_button)
         QWidget.setTabOrder(self.skin_page_button, self.spar_page_button)
-        QWidget.setTabOrder(self.spar_page_button, self.abaqus_page_button)
-        QWidget.setTabOrder(self.abaqus_page_button, self.settings_button)
+        QWidget.setTabOrder(self.spar_page_button, self.export_page_button)
+        QWidget.setTabOrder(self.export_page_button, self.settings_button)
         QWidget.setTabOrder(self.settings_button, self.info_button)
         QWidget.setTabOrder(self.info_button, self.quit_button)
         QWidget.setTabOrder(self.quit_button, self.workpath_lineedit)
         QWidget.setTabOrder(self.workpath_lineedit, self.changedir_button)
         QWidget.setTabOrder(self.changedir_button, self.newproject_button)
         QWidget.setTabOrder(self.newproject_button, self.loadproject_button)
-        QWidget.setTabOrder(self.loadproject_button, self.airfoil_saveairfoil_button)
-        QWidget.setTabOrder(self.airfoil_saveairfoil_button, self.airfoil_delairfoil_button)
-        QWidget.setTabOrder(self.airfoil_delairfoil_button, self.airfoil_uploadcoords_button)
-        QWidget.setTabOrder(self.airfoil_uploadcoords_button, self.airfoil_coord_name)
-        QWidget.setTabOrder(self.airfoil_coord_name, self.airfoil_firstdigit_input)
-        QWidget.setTabOrder(self.airfoil_firstdigit_input, self.airfoil_seconddigit_input)
+        QWidget.setTabOrder(self.loadproject_button, self.airfoil_calculateairfoil_button)
+        QWidget.setTabOrder(self.airfoil_calculateairfoil_button, self.airfoil_seconddigit_input)
         QWidget.setTabOrder(self.airfoil_seconddigit_input, self.airfoil_thirddigit_input)
         QWidget.setTabOrder(self.airfoil_thirddigit_input, self.airfoil_lasttwodigits_input)
-        QWidget.setTabOrder(self.airfoil_lasttwodigits_input, self.airfoil_npoints_input)
-        QWidget.setTabOrder(self.airfoil_npoints_input, self.airfoil_resetzoom_button)
+        QWidget.setTabOrder(self.airfoil_lasttwodigits_input, self.airfoil_resetzoom_button)
         QWidget.setTabOrder(self.airfoil_resetzoom_button, self.airfoil_chartview)
-        QWidget.setTabOrder(self.airfoil_chartview, self.airfoil_listairfoils_widget)
-        QWidget.setTabOrder(self.airfoil_listairfoils_widget, self.station_uploadairfoil_button)
+        QWidget.setTabOrder(self.airfoil_chartview, self.station_uploadairfoil_button)
         QWidget.setTabOrder(self.station_uploadairfoil_button, self.station_listairfoils_box)
         QWidget.setTabOrder(self.station_listairfoils_box, self.station_chordlength_input)
         QWidget.setTabOrder(self.station_chordlength_input, self.station_twistangle_input)
@@ -1945,7 +2032,7 @@ class Ui_MainWindow(object):
         self.parts_button.setText(QCoreApplication.translate("MainWindow", u"Parts", None))
         self.skin_page_button.setText(QCoreApplication.translate("MainWindow", u"Skin", None))
         self.spar_page_button.setText(QCoreApplication.translate("MainWindow", u"Spar", None))
-        self.abaqus_page_button.setText(QCoreApplication.translate("MainWindow", u"Abaqus Export", None))
+        self.export_page_button.setText(QCoreApplication.translate("MainWindow", u"Blade Export", None))
         self.settings_button.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
         self.info_button.setText(QCoreApplication.translate("MainWindow", u"Info", None))
         self.quit_button.setText(QCoreApplication.translate("MainWindow", u"Quit", None))
@@ -1958,19 +2045,21 @@ class Ui_MainWindow(object):
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Version 0.2", None))
         self.newproject_button.setText(QCoreApplication.translate("MainWindow", u"New Project...", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Welcome to EdFoil", None))
-        self.airfoil_saveairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Save airfoil", None))
-        self.airfoil_delairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Delete airfoil", None))
-        self.airfoil_uploadcoords_button.setText(QCoreApplication.translate("MainWindow", u"Upload coordinates:", None))
-        self.airfoil_coord_name.setText(QCoreApplication.translate("MainWindow", u"File", None))
-        self.label_9.setText(QCoreApplication.translate("MainWindow", u"NACA series:", None))
-        self.label_10.setText(QCoreApplication.translate("MainWindow", u"Second digit:", None))
-        self.label_11.setText(QCoreApplication.translate("MainWindow", u"Third digit:", None))
-        self.label_12.setText(QCoreApplication.translate("MainWindow", u"Last two digits:", None))
-        self.label_13.setText(QCoreApplication.translate("MainWindow", u"Number of points:", None))
+        self.label_14.setText(QCoreApplication.translate("MainWindow", u"Airfoils available:", None))
         self.airfoil_resetzoom_button.setText(QCoreApplication.translate("MainWindow", u"Reset", None))
         self.airfoil_xy_current.setText("")
-        self.label_14.setText(QCoreApplication.translate("MainWindow", u"Airfoils available:", None))
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
+        self.airfoil_calculateairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Calculate", None))
+        self.airfoil_saveairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Save", None))
+        self.airfoil_delAirfoil_button.setText(QCoreApplication.translate("MainWindow", u"Delete airfoil", None))
+        self.label_9.setText(QCoreApplication.translate("MainWindow", u"NACA series:", None))
+        self.airfoil_nacaseries_input.setItemText(0, QCoreApplication.translate("MainWindow", u"NACA 4-digit", None))
+        self.airfoil_nacaseries_input.setItemText(1, QCoreApplication.translate("MainWindow", u"NACA 6-series", None))
+        self.airfoil_nacaseries_input.setItemText(2, QCoreApplication.translate("MainWindow", u"NACA 6A-series", None))
+
+        self.label_10.setText(QCoreApplication.translate("MainWindow", u"1st digit (max camber):", None))
+        self.label_11.setText(QCoreApplication.translate("MainWindow", u"2nd digit (pos max camber)", None))
+        self.label_12.setText(QCoreApplication.translate("MainWindow", u"Last two digits (thickness):", None))
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"Airfoil", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"Upload airfoil file:", None))
         self.station_uploadairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Select file...", None))
@@ -2070,11 +2159,28 @@ class Ui_MainWindow(object):
         self.skin_saveSection_button.setText(QCoreApplication.translate("MainWindow", u"Save Section", None))
         self.skin_delSection_button.setText(QCoreApplication.translate("MainWindow", u"Delete Section", None))
         self.label_43.setText(QCoreApplication.translate("MainWindow", u"Spar Page: Coming Soon", None))
-        self.abaqus_expFileName_input.setText(QCoreApplication.translate("MainWindow", u"skin", None))
+        self.export_expFileName_input.setText(QCoreApplication.translate("MainWindow", u"skin", None))
         self.label_46.setText(QCoreApplication.translate("MainWindow", u"Export file name:", None))
         self.label_47.setText(QCoreApplication.translate("MainWindow", u".json", None))
-        self.abaqus_export_button.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
+        self.export_export_button.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
         self.label_42.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
+
+        __sortingEnabled1 = self.export_sectionsList.isSortingEnabled()
+        self.export_sectionsList.setSortingEnabled(False)
+        ___qlistwidgetitem = self.export_sectionsList.item(0)
+        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem1 = self.export_sectionsList.item(1)
+        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem2 = self.export_sectionsList.item(2)
+        ___qlistwidgetitem2.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem3 = self.export_sectionsList.item(3)
+        ___qlistwidgetitem3.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem4 = self.export_sectionsList.item(4)
+        ___qlistwidgetitem4.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem5 = self.export_sectionsList.item(5)
+        ___qlistwidgetitem5.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        self.export_sectionsList.setSortingEnabled(__sortingEnabled1)
+
         self.label_45.setText(QCoreApplication.translate("MainWindow", u"Select the sections to be exported as .json files:", None))
         self.def_msgbar.setText(QCoreApplication.translate("MainWindow", u"Ready.", None))
         self.msgbar.setText("")

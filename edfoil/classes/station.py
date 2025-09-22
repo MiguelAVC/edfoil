@@ -1,24 +1,28 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from edfoil.classes.airfoil import Airfoil
 
 class Station:
-    def __init__(self, 
-                 path : str,
-                 chord : float,
-                 twist_angle : float,
-                 x_offset : float = 0.0,
-                 y_offset : float = 0.0,
-                 z_offset : float = 0.0,
-                 x_multiplier : float = 1.0,
-                 y_multiplier : float = 1.0,
-                 z_multiplier : float = 1.0,
-                 x_mirror : bool = False,
-                 y_mirror : bool = True) -> None:
+    def __init__(
+        self,
+        airfoil: Airfoil, 
+        chord : float,
+        twist_angle : float,
+        x_offset : float = 0.0,
+        y_offset : float = 0.0,
+        z_offset : float = 0.0,
+        x_multiplier : float = 1.0,
+        y_multiplier : float = 1.0,
+        z_multiplier : float = 1.0,
+        x_mirror : bool = False,
+        y_mirror : bool = True,
+        path : str = None, # Deprecated
+    ) -> None:
+        
         """Station class.
 
         Args:
-            path (str): Full path to the .txt file containing airfoil data.
             chord (float): Chord length.
             twist_angle (float): Twist angle in degrees.
             x_offset (float, optional): x offset from origin. Defaults to 0.0.
@@ -34,19 +38,25 @@ class Station:
             Defaults to False.
             y_mirror (bool, optional): To flip airfoil in the x axis. 
             Defaults to True.
+            path (str, optional): Full path to the .txt file containing airfoil
+            data [Deprecated].
         """
         
         # Setting parameters
-        self.parameters ={'chord':chord,
-                          'twist_angle':np.radians(twist_angle),
-                          'offset':(x_offset,y_offset,z_offset),
-                          'multiplier':(x_multiplier,y_multiplier,z_multiplier),
-                          'mirror':(x_mirror,y_mirror),
-                          }
+        self.parameters ={
+            'chord':chord,
+            'twist_angle':np.radians(twist_angle),
+            'offset':(x_offset,y_offset,z_offset),
+            'multiplier':(x_multiplier,y_multiplier,z_multiplier),
+            'mirror':(x_mirror,y_mirror),
+        }
         
         twist_angle_rad = np.radians(twist_angle)
-        coordinates = np.genfromtxt(path)
-        self.airfoil = path.split('\\')[-1][:-4]
+        # DEPRECATED
+        # coordinates = np.genfromtxt(path)
+        # self.airfoil = path.split('\\')[-1][:-4]
+        coordinates = np.array(airfoil.xy)
+        self.airfoil = airfoil.name
         
         # Define if it is a circle
         tolerance:float = 1e-1
@@ -76,8 +86,10 @@ class Station:
         # Rotating
         xy_rotated = np.column_stack((x_scaled,y_scaled))
 
-        rotation_matrix = [[np.cos(twist_angle_rad), -np.sin(twist_angle_rad)],
-                           [np.sin(twist_angle_rad), np.cos(twist_angle_rad)]]
+        rotation_matrix = [
+            [np.cos(twist_angle_rad), -np.sin(twist_angle_rad)],
+            [np.sin(twist_angle_rad), np.cos(twist_angle_rad)]
+        ]
 
         xy_rotated = np.dot(xy_rotated,rotation_matrix)
 
@@ -110,24 +122,55 @@ class Station:
         plt.show()
         
     def xyRange(self) -> list[list[float]]:
-        range_list = [[float(np.min(self.xy[:,col])),float(np.max(self.xy[:,col]))] for col in range(2)]
+        range_list = [
+            [float(np.min(self.xy[:,col])),float(np.max(self.xy[:,col]))] 
+            for col in range(2)
+        ]
         return range_list
 
 # %% Debugging
 
 if __name__ == '__main__':
     
-    # Test 1
-    sta = Station(
-        path=os.path.join(os.getcwd(),'edfoil','airfoils','NACA63416.txt'),
-        chord=1334,
-        twist_angle=24.3,
-        x_offset=-474.26,
-        y_offset=255,
-        z_offset=1500,
-        y_multiplier=1.55,
-        y_mirror=True,
-    )
+    test = 2
     
-    sta.plot('Final')
-    print(sta.parameters['isCircle'])
+    # Test 1
+    
+    if test == 1:
+        sta = Station(
+            path=os.path.join(os.getcwd(),'edfoil','airfoils','NACA63416.txt'),
+            chord=1334,
+            twist_angle=24.3,
+            x_offset=-474.26,
+            y_offset=255,
+            z_offset=1500,
+            y_multiplier=1.55,
+            y_mirror=True,
+        )
+        
+        sta.plot('Final')
+        print(sta.parameters['isCircle'])
+    
+    # Test 2
+    # Task: Airfoil implementation and path deprecation
+    
+    elif test == 2:
+        
+        path = 'edfoil/airfoils/NACA63416.txt'
+        # path = 'edfoil/airfoils/circle.txt'
+        airfoil = Airfoil(name='example')
+        airfoil.importCoords(path=path)
+        
+        sta = Station(
+            airfoil=airfoil,
+            chord=1334,
+            twist_angle=24.3,
+            x_offset=-474.26,
+            y_offset=255,
+            z_offset=1500,
+            y_multiplier=1.55,
+            y_mirror=True,
+        )
+        
+        sta.plot('Final')
+        print(sta.parameters['isCircle'])
