@@ -1,4 +1,5 @@
 import json, subprocess, tempfile, re
+from matplotlib.figure import Figure
 import numpy as np
 from pathlib import Path
 from scipy.interpolate import CubicSpline
@@ -31,13 +32,13 @@ class Airfoil:
     def __init__(self, name:str = '__edit__') -> None:
         self.path = None
         self.name = name
-        self.xy = [] # unified upper+lower list
+        self.xy = [] # unified lower+upper list
         self.upper = [] # for easier access
         self.lower = [] # for easier access
         self.n_points = 0
-        self.family = None   # e.g. 'NACA'
-        self.profile = None  # e.g. '63-206', '2412', etc.
-        self.Imported = False
+        self.family : str = None   # e.g. 'NACA'
+        self.profile : str = None  # e.g. '63-206', '2412', etc.
+        self.imported : bool = False
         self.report = None   # contents of naca.out if using Fortran backend
         
     def __str__(self) -> str:
@@ -49,15 +50,31 @@ class Airfoil:
         coords = np.genfromtxt(path)
         filename = Path(path).stem
         self.path = path
-        self.xy = coords.tolist()
-        self.n_points = len(coords)
         self.family, self.profile = strip_name(filename)
-        self.Imported = True
+        self.imported = True
         
         if self.family and self.profile:
             self.name = f"{self.family}{self.profile}"
         else:
             self.name = self.family or self.profile
+        
+        # Split at min x (leading edge)
+        # Big Assumption: Coordinates are ordered from TE to LE
+        le_index = np.argmin(coords[:,0])
+        
+        side_1 = coords[:le_index+1]
+        side_2 = coords[le_index:]
+        
+        if np.mean(side_1[:,1]) >= np.mean(side_2[:,1]):
+            self.upper = side_1.tolist()[::-1]
+            self.lower = side_2.tolist()[::-1]
+        else:
+            self.upper = side_2.tolist()
+            self.lower = side_1.tolist()
+            
+        self.xy = self.lower + self.upper[1:]
+        # self.xy = coords.tolist()
+        self.n_points = len(coords)
         
     def update(self,coords:list) -> None:
         self.xy = coords
@@ -73,11 +90,13 @@ class Airfoil:
                 line = f'{x} {y}'
                 file.write(line + '\n')
     
-    def plotAirfoil(self) -> None:
-        import matplotlib.pyplot as plt
+    def plotAirfoil(self, display:bool=True) -> Figure | None:
+        from matplotlib.figure import Figure
         font_size = 'x-large'
         x, y = zip(*self.xy)
-        fig, ax = plt.subplots(figsize=(10,3))
+        
+        fig = Figure(figsize=(10,3), tight_layout=True)
+        ax = fig.add_subplot(111)
         ax.set_title(self.name, fontsize='xx-large')
         ax.plot(x,y)
         ax.set_xlabel('x/c [-]', fontsize=font_size)
@@ -89,7 +108,12 @@ class Airfoil:
         )
         ax.grid(visible=True, which='major', linestyle='-', linewidth=0.75)
         ax.axis('equal')
-        plt.show()
+        
+        if display:
+            import matplotlib.pyplot as plt
+            plt.show(fig)
+            return None
+        else: return fig
     
     # NACA 6 series implementation (Deprecated)
     def naca6(self, profile:str, path:str, n_points:int) -> dict:
@@ -197,7 +221,7 @@ class Airfoil:
                     except ValueError:
                         continue
                     
-            xy = upper[::-1] + lower[1:-1]
+            xy = lower[::-1] + upper[1:]
                     
             # If Fortran output is empty
             if not xy:
@@ -325,8 +349,8 @@ if __name__ == '__main__':
         # Test 3
         # Task: NACA 4 and 6 series using Fortran backend
         
-        # nl = Airfoil.nameinput("63A409")
-        nl = Airfoil.nameinput("63-006")
+        nl = Airfoil.nameinput("63A409")
+        # nl = Airfoil.nameinput("63-006")
         
         foil = Airfoil("tmp")
         foil.naca456(

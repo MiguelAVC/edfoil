@@ -4,7 +4,10 @@
 - First point is the trailing edge
 - Direction of the splines are bot curve and then top curve
 - Same number of points for bot and top curve when imported from Station
-- Number of points is 50 or bigger (Need to get rid of this one eventually)'''
+- Number of points is 50 or bigger (Need to get rid of this one eventually)
+- SplineIntersection to find t-parameter of LE is hardcoded to 21, meaning that
+  station instances need at least 42+1 number of points.
+'''
 
 # Import libraries
 import os
@@ -71,7 +74,8 @@ class Section:
         bond_thickness:float = 1,
         genFig:bool = True,
         saveFig:bool = False,
-        tolerance:int = 6, # Tolerance for decimal places ACIS
+        tolerance:int = 6, # Tolerance for decimal places ACIS in LE
+        ini_u0:int = 21, # Initial guess for splineIntersection starting from LE
     ) -> None:
         
         # Parameters
@@ -86,6 +90,7 @@ class Section:
             'z':station.parameters['offset'][2],
             'twist_angle': station.parameters['twist_angle'],
             'isCircle': station.parameters['isCircle'],
+            'u0_initial': ini_u0,
         }
         
         # self.splines = {} defined later
@@ -127,7 +132,7 @@ class Section:
         
         # Index LE
         idx_LE = {x:round(splineIntersection(spline = splines[x],
-            line =chord_line, u0 = 21),tolerance) for x in range(n_plies+1)}
+            line =chord_line, u0 = ini_u0),tolerance) for x in range(n_plies+1)}
         self.indexes['LE'] = idx_LE
         
         # Full skin graph
@@ -565,14 +570,19 @@ class Section:
             
             t_plies_top[i+1] = {}
             
-            if i not in self.indexes['ply_cut_top'].keys():
+            cut = self.indexes['ply_cut_top'].get(i, None)
+            
+            # if i not in self.indexes['ply_cut_top'].keys():
+            if cut is None:
                 
                 t_plies_top[i+1][i] = self.t['top_splines'][i]
                 
             else:
                 
-                t_plies_top[i+1][i] = [x for x in self.t['top_splines'][i] if 
-                    x < self.indexes['ply_cut_top'][i]] + [self.indexes['ply_cut_top'][i]]
+                # t_plies_top[i+1][i] = [x for x in self.t['top_splines'][i] if 
+                #     x < self.indexes['ply_cut_top'][i]] + [self.indexes['ply_cut_top'][i]]
+                
+                t_plies_top[i+1][i] = [x for x in self.t['top_splines'][i] if x < cut] + [cut]
                 
             t_plies_top[i+1][i+1] = self.t['top_splines'][i+1]
             
@@ -660,6 +670,7 @@ class Section:
         # Variables
         n_plies = self.parameters['n_plies']
         base_spline = self.splines[0]
+        u0_ini = self.parameters['u0_initial']
         
         # Base spline data
         lspl_t = np.arange(0, base_spline['u']+1)
@@ -682,10 +693,12 @@ class Section:
         p_olp_sta = self.guides['overlap_start']['p']
         
         u0 = splineIntersection(spline = c_offset[0], 
-            line = self.guides['chord'], u0 = 0)
+            line = self.guides['chord'], u0 = u0_ini)
+        # print(f't: {u0:.2f}, xy = [{c_offset[0]['x'](u0):.2f},{c_offset[0]['y'](u0):.2f}]')
         
         t_target = skinOverlapLocator(d_target = overlap_dist, p0 = p_olp_sta,
             twist_ang = self.parameters['twist_angle'], spline = c_offset[0], u0 = u0)
+        # print(f't_olp: {t_target:.2f}, xy = [{c_offset[0]['x'](t_target):.2f},{c_offset[0]['y'](t_target):.2f}]')
         
         # Intersection coordinates
         p0 = np.array([c_offset[0]['x'](t_target,0),
@@ -709,7 +722,7 @@ class Section:
             
             # First curve of ply
             u0 = splineIntersection(spline = c_offset[i-1],
-                line = self.guides['chord'], u0 = 0)
+                line = self.guides['chord'], u0 = u0_ini)
             
             t_target[i][i-1] = {}
             t_target[i][i-1][0] = splineIntersection(spline = c_offset[i-1], 
@@ -719,7 +732,7 @@ class Section:
             
             # Second curve of ply
             u0 = splineIntersection(spline = c_offset[i],
-                line = self.guides['chord'], u0 = 0)
+                line = self.guides['chord'], u0 = u0_ini)
             
             t_target[i][i] = {}
             t_target[i][i][0] = splineIntersection(spline = c_offset[i],
@@ -874,7 +887,7 @@ class Section:
         t_bond[0][0] = [float(t_sta)] + [float(x) for x in np.arange(
             self.splines[n_plies]['u']) if x > t_sta and x < t_end] + [float(t_end)]
         
-        u0 = splineIntersection(spline = c_offset[0], line = self.guides['chord'], u0 = 0)
+        u0 = splineIntersection(spline = c_offset[0], line = self.guides['chord'], u0 = u0_ini)
         
         t_sta = splineIntersection(spline = c_offset[0],
             line = self.guides['overlap_offset'][0], u0 = u0)
@@ -957,6 +970,7 @@ class Section:
         
         # Variables
         n_plies = self.parameters['n_plies']
+        u0_ini = self.parameters['u0_initial']
         cl = self.guides['chord'] # chordline guide
         base_spline = self.splines[0] # Base spline (original airfoil)
         p = [float(self.splines[0][axis](0)) for axis in ['x','y']] # Reference point
@@ -1121,7 +1135,7 @@ class Section:
         
         ## t-parameter
         u = [splineIntersection(spline = c_offset[curve], line = self.guides['chord'],
-            u0 = 0) for curve in range(n_tePlies+1)]
+            u0 = u0_ini) for curve in range(n_tePlies+1)]
         
         for ply in range(1, n_tePlies+1):
             
@@ -1315,7 +1329,13 @@ if __name__ == '__main__':
         data = ['NACA63416',739,4.8,-260,20,6250,1,1,1,False,True]
         data_sec = [2,1,38.178766667,2,1,True,False,6]
         
+        from edfoil.classes.airfoil import Airfoil
+        path = 'edfoil/airfoils/NACA63416.txt'
+        airfoil = Airfoil(name='example')
+        airfoil.importCoords(path=path)
+        
         sta = Station(
+            airfoil=airfoil,
             chord = data[1],
             twist_angle = data[2],
             x_offset = data[3],
@@ -1326,7 +1346,7 @@ if __name__ == '__main__':
             z_multiplier = data[8],
             x_mirror = data[9],
             y_mirror = data[10],
-            path=os.path.join(os.getcwd(),'edfoil','airfoils',f'{data[0]}.txt'),
+            # path=os.path.join(os.getcwd(),'edfoil','airfoils',f'{data[0]}.txt'),
         )
         
         sec = Section(

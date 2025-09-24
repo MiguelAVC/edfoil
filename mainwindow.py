@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (QMainWindow, QFileDialog, QMessageBox,
 from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
                               QValueAxis, QScatterSeries, QAreaSeries)
 from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
-from PySide6.QtCore import QTimer, Qt, QDir, QPointF, QSizeF, QRectF
+from PySide6.QtCore import QTimer, Qt, QPointF, QSizeF
 
 
 from edfoil.classes.airfoil import Airfoil
@@ -14,9 +14,11 @@ from edfoil.utils.bladeparams import norm_olp
 from edfoil.utils.abaqusExp import *
 from edfoil.utils.dev import resource_path
 
-import os, math
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg, NavigationToolbar2QT
+
 from scipy.interpolate import splev
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -197,7 +199,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.skin_saveSection_button.clicked.connect(self.saveSection)
         
         # ---------------------------------------------------------------------
-        # Page 6 (ABAQUS EXPORT)
+        # Page 6 (EXPORT)
         self.stackedWidget.currentChanged.connect(self.update_sectionList)
         self.export_export_button.clicked.connect(self.exportSections)
         
@@ -337,6 +339,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.airfoil_chartview.setChart(chart)
         self.equal_axes(chart, [[x_min, x_max], [y_min, y_max]])
+        
+        # fig = airfoil.plotAirfoil(display=False)
+        # chart = FigureCanvasQTAgg(fig)
+        # toolbar = NavigationToolbar2QT(chart, self)
+        # self.gridLayout_12.removeWidget(self.airfoil_chartview)
+        # self.gridLayout_12.addWidget(chart, 2,0,1,1)
+        # self.gridLayout_12.addWidget(toolbar, 3,0,1,1)
     
     def delete_airfoil(self):
         airfoil_name = self.airfoil_listairfoils_widget.currentItem().text()
@@ -756,24 +765,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         # ply_series[i][j].setName(f'Curve {j}')
                         ply_series[i][j].setColor(colours[i-1])
                 
-                # series = QAreaSeries(series_1,series_0)
-                
-                # Add to chart
-                self.skin_full_chart.removeAllSeries()
+                # Full graph
+                chart = QChart()
+                chart.setAnimationOptions(QChart.SeriesAnimations)
                 for i in list(ply_series.keys()):
                     for j in list(ply_series[i].keys()):
-                        self.skin_full_chart.addSeries(ply_series[i][j])
-                self.skin_full_chart.createDefaultAxes()
-                self.skin_full_chart.legend().show()
-                self.skin_full_chart.zoom(0.9)
+                        chart.addSeries(ply_series[i][j])
+                chart.createDefaultAxes()
                 
-                self.handle_msgbar(f'Number of curves: {len(data.splines.keys())}')
+                x_axis = chart.axes(Qt.Horizontal)[0]
+                y_axis = chart.axes(Qt.Vertical)[0]
+                x_axis.setTitleText('x [d]')
+                y_axis.setTitleText('y [d]')
+                x_axis.setTitleFont(QFont('Helvetica',14))
+                y_axis.setTitleFont(QFont('Helvetica',14))
+                self.skin_full_chartview.setChart(chart)
+                self.equal_axes(chart, station.xyRange())
+                
+                # Zoomed graph     
+                x = [
+                    data.points['bot_1'][1][2]['x'][0],
+                    data.points['top_1'][1][3]['x'][0],
+                ]
+                
+                y = [
+                    data.points['bot_1'][1][2]['y'][0],
+                    data.points['top_1'][1][3]['y'][0],
+                ]
+                
+                x.sort()
+                y.sort()
+                print(f'x: {x}\n y: {y}')
                 
                 # Temporary save
                 self.edits['__section__'] = data
-                
-            # except ValueError:
-            #     self.handle_msgbar('Skin section: Wrong input')
+                self.handle_msgbar(f'Number of curves: {len(data.splines.keys())}')
             
             except NameError:
                 print('Skin section: Error - Wrong input.')
@@ -1108,4 +1134,3 @@ class session():
         self.sections = {}
         self.skin = {}
         self.blade = {}
-        

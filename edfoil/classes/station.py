@@ -20,9 +20,11 @@ class Station:
         path : str = None, # Deprecated
     ) -> None:
         
-        """Station class.
+        """
+        Station class. Defines a blade station by transforming an airfoil.
 
         Args:
+            airfoil (Airfoil): Airfoil object.
             chord (float): Chord length.
             twist_angle (float): Twist angle in degrees.
             x_offset (float, optional): x offset from origin. Defaults to 0.0.
@@ -56,6 +58,8 @@ class Station:
         # coordinates = np.genfromtxt(path)
         # self.airfoil = path.split('\\')[-1][:-4]
         coordinates = np.array(airfoil.xy)
+        upper_og = np.array(airfoil.upper)
+        lower_og = np.array(airfoil.lower)
         self.airfoil = airfoil.name
         
         # Define if it is a circle
@@ -65,41 +69,51 @@ class Station:
         radius = np.mean(distance_to_centre)
         self.parameters['isCircle'] = bool(np.all(np.abs(distance_to_centre - radius) < tolerance))
         
+        # Mirroring
+        upper_mirr : np.ndarray = upper_og
+        lower_mirr : np.ndarray = lower_og
+        
+        if x_mirror or y_mirror:
+            up_temp : np.ndarray = upper_mirr
+            lo_temp : np.ndarray = lower_mirr
+            if x_mirror:
+                up_temp[:,0] *= -1
+                lo_temp[:,0] *= -1
+                upper_mirr = up_temp
+                lower_mirr = lo_temp
+                
+            if y_mirror:
+                up_temp[:,1] *= -1
+                lo_temp[:,1] *= -1
+                upper_mirr = lo_temp[::-1]
+                lower_mirr = up_temp[::-1]
+        
+        coordinates : np.ndarray = np.vstack((lower_mirr,upper_mirr[1:]))
+        
         # Generating station
-        x_original = coordinates[:,0]
-        y_original = coordinates[:,1]
+        x_mirr : np.ndarray = coordinates[:,0]
+        y_mirr : np.ndarray = coordinates[:,1]
         
         # Scaling
-        if x_mirror == True:
-            x_mirror = -1
-        else:
-            x_mirror = 1
-            
-        if y_mirror == True:
-            y_mirror = -1
-        else:
-            y_mirror = 1
-        
-        x_scaled = x_original * chord * x_multiplier * x_mirror
-        y_scaled = y_original * chord * y_multiplier * y_mirror
+        x_scaled = x_mirr * chord * x_multiplier
+        y_scaled = y_mirr * chord * y_multiplier
 
         # Rotating
-        xy_rotated = np.column_stack((x_scaled,y_scaled))
+        xy_scaled = np.column_stack((x_scaled,y_scaled))
 
         rotation_matrix = [
             [np.cos(twist_angle_rad), -np.sin(twist_angle_rad)],
             [np.sin(twist_angle_rad), np.cos(twist_angle_rad)]
         ]
 
-        xy_rotated = np.dot(xy_rotated,rotation_matrix)
+        xy_rotated = np.dot(xy_scaled,rotation_matrix)
 
         # Offsetting
-        x_offset = xy_rotated[:,0] + x_offset
-        y_offset = xy_rotated[:,1] + y_offset
+        x_off = xy_rotated[:,0] + x_offset
+        y_off = xy_rotated[:,1] + y_offset
 
-        coordinates_station = np.column_stack((x_offset,y_offset))
-        
-        self.xy = coordinates_station
+        coordinates_station = np.column_stack((x_off,y_off))
+        self.xy : np.ndarray = coordinates_station
         
     def plot(self, name) -> None:
         fig, ax = plt.subplots(figsize=(10,6))
@@ -173,4 +187,4 @@ if __name__ == '__main__':
         )
         
         sta.plot('Final')
-        print(sta.parameters['isCircle'])
+        print(f'Station is circle: {sta.parameters['isCircle']}')

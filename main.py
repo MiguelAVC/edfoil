@@ -1,5 +1,5 @@
 import sys, os
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QStyleFactory
 from PySide6.QtGui import QIcon
 from mainwindow import MainWindow
 
@@ -16,6 +16,7 @@ except ImportError:
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(os.path.join(basedir, 'resources', 'icons', 'icon.ico')))
+    app.setStyle(QStyleFactory.create("Fusion"))
     window = MainWindow(app)
     window.show()
 
