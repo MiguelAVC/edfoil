@@ -474,47 +474,15 @@ class Ui_MainWindow(object):
         self.airfoil_graph_widget = QWidget(self.airfoil_page)
         self.airfoil_graph_widget.setObjectName(u"airfoil_graph_widget")
         self.airfoil_graph_widget.setMinimumSize(QSize(800, 0))
-        self.airfoil_graph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:#193d4e;\n"
-"	color:white;\n"
-"	border-radius:10px;\n"
-"}")
-        self.gridLayout_12 = QGridLayout(self.airfoil_graph_widget)
-        self.gridLayout_12.setObjectName(u"gridLayout_12")
-        self.gridLayout_12.setContentsMargins(20, 20, 20, 20)
-        self.airfoil_resetzoom_button = QPushButton(self.airfoil_graph_widget)
-        self.airfoil_resetzoom_button.setObjectName(u"airfoil_resetzoom_button")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        sizePolicy6.setHorizontalStretch(0)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.airfoil_resetzoom_button.sizePolicy().hasHeightForWidth())
-        self.airfoil_resetzoom_button.setSizePolicy(sizePolicy6)
-
-        self.gridLayout_12.addWidget(self.airfoil_resetzoom_button, 0, 2, 1, 1)
-
-        self.airfoil_xy_current = QLabel(self.airfoil_graph_widget)
-        self.airfoil_xy_current.setObjectName(u"airfoil_xy_current")
-        sizePolicy.setHeightForWidth(self.airfoil_xy_current.sizePolicy().hasHeightForWidth())
-        self.airfoil_xy_current.setSizePolicy(sizePolicy)
-        self.airfoil_xy_current.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.gridLayout_12.addWidget(self.airfoil_xy_current, 0, 1, 1, 1)
-
-        self.horizontalSpacer_21 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_12.addItem(self.horizontalSpacer_21, 0, 0, 1, 1)
-
-        self.airfoil_chartview = QChartView(self.airfoil_graph_widget)
-        self.airfoil_chartview.setObjectName(u"airfoil_chartview")
-        self.airfoil_chartview.viewport().setProperty("cursor", QCursor(Qt.CursorShape.CrossCursor))
-        self.airfoil_chartview.setMouseTracking(True)
-        self.airfoil_chartview.setStyleSheet(u"QGraphicsView{\n"
+        self.airfoil_graph_widget.setStyleSheet(u"QWidget#airfoil_graph_widget{\n"
 "	background-color:white;\n"
+"	border-radius:10px;\n"
+"    border: 10px solid #193d4e;         /* width + style + color */\n"
+"    border-radius: 25px;\n"
 "}")
-        self.airfoil_chartview.setRenderHints(QPainter.RenderHint.Antialiasing|QPainter.RenderHint.LosslessImageRendering|QPainter.RenderHint.NonCosmeticBrushPatterns|QPainter.RenderHint.SmoothPixmapTransform|QPainter.RenderHint.TextAntialiasing|QPainter.RenderHint.VerticalSubpixelPositioning)
-
-        self.gridLayout_12.addWidget(self.airfoil_chartview, 1, 0, 1, 3)
-
+        self.verticalLayout_9 = QVBoxLayout(self.airfoil_graph_widget)
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.verticalLayout_9.setContentsMargins(20, 20, 20, 20)
 
         self.gridLayout_6.addWidget(self.airfoil_graph_widget, 0, 3, 7, 1)
 
@@ -652,11 +620,11 @@ class Ui_MainWindow(object):
 
         self.label_10 = QLabel(self.airfoil_parameters_widget)
         self.label_10.setObjectName(u"label_10")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
-        sizePolicy7.setHorizontalStretch(0)
-        sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.label_10.sizePolicy().hasHeightForWidth())
-        self.label_10.setSizePolicy(sizePolicy7)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.label_10.sizePolicy().hasHeightForWidth())
+        self.label_10.setSizePolicy(sizePolicy6)
         self.label_10.setMinimumSize(QSize(125, 0))
         self.label_10.setMaximumSize(QSize(150, 16777215))
         self.label_10.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
@@ -666,11 +634,11 @@ class Ui_MainWindow(object):
 
         self.airfoil_seconddigit_input = QSpinBox(self.airfoil_parameters_widget)
         self.airfoil_seconddigit_input.setObjectName(u"airfoil_seconddigit_input")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.airfoil_seconddigit_input.sizePolicy().hasHeightForWidth())
-        self.airfoil_seconddigit_input.setSizePolicy(sizePolicy8)
+        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.airfoil_seconddigit_input.sizePolicy().hasHeightForWidth())
+        self.airfoil_seconddigit_input.setSizePolicy(sizePolicy7)
         self.airfoil_seconddigit_input.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.airfoil_seconddigit_input.setAlignment(Qt.AlignmentFlag.AlignJustify|Qt.AlignmentFlag.AlignVCenter)
         self.airfoil_seconddigit_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
@@ -681,8 +649,8 @@ class Ui_MainWindow(object):
 
         self.label_11 = QLabel(self.airfoil_parameters_widget)
         self.label_11.setObjectName(u"label_11")
-        sizePolicy7.setHeightForWidth(self.label_11.sizePolicy().hasHeightForWidth())
-        self.label_11.setSizePolicy(sizePolicy7)
+        sizePolicy6.setHeightForWidth(self.label_11.sizePolicy().hasHeightForWidth())
+        self.label_11.setSizePolicy(sizePolicy6)
         self.label_11.setMinimumSize(QSize(125, 0))
         self.label_11.setMaximumSize(QSize(150, 16777215))
         self.label_11.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
@@ -692,8 +660,8 @@ class Ui_MainWindow(object):
 
         self.airfoil_thirddigit_input = QSpinBox(self.airfoil_parameters_widget)
         self.airfoil_thirddigit_input.setObjectName(u"airfoil_thirddigit_input")
-        sizePolicy8.setHeightForWidth(self.airfoil_thirddigit_input.sizePolicy().hasHeightForWidth())
-        self.airfoil_thirddigit_input.setSizePolicy(sizePolicy8)
+        sizePolicy7.setHeightForWidth(self.airfoil_thirddigit_input.sizePolicy().hasHeightForWidth())
+        self.airfoil_thirddigit_input.setSizePolicy(sizePolicy7)
         self.airfoil_thirddigit_input.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.airfoil_thirddigit_input.setAlignment(Qt.AlignmentFlag.AlignJustify|Qt.AlignmentFlag.AlignVCenter)
         self.airfoil_thirddigit_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
@@ -704,8 +672,8 @@ class Ui_MainWindow(object):
 
         self.label_12 = QLabel(self.airfoil_parameters_widget)
         self.label_12.setObjectName(u"label_12")
-        sizePolicy7.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
-        self.label_12.setSizePolicy(sizePolicy7)
+        sizePolicy6.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
+        self.label_12.setSizePolicy(sizePolicy6)
         self.label_12.setMinimumSize(QSize(125, 0))
         self.label_12.setMaximumSize(QSize(150, 16777215))
         self.label_12.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
@@ -715,8 +683,8 @@ class Ui_MainWindow(object):
 
         self.airfoil_lasttwodigits_input = QSpinBox(self.airfoil_parameters_widget)
         self.airfoil_lasttwodigits_input.setObjectName(u"airfoil_lasttwodigits_input")
-        sizePolicy8.setHeightForWidth(self.airfoil_lasttwodigits_input.sizePolicy().hasHeightForWidth())
-        self.airfoil_lasttwodigits_input.setSizePolicy(sizePolicy8)
+        sizePolicy7.setHeightForWidth(self.airfoil_lasttwodigits_input.sizePolicy().hasHeightForWidth())
+        self.airfoil_lasttwodigits_input.setSizePolicy(sizePolicy7)
         self.airfoil_lasttwodigits_input.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.airfoil_lasttwodigits_input.setAlignment(Qt.AlignmentFlag.AlignJustify|Qt.AlignmentFlag.AlignVCenter)
         self.airfoil_lasttwodigits_input.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.PlusMinus)
@@ -765,7 +733,7 @@ class Ui_MainWindow(object):
         self.station_page.setObjectName(u"station_page")
         self.station_page.setStyleSheet(u"QPushButton{\n"
 "	font:700 10pt;\n"
-"	background-color:#0B212E;\n"
+"	background-color:#254656;\n"
 "	border-radius:5px;\n"
 "	color:white;\n"
 "	padding:0.25em 1em;\n"
@@ -783,6 +751,7 @@ class Ui_MainWindow(object):
         self.station_tab_widget.setObjectName(u"station_tab_widget")
         self.station_tab1 = QWidget()
         self.station_tab1.setObjectName(u"station_tab1")
+        self.station_tab1.setStyleSheet(u"")
         self.gridLayout_16 = QGridLayout(self.station_tab1)
         self.gridLayout_16.setObjectName(u"gridLayout_16")
         self.gridLayout_16.setContentsMargins(0, 0, 0, 0)
@@ -798,8 +767,9 @@ class Ui_MainWindow(object):
         self.widget_3 = QWidget(self.station_tab1)
         self.widget_3.setObjectName(u"widget_3")
         self.widget_3.setStyleSheet(u"QWidget{\n"
-"	background-color:#0B212E;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
+"	border-radius:10px;\n"
 "}")
         self.formLayout_3 = QFormLayout(self.widget_3)
         self.formLayout_3.setObjectName(u"formLayout_3")
@@ -852,8 +822,9 @@ class Ui_MainWindow(object):
         self.widget_4 = QWidget(self.station_tab1)
         self.widget_4.setObjectName(u"widget_4")
         self.widget_4.setStyleSheet(u"QWidget{\n"
-"	background-color:#0B212E;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
+"	border-radius:10px;\n"
 "}\n"
 "\n"
 "QLineEdit{\n"
@@ -1064,9 +1035,9 @@ class Ui_MainWindow(object):
         self.sta_list_widget.setMinimumSize(QSize(50, 0))
         self.sta_list_widget.setMaximumSize(QSize(16777215, 50))
         self.sta_list_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:#0B212E;\n"
-"	border-radius:10px;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
+"	border-radius:10px;\n"
 "}")
         self.formLayout = QFormLayout(self.sta_list_widget)
         self.formLayout.setObjectName(u"formLayout")
@@ -1102,14 +1073,14 @@ class Ui_MainWindow(object):
 
         self.station_graph_widget = QWidget(self.station_tab1)
         self.station_graph_widget.setObjectName(u"station_graph_widget")
-        sizePolicy9 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy9.setHorizontalStretch(0)
-        sizePolicy9.setVerticalStretch(0)
-        sizePolicy9.setHeightForWidth(self.station_graph_widget.sizePolicy().hasHeightForWidth())
-        self.station_graph_widget.setSizePolicy(sizePolicy9)
+        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.station_graph_widget.sizePolicy().hasHeightForWidth())
+        self.station_graph_widget.setSizePolicy(sizePolicy8)
         self.station_graph_widget.setMinimumSize(QSize(800, 0))
         self.station_graph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color:#0B212E;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
 "	border-radius:10px;\n"
 "}")
@@ -1123,13 +1094,6 @@ class Ui_MainWindow(object):
         self.horizontalSpacer_26 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.gridLayout_13.addItem(self.horizontalSpacer_26, 0, 1, 1, 1)
-
-        self.station_resetzoom_button = QPushButton(self.station_graph_widget)
-        self.station_resetzoom_button.setObjectName(u"station_resetzoom_button")
-        sizePolicy6.setHeightForWidth(self.station_resetzoom_button.sizePolicy().hasHeightForWidth())
-        self.station_resetzoom_button.setSizePolicy(sizePolicy6)
-
-        self.gridLayout_13.addWidget(self.station_resetzoom_button, 0, 3, 1, 1)
 
         self.label = QLabel(self.station_graph_widget)
         self.label.setObjectName(u"label")
@@ -1162,82 +1126,87 @@ class Ui_MainWindow(object):
         self.gridLayout_17 = QGridLayout(self.station_tab2)
         self.gridLayout_17.setObjectName(u"gridLayout_17")
         self.gridLayout_17.setContentsMargins(0, 0, 0, 0)
-        self.label_44 = QLabel(self.station_tab2)
-        self.label_44.setObjectName(u"label_44")
-        sizePolicy.setHeightForWidth(self.label_44.sizePolicy().hasHeightForWidth())
-        self.label_44.setSizePolicy(sizePolicy)
-
-        self.gridLayout_17.addWidget(self.label_44, 0, 0, 1, 1)
-
-        self.station_saveTable_button = QPushButton(self.station_tab2)
-        self.station_saveTable_button.setObjectName(u"station_saveTable_button")
-
-        self.gridLayout_17.addWidget(self.station_saveTable_button, 2, 1, 1, 1)
-
-        self.station_sortTable_button = QPushButton(self.station_tab2)
-        self.station_sortTable_button.setObjectName(u"station_sortTable_button")
-
-        self.gridLayout_17.addWidget(self.station_sortTable_button, 2, 0, 1, 1)
-
-        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_17.addItem(self.horizontalSpacer_12, 0, 2, 1, 1)
-
         self.station_nStationsAdv_input = QSpinBox(self.station_tab2)
         self.station_nStationsAdv_input.setObjectName(u"station_nStationsAdv_input")
         self.station_nStationsAdv_input.setMouseTracking(False)
         self.station_nStationsAdv_input.setProperty("showGroupSeparator", False)
         self.station_nStationsAdv_input.setMinimum(1)
 
-        self.gridLayout_17.addWidget(self.station_nStationsAdv_input, 0, 1, 1, 1)
+        self.gridLayout_17.addWidget(self.station_nStationsAdv_input, 0, 3, 1, 1)
+
+        self.station_saveTable_button = QPushButton(self.station_tab2)
+        self.station_saveTable_button.setObjectName(u"station_saveTable_button")
+
+        self.gridLayout_17.addWidget(self.station_saveTable_button, 2, 3, 1, 1)
+
+        self.station_impTable_button = QPushButton(self.station_tab2)
+        self.station_impTable_button.setObjectName(u"station_impTable_button")
+
+        self.gridLayout_17.addWidget(self.station_impTable_button, 2, 1, 1, 1)
 
         self.station_tableStations_input = QTableWidget(self.station_tab2)
         if (self.station_tableStations_input.columnCount() < 11):
             self.station_tableStations_input.setColumnCount(11)
+        font2 = QFont()
+        font2.setPointSize(10)
+        font2.setBold(True)
         __qtablewidgetitem = QTableWidgetItem()
+        __qtablewidgetitem.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
+        __qtablewidgetitem1.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         __qtablewidgetitem2 = QTableWidgetItem()
+        __qtablewidgetitem2.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
+        __qtablewidgetitem3.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         __qtablewidgetitem4 = QTableWidgetItem()
+        __qtablewidgetitem4.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
+        __qtablewidgetitem5.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(5, __qtablewidgetitem5)
         __qtablewidgetitem6 = QTableWidgetItem()
+        __qtablewidgetitem6.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(6, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
+        __qtablewidgetitem7.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(7, __qtablewidgetitem7)
         __qtablewidgetitem8 = QTableWidgetItem()
+        __qtablewidgetitem8.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(8, __qtablewidgetitem8)
         __qtablewidgetitem9 = QTableWidgetItem()
+        __qtablewidgetitem9.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(9, __qtablewidgetitem9)
         __qtablewidgetitem10 = QTableWidgetItem()
+        __qtablewidgetitem10.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(10, __qtablewidgetitem10)
         if (self.station_tableStations_input.rowCount() < 1):
             self.station_tableStations_input.setRowCount(1)
         __qtablewidgetitem11 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 3, __qtablewidgetitem11)
+        self.station_tableStations_input.setItem(0, 0, __qtablewidgetitem11)
         __qtablewidgetitem12 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 4, __qtablewidgetitem12)
+        self.station_tableStations_input.setItem(0, 3, __qtablewidgetitem12)
         __qtablewidgetitem13 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 5, __qtablewidgetitem13)
+        self.station_tableStations_input.setItem(0, 4, __qtablewidgetitem13)
         __qtablewidgetitem14 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 6, __qtablewidgetitem14)
+        self.station_tableStations_input.setItem(0, 5, __qtablewidgetitem14)
         __qtablewidgetitem15 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 7, __qtablewidgetitem15)
+        self.station_tableStations_input.setItem(0, 6, __qtablewidgetitem15)
         __qtablewidgetitem16 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 8, __qtablewidgetitem16)
+        self.station_tableStations_input.setItem(0, 7, __qtablewidgetitem16)
         __qtablewidgetitem17 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 9, __qtablewidgetitem17)
+        self.station_tableStations_input.setItem(0, 8, __qtablewidgetitem17)
         __qtablewidgetitem18 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 10, __qtablewidgetitem18)
+        self.station_tableStations_input.setItem(0, 9, __qtablewidgetitem18)
+        __qtablewidgetitem19 = QTableWidgetItem()
+        self.station_tableStations_input.setItem(0, 10, __qtablewidgetitem19)
         self.station_tableStations_input.setObjectName(u"station_tableStations_input")
-        font2 = QFont()
-        font2.setBold(False)
-        self.station_tableStations_input.setFont(font2)
+        font3 = QFont()
+        font3.setBold(False)
+        self.station_tableStations_input.setFont(font3)
         self.station_tableStations_input.setStyleSheet(u"QTableWidget{\n"
 "	border: 3px solid #0B212E;\n"
 "	border-radius:10px;\n"
@@ -1257,7 +1226,23 @@ class Ui_MainWindow(object):
         self.station_tableStations_input.verticalHeader().setProperty("showSortIndicator", False)
         self.station_tableStations_input.verticalHeader().setStretchLastSection(False)
 
-        self.gridLayout_17.addWidget(self.station_tableStations_input, 1, 0, 1, 3)
+        self.gridLayout_17.addWidget(self.station_tableStations_input, 1, 1, 1, 5)
+
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout_17.addItem(self.horizontalSpacer_12, 0, 5, 1, 1)
+
+        self.label_44 = QLabel(self.station_tab2)
+        self.label_44.setObjectName(u"label_44")
+        sizePolicy.setHeightForWidth(self.label_44.sizePolicy().hasHeightForWidth())
+        self.label_44.setSizePolicy(sizePolicy)
+
+        self.gridLayout_17.addWidget(self.label_44, 0, 1, 1, 1)
+
+        self.station_sortTable_button = QPushButton(self.station_tab2)
+        self.station_sortTable_button.setObjectName(u"station_sortTable_button")
+
+        self.gridLayout_17.addWidget(self.station_sortTable_button, 2, 2, 1, 1)
 
         self.station_tab_widget.addTab(self.station_tab2, "")
 
@@ -1285,9 +1270,9 @@ class Ui_MainWindow(object):
         self.widget_7 = QWidget(self.blade_page)
         self.widget_7.setObjectName(u"widget_7")
         self.widget_7.setStyleSheet(u"QWidget{\n"
-"	background-color: #0B212E;\n"
-"	border-radius:10px;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
+"	border-radius:10px;\n"
 "}\n"
 "\n"
 "QGraphicsView{\n"
@@ -1349,14 +1334,14 @@ class Ui_MainWindow(object):
         self.blade_skinolpsta_table = QTableWidget(self.widget_2)
         if (self.blade_skinolpsta_table.columnCount() < 2):
             self.blade_skinolpsta_table.setColumnCount(2)
-        font3 = QFont()
-        font3.setBold(True)
-        __qtablewidgetitem19 = QTableWidgetItem()
-        __qtablewidgetitem19.setFont(font3);
-        self.blade_skinolpsta_table.setHorizontalHeaderItem(0, __qtablewidgetitem19)
+        font4 = QFont()
+        font4.setBold(True)
         __qtablewidgetitem20 = QTableWidgetItem()
-        __qtablewidgetitem20.setFont(font3);
-        self.blade_skinolpsta_table.setHorizontalHeaderItem(1, __qtablewidgetitem20)
+        __qtablewidgetitem20.setFont(font4);
+        self.blade_skinolpsta_table.setHorizontalHeaderItem(0, __qtablewidgetitem20)
+        __qtablewidgetitem21 = QTableWidgetItem()
+        __qtablewidgetitem21.setFont(font4);
+        self.blade_skinolpsta_table.setHorizontalHeaderItem(1, __qtablewidgetitem21)
         if (self.blade_skinolpsta_table.rowCount() < 2):
             self.blade_skinolpsta_table.setRowCount(2)
         self.blade_skinolpsta_table.setObjectName(u"blade_skinolpsta_table")
@@ -1398,12 +1383,12 @@ class Ui_MainWindow(object):
         self.blade_skinolplen_table = QTableWidget(self.widget_6)
         if (self.blade_skinolplen_table.columnCount() < 2):
             self.blade_skinolplen_table.setColumnCount(2)
-        __qtablewidgetitem21 = QTableWidgetItem()
-        __qtablewidgetitem21.setFont(font3);
-        self.blade_skinolplen_table.setHorizontalHeaderItem(0, __qtablewidgetitem21)
         __qtablewidgetitem22 = QTableWidgetItem()
-        __qtablewidgetitem22.setFont(font3);
-        self.blade_skinolplen_table.setHorizontalHeaderItem(1, __qtablewidgetitem22)
+        __qtablewidgetitem22.setFont(font4);
+        self.blade_skinolplen_table.setHorizontalHeaderItem(0, __qtablewidgetitem22)
+        __qtablewidgetitem23 = QTableWidgetItem()
+        __qtablewidgetitem23.setFont(font4);
+        self.blade_skinolplen_table.setHorizontalHeaderItem(1, __qtablewidgetitem23)
         if (self.blade_skinolplen_table.rowCount() < 2):
             self.blade_skinolplen_table.setRowCount(2)
         self.blade_skinolplen_table.setObjectName(u"blade_skinolplen_table")
@@ -1429,8 +1414,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.blade_interpolate_button = QPushButton(self.widget_9)
         self.blade_interpolate_button.setObjectName(u"blade_interpolate_button")
-        sizePolicy8.setHeightForWidth(self.blade_interpolate_button.sizePolicy().hasHeightForWidth())
-        self.blade_interpolate_button.setSizePolicy(sizePolicy8)
+        sizePolicy7.setHeightForWidth(self.blade_interpolate_button.sizePolicy().hasHeightForWidth())
+        self.blade_interpolate_button.setSizePolicy(sizePolicy7)
         self.blade_interpolate_button.setStyleSheet(u"")
         self.blade_interpolate_button.setCheckable(False)
 
@@ -1456,11 +1441,11 @@ class Ui_MainWindow(object):
 
         self.label_40 = QLabel(self.widget_9)
         self.label_40.setObjectName(u"label_40")
-        font4 = QFont()
-        font4.setPointSize(10)
-        font4.setBold(True)
-        font4.setItalic(False)
-        self.label_40.setFont(font4)
+        font5 = QFont()
+        font5.setPointSize(10)
+        font5.setBold(True)
+        font5.setItalic(False)
+        self.label_40.setFont(font5)
         self.label_40.setStyleSheet(u"QLabel{\n"
 "	font:700 10pt;\n"
 "	background-color:#0B212E;\n"
@@ -1513,11 +1498,11 @@ class Ui_MainWindow(object):
 
         self.tableView = QTableView(self.widget_10)
         self.tableView.setObjectName(u"tableView")
-        sizePolicy10 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
-        sizePolicy10.setHorizontalStretch(0)
-        sizePolicy10.setVerticalStretch(0)
-        sizePolicy10.setHeightForWidth(self.tableView.sizePolicy().hasHeightForWidth())
-        self.tableView.setSizePolicy(sizePolicy10)
+        sizePolicy9 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
+        sizePolicy9.setHorizontalStretch(0)
+        sizePolicy9.setVerticalStretch(0)
+        sizePolicy9.setHeightForWidth(self.tableView.sizePolicy().hasHeightForWidth())
+        self.tableView.setSizePolicy(sizePolicy9)
 
         self.verticalLayout_7.addWidget(self.tableView)
 
@@ -1540,7 +1525,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.widget_8.sizePolicy().hasHeightForWidth())
         self.widget_8.setSizePolicy(sizePolicy)
         self.widget_8.setStyleSheet(u"QWidget{\n"
-"	background-color:#0B212E;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
 "	border-radius:10px;\n"
 "}\n"
@@ -1577,23 +1562,26 @@ class Ui_MainWindow(object):
         self.gridLayout_11.setObjectName(u"gridLayout_11")
         self.skin_tethickness_input = QLineEdit(self.widget_8)
         self.skin_tethickness_input.setObjectName(u"skin_tethickness_input")
-        sizePolicy6.setHeightForWidth(self.skin_tethickness_input.sizePolicy().hasHeightForWidth())
-        self.skin_tethickness_input.setSizePolicy(sizePolicy6)
+        sizePolicy10 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+        sizePolicy10.setHorizontalStretch(0)
+        sizePolicy10.setVerticalStretch(0)
+        sizePolicy10.setHeightForWidth(self.skin_tethickness_input.sizePolicy().hasHeightForWidth())
+        self.skin_tethickness_input.setSizePolicy(sizePolicy10)
 
         self.gridLayout_11.addWidget(self.skin_tethickness_input, 4, 2, 1, 2)
 
         self.skin_overlaptarget_input = QLineEdit(self.widget_8)
         self.skin_overlaptarget_input.setObjectName(u"skin_overlaptarget_input")
-        sizePolicy6.setHeightForWidth(self.skin_overlaptarget_input.sizePolicy().hasHeightForWidth())
-        self.skin_overlaptarget_input.setSizePolicy(sizePolicy6)
+        sizePolicy10.setHeightForWidth(self.skin_overlaptarget_input.sizePolicy().hasHeightForWidth())
+        self.skin_overlaptarget_input.setSizePolicy(sizePolicy10)
         self.skin_overlaptarget_input.setReadOnly(True)
 
         self.gridLayout_11.addWidget(self.skin_overlaptarget_input, 3, 2, 1, 2)
 
         self.skin_plythickness_input = QLineEdit(self.widget_8)
         self.skin_plythickness_input.setObjectName(u"skin_plythickness_input")
-        sizePolicy6.setHeightForWidth(self.skin_plythickness_input.sizePolicy().hasHeightForWidth())
-        self.skin_plythickness_input.setSizePolicy(sizePolicy6)
+        sizePolicy10.setHeightForWidth(self.skin_plythickness_input.sizePolicy().hasHeightForWidth())
+        self.skin_plythickness_input.setSizePolicy(sizePolicy10)
 
         self.gridLayout_11.addWidget(self.skin_plythickness_input, 2, 2, 1, 2)
 
@@ -1624,8 +1612,8 @@ class Ui_MainWindow(object):
 
         self.skin_savefig_input = QCheckBox(self.widget_8)
         self.skin_savefig_input.setObjectName(u"skin_savefig_input")
-        sizePolicy8.setHeightForWidth(self.skin_savefig_input.sizePolicy().hasHeightForWidth())
-        self.skin_savefig_input.setSizePolicy(sizePolicy8)
+        sizePolicy7.setHeightForWidth(self.skin_savefig_input.sizePolicy().hasHeightForWidth())
+        self.skin_savefig_input.setSizePolicy(sizePolicy7)
         self.skin_savefig_input.setMinimumSize(QSize(0, 0))
         self.skin_savefig_input.setMaximumSize(QSize(16777215, 16777215))
 
@@ -1651,8 +1639,8 @@ class Ui_MainWindow(object):
 
         self.skin_nplies_input = QLineEdit(self.widget_8)
         self.skin_nplies_input.setObjectName(u"skin_nplies_input")
-        sizePolicy6.setHeightForWidth(self.skin_nplies_input.sizePolicy().hasHeightForWidth())
-        self.skin_nplies_input.setSizePolicy(sizePolicy6)
+        sizePolicy10.setHeightForWidth(self.skin_nplies_input.sizePolicy().hasHeightForWidth())
+        self.skin_nplies_input.setSizePolicy(sizePolicy10)
 
         self.gridLayout_11.addWidget(self.skin_nplies_input, 1, 2, 1, 2)
 
@@ -1663,9 +1651,9 @@ class Ui_MainWindow(object):
         self.skin_zoomedgraph_widget.setObjectName(u"skin_zoomedgraph_widget")
         self.skin_zoomedgraph_widget.setMinimumSize(QSize(0, 0))
         self.skin_zoomedgraph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color: #0B212E;\n"
-"	border-radius:10px;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
+"	border-radius:10px;\n"
 "}")
         self.gridLayout_15 = QGridLayout(self.skin_zoomedgraph_widget)
         self.gridLayout_15.setObjectName(u"gridLayout_15")
@@ -1691,10 +1679,10 @@ class Ui_MainWindow(object):
         self.label_29.setObjectName(u"label_29")
         sizePolicy4.setHeightForWidth(self.label_29.sizePolicy().hasHeightForWidth())
         self.label_29.setSizePolicy(sizePolicy4)
-        font5 = QFont()
-        font5.setPointSize(12)
-        font5.setBold(True)
-        self.label_29.setFont(font5)
+        font6 = QFont()
+        font6.setPointSize(12)
+        font6.setBold(True)
+        self.label_29.setFont(font6)
         self.label_29.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_10.addWidget(self.label_29, 0, 0, 1, 2)
@@ -1703,9 +1691,9 @@ class Ui_MainWindow(object):
         self.skin_maingraph_widget.setObjectName(u"skin_maingraph_widget")
         self.skin_maingraph_widget.setMinimumSize(QSize(600, 0))
         self.skin_maingraph_widget.setStyleSheet(u"QWidget{\n"
-"	background-color: #0B212E;\n"
-"	border-radius:10px;\n"
+"	background-color:#193d4e;\n"
 "	color:white;\n"
+"	border-radius:10px;\n"
 "}")
         self.gridLayout_7 = QGridLayout(self.skin_maingraph_widget)
         self.gridLayout_7.setObjectName(u"gridLayout_7")
@@ -1833,12 +1821,6 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.label_42, 0, 0, 1, 3)
 
         self.export_sectionsList = QListWidget(self.export_page)
-        QListWidgetItem(self.export_sectionsList)
-        QListWidgetItem(self.export_sectionsList)
-        QListWidgetItem(self.export_sectionsList)
-        QListWidgetItem(self.export_sectionsList)
-        QListWidgetItem(self.export_sectionsList)
-        QListWidgetItem(self.export_sectionsList)
         self.export_sectionsList.setObjectName(u"export_sectionsList")
         self.export_sectionsList.setStyleSheet(u"QListWidget{\n"
 "	border: 2px solid #0B212E;\n"
@@ -1980,9 +1962,7 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.airfoil_calculateairfoil_button, self.airfoil_seconddigit_input)
         QWidget.setTabOrder(self.airfoil_seconddigit_input, self.airfoil_thirddigit_input)
         QWidget.setTabOrder(self.airfoil_thirddigit_input, self.airfoil_lasttwodigits_input)
-        QWidget.setTabOrder(self.airfoil_lasttwodigits_input, self.airfoil_resetzoom_button)
-        QWidget.setTabOrder(self.airfoil_resetzoom_button, self.airfoil_chartview)
-        QWidget.setTabOrder(self.airfoil_chartview, self.station_uploadairfoil_button)
+        QWidget.setTabOrder(self.airfoil_lasttwodigits_input, self.station_uploadairfoil_button)
         QWidget.setTabOrder(self.station_uploadairfoil_button, self.station_listairfoils_box)
         QWidget.setTabOrder(self.station_listairfoils_box, self.station_chordlength_input)
         QWidget.setTabOrder(self.station_chordlength_input, self.station_twistangle_input)
@@ -1997,8 +1977,7 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.station_mirrory_input, self.station_savestation_button)
         QWidget.setTabOrder(self.station_savestation_button, self.station_delstation_button)
         QWidget.setTabOrder(self.station_delstation_button, self.station_chartview)
-        QWidget.setTabOrder(self.station_chartview, self.station_resetzoom_button)
-        QWidget.setTabOrder(self.station_resetzoom_button, self.station_liststation_box)
+        QWidget.setTabOrder(self.station_chartview, self.station_liststation_box)
         QWidget.setTabOrder(self.station_liststation_box, self.blade_olpsta_chartview)
         QWidget.setTabOrder(self.blade_olpsta_chartview, self.blade_olplen_chartview)
         QWidget.setTabOrder(self.blade_olplen_chartview, self.blade_interpolate_button)
@@ -2040,14 +2019,15 @@ class Ui_MainWindow(object):
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Work Directory:", None))
         self.workpath_lineedit.setText("")
         self.changedir_button.setText(QCoreApplication.translate("MainWindow", u"Change...", None))
+#if QT_CONFIG(tooltip)
+        self.loadproject_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">Coming Soon.</span></p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.loadproject_button.setText(QCoreApplication.translate("MainWindow", u"Load Project...", None))
         self.label_5.setText("")
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Version 0.2", None))
         self.newproject_button.setText(QCoreApplication.translate("MainWindow", u"New Project...", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Welcome to EdFoil", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Airfoils available:", None))
-        self.airfoil_resetzoom_button.setText(QCoreApplication.translate("MainWindow", u"Reset", None))
-        self.airfoil_xy_current.setText("")
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
         self.airfoil_calculateairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Calculate", None))
         self.airfoil_saveairfoil_button.setText(QCoreApplication.translate("MainWindow", u"Save", None))
@@ -2089,12 +2069,16 @@ class Ui_MainWindow(object):
         self.station_delstation_button.setText(QCoreApplication.translate("MainWindow", u"Delete Station", None))
         self.label_35.setText(QCoreApplication.translate("MainWindow", u"Current station:", None))
         self.station_xy_current.setText("")
-        self.station_resetzoom_button.setText(QCoreApplication.translate("MainWindow", u"Reset", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Airfoil Plot", None))
         self.station_tab_widget.setTabText(self.station_tab_widget.indexOf(self.station_tab1), QCoreApplication.translate("MainWindow", u"Interactive", None))
-        self.label_44.setText(QCoreApplication.translate("MainWindow", u"Number of stations:", None))
         self.station_saveTable_button.setText(QCoreApplication.translate("MainWindow", u"Save Stations", None))
-        self.station_sortTable_button.setText(QCoreApplication.translate("MainWindow", u"Sort Stations", None))
+#if QT_CONFIG(tooltip)
+        self.station_impTable_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">IMPORTANT: This deletes all previously saved stations.</span></p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.station_impTable_button.setWhatsThis("")
+#endif // QT_CONFIG(whatsthis)
+        self.station_impTable_button.setText(QCoreApplication.translate("MainWindow", u"Import from file...", None))
         ___qtablewidgetitem = self.station_tableStations_input.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Airfoil", None));
         ___qtablewidgetitem1 = self.station_tableStations_input.horizontalHeaderItem(1)
@@ -2122,6 +2106,11 @@ class Ui_MainWindow(object):
         self.station_tableStations_input.setSortingEnabled(False)
         self.station_tableStations_input.setSortingEnabled(__sortingEnabled)
 
+        self.label_44.setText(QCoreApplication.translate("MainWindow", u"Number of stations:", None))
+#if QT_CONFIG(tooltip)
+        self.station_sortTable_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">Sorts the stations based on the Z axis.</span></p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.station_sortTable_button.setText(QCoreApplication.translate("MainWindow", u"Sort Stations", None))
         self.station_tab_widget.setTabText(self.station_tab_widget.indexOf(self.station_tab2), QCoreApplication.translate("MainWindow", u"Advanced", None))
         self.label_48.setText(QCoreApplication.translate("MainWindow", u"Interpolation - Skin Overlap (Start)", None))
         self.label_49.setText(QCoreApplication.translate("MainWindow", u"Interpolation - Skin Overlap (Length)", None))
@@ -2164,23 +2153,6 @@ class Ui_MainWindow(object):
         self.label_47.setText(QCoreApplication.translate("MainWindow", u".json", None))
         self.export_export_button.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
         self.label_42.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
-
-        __sortingEnabled1 = self.export_sectionsList.isSortingEnabled()
-        self.export_sectionsList.setSortingEnabled(False)
-        ___qlistwidgetitem = self.export_sectionsList.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem1 = self.export_sectionsList.item(1)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem2 = self.export_sectionsList.item(2)
-        ___qlistwidgetitem2.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem3 = self.export_sectionsList.item(3)
-        ___qlistwidgetitem3.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem4 = self.export_sectionsList.item(4)
-        ___qlistwidgetitem4.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem5 = self.export_sectionsList.item(5)
-        ___qlistwidgetitem5.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        self.export_sectionsList.setSortingEnabled(__sortingEnabled1)
-
         self.label_45.setText(QCoreApplication.translate("MainWindow", u"Select the sections to be exported as .json files:", None))
         self.def_msgbar.setText(QCoreApplication.translate("MainWindow", u"Ready.", None))
         self.msgbar.setText("")

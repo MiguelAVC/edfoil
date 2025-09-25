@@ -1,5 +1,6 @@
 import json, subprocess, tempfile, re
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 from scipy.interpolate import CubicSpline
@@ -91,12 +92,15 @@ class Airfoil:
                 file.write(line + '\n')
     
     def plotAirfoil(self, display:bool=True) -> Figure | None:
-        from matplotlib.figure import Figure
         font_size = 'x-large'
         x, y = zip(*self.xy)
         
-        fig = Figure(figsize=(10,3), tight_layout=True)
-        ax = fig.add_subplot(111)
+        if display:
+            fig, ax = plt.subplots(figsize=(10,3), tight_layout=True)
+        else:
+            fig = Figure(figsize=(10,3), tight_layout=True)
+            ax = fig.add_subplot(111)
+            
         ax.set_title(self.name, fontsize='xx-large')
         ax.plot(x,y)
         ax.set_xlabel('x/c [-]', fontsize=font_size)
@@ -110,8 +114,7 @@ class Airfoil:
         ax.axis('equal')
         
         if display:
-            import matplotlib.pyplot as plt
-            plt.show(fig)
+            plt.show()
             return None
         else: return fig
     

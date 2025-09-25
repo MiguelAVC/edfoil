@@ -689,6 +689,9 @@ QPushButton:pressed {
                   <height>0</height>
                  </size>
                 </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Coming Soon.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="text">
                  <string>Load Project...</string>
                 </property>
@@ -882,13 +885,14 @@ QPushButton:pressed {
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QWidget{
-	background-color:#193d4e;
-	color:white;
+                 <string notr="true">QWidget#airfoil_graph_widget{
+	background-color:white;
 	border-radius:10px;
+    border: 10px solid #193d4e;         /* width + style + color */
+    border-radius: 25px;
 }</string>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_12">
+                <layout class="QVBoxLayout" name="verticalLayout_9">
                  <property name="leftMargin">
                   <number>20</number>
                  </property>
@@ -901,66 +905,6 @@ QPushButton:pressed {
                  <property name="bottomMargin">
                   <number>20</number>
                  </property>
-                 <item row="0" column="2">
-                  <widget class="QPushButton" name="airfoil_resetzoom_button">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Reset</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="airfoil_xy_current">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <spacer name="horizontalSpacer_21">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="1" column="0" colspan="3">
-                  <widget class="QChartView" name="airfoil_chartview">
-                   <property name="cursor" stdset="0">
-                    <cursorShape>CrossCursor</cursorShape>
-                   </property>
-                   <property name="mouseTracking">
-                    <bool>true</bool>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QGraphicsView{
-	background-color:white;
-}</string>
-                   </property>
-                   <property name="renderHints">
-                    <set>QPainter::RenderHint::Antialiasing|QPainter::RenderHint::LosslessImageRendering|QPainter::RenderHint::NonCosmeticBrushPatterns|QPainter::RenderHint::SmoothPixmapTransform|QPainter::RenderHint::TextAntialiasing|QPainter::RenderHint::VerticalSubpixelPositioning</set>
-                   </property>
-                  </widget>
-                 </item>
                 </layout>
                </widget>
               </item>
@@ -1391,7 +1335,7 @@ QListWidget::item:hover {
              <property name="styleSheet">
               <string notr="true">QPushButton{
 	font:700 10pt;
-	background-color:#0B212E;
+	background-color:#254656;
 	border-radius:5px;
 	color:white;
 	padding:0.25em 1em;
@@ -1419,9 +1363,12 @@ QPushButton:hover{
               <item row="0" column="0" colspan="2">
                <widget class="QTabWidget" name="station_tab_widget">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="station_tab1">
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
                  <attribute name="title">
                   <string>Interactive</string>
                  </attribute>
@@ -1457,8 +1404,9 @@ QPushButton:hover{
                    <widget class="QWidget" name="widget_3" native="true">
                     <property name="styleSheet">
                      <string notr="true">QWidget{
-	background-color:#0B212E;
+	background-color:#193d4e;
 	color:white;
+	border-radius:10px;
 }</string>
                     </property>
                     <layout class="QFormLayout" name="formLayout_3">
@@ -1545,8 +1493,9 @@ QPushButton:hover{
                    <widget class="QWidget" name="widget_4" native="true">
                     <property name="styleSheet">
                      <string notr="true">QWidget{
-	background-color:#0B212E;
+	background-color:#193d4e;
 	color:white;
+	border-radius:10px;
 }
 
 QLineEdit{
@@ -1983,9 +1932,9 @@ QPushButton:pressed {
                        </property>
                        <property name="styleSheet">
                         <string notr="true">QWidget{
-	background-color:#0B212E;
-	border-radius:10px;
+	background-color:#193d4e;
 	color:white;
+	border-radius:10px;
 }</string>
                        </property>
                        <layout class="QFormLayout" name="formLayout">
@@ -2058,7 +2007,7 @@ QPushButton:pressed {
                     </property>
                     <property name="styleSheet">
                      <string notr="true">QWidget{
-	background-color:#0B212E;
+	background-color:#193d4e;
 	color:white;
 	border-radius:10px;
 }</string>
@@ -2083,19 +2032,6 @@ QPushButton:pressed {
                         </size>
                        </property>
                       </spacer>
-                     </item>
-                     <item row="0" column="3">
-                      <widget class="QPushButton" name="station_resetzoom_button">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Reset</string>
-                       </property>
-                      </widget>
                      </item>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label">
@@ -2150,50 +2086,7 @@ QPushButton:pressed {
                   <property name="bottomMargin">
                    <number>0</number>
                   </property>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_44">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Number of stations:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>station_nStationsAdv_input</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QPushButton" name="station_saveTable_button">
-                    <property name="text">
-                     <string>Save Stations</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QPushButton" name="station_sortTable_button">
-                    <property name="text">
-                     <string>Sort Stations</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <spacer name="horizontalSpacer_12">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="0" column="1">
+                  <item row="0" column="3">
                    <widget class="QSpinBox" name="station_nStationsAdv_input">
                     <property name="mouseTracking">
                      <bool>false</bool>
@@ -2206,7 +2099,27 @@ QPushButton:pressed {
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0" colspan="3">
+                  <item row="2" column="3">
+                   <widget class="QPushButton" name="station_saveTable_button">
+                    <property name="text">
+                     <string>Save Stations</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QPushButton" name="station_impTable_button">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;IMPORTANT: This deletes all previously saved stations.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="whatsThis">
+                     <string/>
+                    </property>
+                    <property name="text">
+                     <string>Import from file...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1" colspan="5">
                    <widget class="QTableWidget" name="station_tableStations_input">
                     <property name="font">
                      <font>
@@ -2266,57 +2179,128 @@ QPushButton:pressed {
                      <property name="text">
                       <string>Airfoil</string>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
+                     </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>Chord Length</string>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>Twist Angle</string>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
+                     </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>x-offset</string>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>y-offset</string>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
+                     </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>z-offset</string>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>x-multiplier</string>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
+                     </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>y-multiplier</string>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>z-mutiplier</string>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
+                     </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>x-mirror</string>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                     </column>
                     <column>
                      <property name="text">
                       <string>y-mirror</string>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <bold>true</bold>
+                      </font>
+                     </property>
                     </column>
+                    <item row="0" column="0">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </item>
                     <item row="0" column="3">
                      <property name="text">
                       <string/>
@@ -2359,6 +2343,45 @@ QPushButton:pressed {
                     </item>
                    </widget>
                   </item>
+                  <item row="0" column="5">
+                   <spacer name="horizontalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="label_44">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Number of stations:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>station_nStationsAdv_input</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QPushButton" name="station_sortTable_button">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Sorts the stations based on the Z axis.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Sort Stations</string>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </widget>
@@ -2398,9 +2421,9 @@ QPushButton:hover{
                <widget class="QWidget" name="widget_7" native="true">
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color: #0B212E;
-	border-radius:10px;
+	background-color:#193d4e;
 	color:white;
+	border-radius:10px;
 }
 
 QGraphicsView{
@@ -2806,7 +2829,7 @@ QGraphicsView{
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color:#0B212E;
+	background-color:#193d4e;
 	color:white;
 	border-radius:10px;
 }
@@ -3019,9 +3042,9 @@ QComboBox{
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color: #0B212E;
-	border-radius:10px;
+	background-color:#193d4e;
 	color:white;
+	border-radius:10px;
 }</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_15">
@@ -3082,9 +3105,9 @@ QComboBox{
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QWidget{
-	background-color: #0B212E;
-	border-radius:10px;
+	background-color:#193d4e;
 	color:white;
+	border-radius:10px;
 }</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_7">
@@ -3316,36 +3339,6 @@ QListWidget::item:hover {
                 <property name="selectionMode">
                  <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
                 </property>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
                </widget>
               </item>
               <item row="1" column="0" colspan="4">
@@ -3510,8 +3503,6 @@ QListWidget::item:hover {
   <tabstop>airfoil_seconddigit_input</tabstop>
   <tabstop>airfoil_thirddigit_input</tabstop>
   <tabstop>airfoil_lasttwodigits_input</tabstop>
-  <tabstop>airfoil_resetzoom_button</tabstop>
-  <tabstop>airfoil_chartview</tabstop>
   <tabstop>station_uploadairfoil_button</tabstop>
   <tabstop>station_listairfoils_box</tabstop>
   <tabstop>station_chordlength_input</tabstop>
@@ -3527,7 +3518,6 @@ QListWidget::item:hover {
   <tabstop>station_savestation_button</tabstop>
   <tabstop>station_delstation_button</tabstop>
   <tabstop>station_chartview</tabstop>
-  <tabstop>station_resetzoom_button</tabstop>
   <tabstop>station_liststation_box</tabstop>
   <tabstop>blade_olpsta_chartview</tabstop>
   <tabstop>blade_olplen_chartview</tabstop>

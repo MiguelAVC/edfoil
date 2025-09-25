@@ -18,6 +18,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg, NavigationToolbar2QT
+from matplotlib.figure import Figure
+import pandas as pd
 
 from scipy.interpolate import splev
 
@@ -75,9 +77,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.load_default_airfoils()
         
         # Main chart
-        self.airfoil_chart = self.graph_template()
-        self.airfoil_chartview.setChart(self.airfoil_chart)
-        self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
+        # self.airfoil_chart = self.graph_template()
+        # self.airfoil_chartview.setChart(self.airfoil_chart)
+        # self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
+        self.airfoil_fig = Figure(figsize=(10, 3), tight_layout=True)
+        self.airfoil_ax = self.airfoil_fig.add_subplot(111)
+        self.canvas = FigureCanvasQTAgg(self.airfoil_fig)
+        self.toolbar = NavigationToolbar2QT(self.canvas, self)
+        self.verticalLayout_9.addWidget(self.toolbar)
+        self.verticalLayout_9.addWidget(self.canvas)
         
         # Signals
         self.airfoil_nacaseries_input.currentTextChanged.connect(self.update_parameters)
@@ -122,29 +130,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Advanced tab
         # ------------
-        # Default values
-        list_airfoils_advanced = QComboBox()
-        list_airfoils_advanced.addItems(list(self.db.airfoils.keys()))
-        self.station_tableStations_input.setCellWidget(0,0,list_airfoils_advanced)
-        
-        xmirror_airfoils_advanced = QCheckBox()
-        xmirror_airfoils_advanced.setCheckable(True)
-        self.station_tableStations_input.setCellWidget(0,9,xmirror_airfoils_advanced)
-        
-        ymirror_airfoils_advanced = QCheckBox()
-        ymirror_airfoils_advanced.setCheckable(True)
-        ymirror_airfoils_advanced.setChecked(True)
-        self.station_tableStations_input.setCellWidget(0,10,ymirror_airfoils_advanced)
-        
-        self.list_airfoils_advanced_default = [1.,0.,0.,0.,0.,1.,1.,1.]
-        self.station_tableStations_input.setSortingEnabled(False)
-        for column in range(len(self.list_airfoils_advanced_default)):
-            text_cell = QTableWidgetItem(str(self.list_airfoils_advanced_default[column]))
-            self.station_tableStations_input.setItem(0,column+1,text_cell)
+        self.stations_insert_row(def_row=True)
+        self.station_tableStations_input.setColumnWidth(0, 130)
+        self.station_tableStations_input.setColumnWidth(1, 100)
         self.station_tableStations_input.setSortingEnabled(True)
         
         # Signals
         self.station_nStationsAdv_input.valueChanged.connect(self.update_stations_table)
+        self.station_impTable_button.clicked.connect(self.import_stations_to_table)
         self.station_sortTable_button.clicked.connect(self.sort_advanced_stations_table)
         self.station_saveTable_button.clicked.connect(self.save_multiple_stations)
         
@@ -297,55 +290,67 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             airfoil = self.db.airfoils[airfoil_name.replace(' ','')]
         
-        # Clear the current series data and update with new values
-        series = QLineSeries()
-        for i in airfoil.xy:
-            series.append(float(i[0]),float(i[1]))
+        # # Clear the current series data and update with new values
+        # series = QLineSeries()
+        # for i in airfoil.xy:
+        #     series.append(float(i[0]),float(i[1]))
         
-        # Create new chart
-        chart = QChart()
-        chart.setAnimationOptions(QChart.SeriesAnimations)
-        # chart.legend().hide()
-        chart.addSeries(series)
+        # # Create new chart
+        # chart = QChart()
+        # chart.setAnimationOptions(QChart.SeriesAnimations)
+        # # chart.legend().hide()
+        # chart.addSeries(series)
         
-        xy_range = np.array(airfoil.xy)
+        # xy_range = np.array(airfoil.xy)
         
-        x_min = np.min(xy_range[:,0])
-        x_max = np.max(xy_range[:,0])
-        y_min = np.min(xy_range[:,1])
-        y_max = np.max(xy_range[:,1])
+        # x_min = np.min(xy_range[:,0])
+        # x_max = np.max(xy_range[:,0])
+        # y_min = np.min(xy_range[:,1])
+        # y_max = np.max(xy_range[:,1])
         
-        # Chord line
-        cl = QLineSeries()
-        cl.append(x_min, 0)
-        cl.append(x_max, 0)
-        chart.addSeries(cl)
+        # # Chord line
+        # cl = QLineSeries()
+        # cl.append(x_min, 0)
+        # cl.append(x_max, 0)
+        # chart.addSeries(cl)
         
-        # Legend
-        series.setName(airfoil_name)
-        cl.setName('Chord line')
-        cl.setColor(QColor(150,150,150))
-        cl.setPen(QPen(QBrush(QColor(150,150,150)), 2, Qt.DashLine))
-        chart.legend().setVisible(True)
-        chart.legend().setAlignment(Qt.AlignBottom)
+        # # Legend
+        # series.setName(airfoil_name)
+        # cl.setName('Chord line')
+        # cl.setColor(QColor(150,150,150))
+        # cl.setPen(QPen(QBrush(QColor(150,150,150)), 2, Qt.DashLine))
+        # chart.legend().setVisible(True)
+        # chart.legend().setAlignment(Qt.AlignBottom)
         
-        chart.createDefaultAxes()
-        x_axis = chart.axes(Qt.Horizontal)[0]
-        y_axis = chart.axes(Qt.Vertical)[0]
-        x_axis.setTitleText('x/c [-]')
-        y_axis.setTitleText('y/c [-]')
-        x_axis.setTitleFont(QFont('Helvetica',14))
-        y_axis.setTitleFont(QFont('Helvetica',14))
+        # chart.createDefaultAxes()
+        # x_axis = chart.axes(Qt.Horizontal)[0]
+        # y_axis = chart.axes(Qt.Vertical)[0]
+        # x_axis.setTitleText('x/c [-]')
+        # y_axis.setTitleText('y/c [-]')
+        # x_axis.setTitleFont(QFont('Helvetica',14))
+        # y_axis.setTitleFont(QFont('Helvetica',14))
         
-        self.airfoil_chartview.setChart(chart)
-        self.equal_axes(chart, [[x_min, x_max], [y_min, y_max]])
+        # self.airfoil_chartview.setChart(chart)
+        # self.equal_axes(chart, [[x_min, x_max], [y_min, y_max]])
         
-        # fig = airfoil.plotAirfoil(display=False)
-        # chart = FigureCanvasQTAgg(fig)
-        # toolbar = NavigationToolbar2QT(chart, self)
-        # self.gridLayout_12.removeWidget(self.airfoil_chartview)
-        # self.gridLayout_12.addWidget(chart, 2,0,1,1)
-        # self.gridLayout_12.addWidget(toolbar, 3,0,1,1)
+        self.airfoil_ax.clear()
+        x, y = zip(*airfoil.xy)
+        n = len(x) // 2
+        
+        self.airfoil_ax.set_title(airfoil.name, fontsize='xx-large')
+        self.airfoil_ax.plot(x[:n+1],y[:n+1], color = 'C0', label='lower')
+        self.airfoil_ax.plot(x[n:],y[n:], color = 'C1', label='upper')
+        self.airfoil_ax.plot([x[0],x[n]],[y[0],y[n]], color = 'black', ls='--',label='chord line', lw=1)
+        self.airfoil_ax.set_xlabel('x/c [-]', fontsize='x-large')
+        self.airfoil_ax.set_ylabel('y/c [-]', fontsize='x-large')
+        self.airfoil_ax.minorticks_on()
+        self.airfoil_ax.tick_params(axis='both', which='both', direction='in',
+                            top=True, right=True, labelsize='x-large')
+        self.airfoil_ax.grid(visible=True, which='major', linestyle='-', linewidth=0.75)
+        self.airfoil_ax.set_aspect('equal', adjustable='datalim')
+        self.airfoil_ax.legend(loc = 'best')
+        
+        self.canvas.draw_idle()
     
     def delete_airfoil(self):
         airfoil_name = self.airfoil_listairfoils_widget.currentItem().text()
@@ -498,31 +503,91 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # print(self.station_liststation_box.currentIndex())
     
     ### ADVANCED TAB METHODS (Page 2b)
+    
+    def stations_insert_row(
+        self,
+        airfoil: str | None = None,
+        def_row: bool = False,
+        data_row: list | None = None,
+        xmirror: bool = False,
+        ymirror: bool = True,
+        ):
+        
+        t = self.station_tableStations_input
+        if def_row:
+            n_rows = 0
+        else:
+            n_rows = t.rowCount()
+            t.insertRow(n_rows)
+        
+        # Column 0: Airfoil
+        c0 = QComboBox()
+        c0.addItems(list(self.db.airfoils.keys()))
+        if airfoil in list(self.db.airfoils.keys()):
+            c0.setCurrentText(airfoil)
+        else: c0.setCurrentIndex(0)
+        t.setCellWidget(n_rows, 0, c0)
+        
+        # Column 1-8: Numeric items
+        num_default = data_row if data_row else [1., 0., 0., 0., 0., 1., 1., 1.]
+        for c, val in enumerate(num_default, start=1):
+            t.setItem(n_rows, c, NumericItem(f"{val:.6g}"))
+            
+        # Column 9-10: Checkboxes
+        x_mir = QCheckBox()
+        x_mir.setChecked(xmirror)
+        y_mir = QCheckBox()
+        y_mir.setChecked(ymirror)
+        t.setCellWidget(n_rows, 9, x_mir)
+        t.setCellWidget(n_rows, 10, y_mir)
+    
     def sort_advanced_stations_table(self):
         self.station_tableStations_input.sortItems(5)
     
+    def import_stations_to_table(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.ExistingFile)
+        dialog.setNameFilter(self.tr('Data files (*.csv *.txt);;All files (*)'))
+        dialog.setViewMode(QFileDialog.Detail)
+        
+        if not dialog.exec():
+                return  # user cancelled
+        filepath = dialog.selectedFiles()[0]
+        
+        # Read file
+        try:
+            df = pd.read_csv(filepath, header=0)
+        except Exception as e:
+            self.handle_msgbar(f"Failed to read file: {e}")
+            return
+        
+        # Clean station table and stations in session
+        t = self.station_tableStations_input
+        t.setSortingEnabled(False)
+        t.clearContents()
+        t.setRowCount(0)
+        t.setSortingEnabled(True)
+        self.db.cleanStations()
+        
+        # Populate station table
+        rows, _ = df.shape
+        for r in range(rows):
+            self.stations_insert_row(
+                airfoil=df.iloc[r]['airfoil'],
+                def_row=False,
+                data_row=df.iloc[r].tolist()[1:-2],
+                xmirror=df.iloc[r]['mirror_x'],
+                ymirror=df.iloc[r]['mirror_y'],
+            )
+        
+        self.station_nStationsAdv_input.setValue(rows)
+        self.handle_msgbar(f'File imported succesfully: {filepath}')
     
     def update_stations_table(self, value):
         n_rows = self.station_tableStations_input.rowCount()
-        # Make first column have a dropdown menu for airfoil
-        list_airfoils = QComboBox()
-        list_airfoils.addItems(list(self.db.airfoils.keys()))
-        xmirror = QCheckBox()
-        xmirror.setCheckable(True)
-        ymirror = QCheckBox()
-        ymirror.setCheckable(True)
-        ymirror.setChecked(True)
         
         if value > n_rows:
-            self.station_tableStations_input.insertRow(n_rows)
-            self.station_tableStations_input.setCellWidget(n_rows,0,list_airfoils)
-            self.station_tableStations_input.setCellWidget(n_rows,9,xmirror)
-            self.station_tableStations_input.setCellWidget(n_rows,10,ymirror)
-            
-            for column in range(1,9):
-                cell_item = self.station_tableStations_input.item(n_rows-1,column)
-                new_cell = QTableWidgetItem(cell_item.text())
-                self.station_tableStations_input.setItem(n_rows,column,new_cell)
+            self.stations_insert_row()
             
         elif value < n_rows:
             self.station_tableStations_input.removeRow(value)
@@ -848,37 +913,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.airfoil_listairfoils_widget.clear()
         self.airfoil_listairfoils_widget.addItems(names)
     
-    def airfoil_mousecoords(self, event: QMouseEvent) -> None:
-        # coords = event.position()
-        # x,y = coords.x(), coords.y()
-        # coord_lims = self.airfoil_chart.plotArea().getCoords()
+    # def airfoil_mousecoords(self, event: QMouseEvent) -> None:
+    #     # coords = event.position()
+    #     # x,y = coords.x(), coords.y()
+    #     # coord_lims = self.airfoil_chart.plotArea().getCoords()
         
-        # if (x >= coord_lims[0] and x <= coord_lims[2] and
-        #     y >= coord_lims[1] and y <= coord_lims[3]):
+    #     # if (x >= coord_lims[0] and x <= coord_lims[2] and
+    #     #     y >= coord_lims[1] and y <= coord_lims[3]):
             
-        #     coords_scaled = self.airfoil_chart.mapToValue(coords)
-        #     x_scaled = coords_scaled.x()
-        #     y_scaled = coords_scaled.y()
+    #     #     coords_scaled = self.airfoil_chart.mapToValue(coords)
+    #     #     x_scaled = coords_scaled.x()
+    #     #     y_scaled = coords_scaled.y()
             
-        #     self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
+    #     #     self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
         
-        chart = self.airfoil_chartview.chart()
-        if chart is None or not chart.series():
-            return
+    #     chart = self.airfoil_chartview.chart()
+    #     if chart is None or not chart.series():
+    #         return
           
-        series = chart.series()[0]  # or find the one you want
-        pos = event.position()      # QChartView coords
+    #     series = chart.series()[0]  # or find the one you want
+    #     pos = event.position()      # QChartView coords
 
-        # Map to data using the series-aware overload
-        value_pt = chart.mapToValue(pos, series)
+    #     # Map to data using the series-aware overload
+    #     value_pt = chart.mapToValue(pos, series)
 
-        # Check that the mapped point is inside the plotArea by re-mapping back
-        back = chart.mapToPosition(value_pt, series)  # chart coords
-        if chart.plotArea().contains(back):
-            self.airfoil_xy_current.setText(f'({value_pt.x():.2f}, {value_pt.y():.2f})')
-        else:
-            # Optional: clear or ignore when outside
-            pass
+    #     # Check that the mapped point is inside the plotArea by re-mapping back
+    #     back = chart.mapToPosition(value_pt, series)  # chart coords
+    #     if chart.plotArea().contains(back):
+    #         self.airfoil_xy_current.setText(f'({value_pt.x():.2f}, {value_pt.y():.2f})')
+    #     else:
+    #         # Optional: clear or ignore when outside
+    #         pass
             
     def station_mousecoords(self, event: QMouseEvent) -> None:
         coords = event.position()
@@ -1041,6 +1106,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.page_title_label.setText(self.export_page_button.text())
     
     def upload_airfoil_file(self):
+        # TODO: Update this to not clash with Airfoil Creator Tab
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFiles)
         dialog.setNameFilter(self.tr('Files (*.csv *.txt)'))
@@ -1126,7 +1192,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.def_msgbar.show()
             self.msgbar.hide()
         
-        
+
+# Main database in every session.       
 class session():
     def __init__(self):
         self.airfoils = {}
@@ -1134,3 +1201,14 @@ class session():
         self.sections = {}
         self.skin = {}
         self.blade = {}
+    
+    def cleanStations(self):
+        self.stations = {}
+
+# For turning string inputs to floats inside QTableWidget instances
+class NumericItem(QTableWidgetItem):
+    def __lt__(self, other):
+        try:
+            return float(self.text()) < float(other.text())
+        except ValueError:
+            return super().__lt__(other)
