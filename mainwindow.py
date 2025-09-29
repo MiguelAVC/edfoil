@@ -1,9 +1,13 @@
 from ui_mainwindow import Ui_MainWindow
 from PySide6.QtWidgets import (QMainWindow, QFileDialog, QMessageBox, 
-                               QCheckBox, QComboBox, QTableWidgetItem)
+                               QCheckBox, QComboBox, QTableWidgetItem,
+                               QTableView, QApplication, QButtonGroup,
+                               QTableWidget, QStyledItemDelegate, QLineEdit)
 from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
                               QValueAxis, QScatterSeries, QAreaSeries)
-from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
+from PySide6.QtGui import (QPainter, QFont, QPen, QBrush, QColor, Qt, 
+                           QMouseEvent, QStandardItemModel, QStandardItem,
+                           QIntValidator, QDoubleValidator)
 from PySide6.QtCore import QTimer, Qt, QPointF, QSizeF
 
 
@@ -52,7 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_page_button.clicked.connect(self.switch_to_stationPage)
         self.blade_page_button.clicked.connect(self.switch_to_bladePage)
         self.skin_page_button.clicked.connect(self.switch_to_skinPage)
-        self.spar_page_button.clicked.connect(self.switch_to_sparPage)
+        # self.spar_page_button.clicked.connect(self.switch_to_sparPage)
         self.export_page_button.clicked.connect(self.switch_to_exportPage)
         
         # Lower sidebar buttons
@@ -82,6 +86,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
         self.airfoil_fig = Figure(figsize=(10, 3), tight_layout=True)
         self.airfoil_ax = self.airfoil_fig.add_subplot(111)
+        self.airfoil_ax.set_xlabel('x/c [-]', fontsize='x-large')
+        self.airfoil_ax.set_ylabel('y/c [-]', fontsize='x-large')
+        self.airfoil_ax.minorticks_on()
+        self.airfoil_ax.tick_params(axis='both', which='both', direction='in',
+                            top=True, right=True, labelsize='medium')
+        self.airfoil_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
         self.canvas = FigureCanvasQTAgg(self.airfoil_fig)
         self.toolbar = NavigationToolbar2QT(self.canvas, self)
         self.verticalLayout_9.addWidget(self.toolbar)
@@ -112,6 +122,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_chart_empty = self.graph_template()
         self.station_chartview.setChart(self.station_chart_empty)
         self.station_chartview.mouseMoveEvent = self.station_mousecoords
+        
+        # Validators
+        self.station_chordlength_input.setValidator(QDoubleValidator(1.,1e6,3))
+        self.station_twistangle_input.setValidator(QDoubleValidator(-1e6,1e6,3))
+        self.station_offsetx_input.setValidator(QDoubleValidator(-1e6,1e6,3))
+        self.station_offsety_input.setValidator(QDoubleValidator(-1e6,1e6,3))
+        self.station_offsetz_input.setValidator(QDoubleValidator(0,1e6,3))
+        self.station_multx_input.setValidator(QDoubleValidator(0.1,1e6,3))
+        self.station_multy_input.setValidator(QDoubleValidator(0.1,1e6,3))
+        self.station_multz_input.setValidator(QDoubleValidator(0.1,1e6,3))
         
         # Signals
         self.station_listairfoils_box.currentTextChanged.connect(self.onTextChanged)
@@ -151,17 +171,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.blade_olplen_chart = self.graph_template()
         self.blade_olplen_chartview.setChart(self.blade_olplen_chart)
         
+        # Radio Buttons LOC
+        self.skin_grp_loc = QButtonGroup(self)
+        self.skin_grp_loc.addButton(self.skin_loc_radio1)
+        self.skin_grp_loc.addButton(self.skin_loc_radio2)
+        self.skin_grp_loc.setExclusive(True)
+        self.loc_widget.hide()
+        
+        # Radio Buttons LEN
+        self.skin_grp_len = QButtonGroup(self)
+        self.skin_grp_len.addButton(self.skin_len_radio1)
+        self.skin_grp_len.addButton(self.skin_len_radio2)
+        self.skin_grp_len.setExclusive(True)
+        self.len_widget.hide()
+        
+        # Valditors
+        self.blade_skinolpsta_table.setItemDelegate(FloatDelegate(self.blade_skinolpsta_table))
+        self.blade_skinolplen_table.setItemDelegate(FloatDelegate(self.blade_skinolplen_table))
+        # TODO: Hardcoded top values
+        self.skin_olp_loc_const.setValidator(QDoubleValidator(0.1,200,3))
+        self.skin_olp_len_const.setValidator(QDoubleValidator(1,200,3))
+        
         # Signals
         self.blade_skinolpsta_table.cellChanged.connect(lambda row, col:
             self.new_row_table(self.blade_skinolpsta_table, row, col))
         self.blade_skinolplen_table.cellChanged.connect(lambda row, col:
             self.new_row_table(self.blade_skinolplen_table, row, col))
         
+        self.skin_grp_loc.buttonToggled.connect(self.showHideLOC)
+        self.skin_grp_len.buttonToggled.connect(self.showHideLEN)
         self.blade_order_input.valueChanged.connect(self.resize_blade_table)
-        
         self.blade_interpolate_button.clicked.connect(self.interpolate_overlap)
-        
         self.blade_saveparams_button.clicked.connect(self.save_bladeparams)
+        self.blade_skinolplen_selected.currentTextChanged.connect(self.table_interpolation_vals)
+        self.blade_skinolpsta_selected.currentTextChanged.connect(self.table_interpolation_vals)
         
         # ---------------------------------------------------------------------
         # Page 4 (Skin)
@@ -171,12 +214,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_skin.setSingleShot(True)
         self.timer_skin.timeout.connect(self.build_section)
         
-        # Charts
-        self.skin_zoom_chart = self.graph_template()
-        self.skin_zoom_chartview.setChart(self.skin_zoom_chart)
+        # Validators
+        # TODO: Top values are hardcoded for now
+        self.skin_nplies_input.setValidator(QIntValidator(1, 10))
+        self.skin_plythickness_input.setValidator(QDoubleValidator(0.1,20,3))
+        self.skin_tethickness_input.setValidator(QDoubleValidator(0.1,200,3))
+        self.skin_bond_input.setValidator(QDoubleValidator(0.1,20,3))
         
-        self.skin_full_chart = self.graph_template()
-        self.skin_full_chartview.setChart(self.skin_full_chart)
+        # Chart
+        self.skin_fig = Figure(figsize=(10, 3), tight_layout=True)
+        self.skin_ax = self.skin_fig.add_subplot(111)
+        self.skin_ax.set_xlabel('x [d]', fontsize='x-large')
+        self.skin_ax.set_ylabel('y [d]', fontsize='x-large')
+        self.skin_ax.minorticks_on()
+        self.skin_ax.tick_params(axis='both', which='both', direction='in',
+                            top=True, right=True, labelsize='medium')
+        self.skin_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
+        self.canvas_4 = FigureCanvasQTAgg(self.skin_fig)
+        self.toolbar_4 = NavigationToolbar2QT(self.canvas_4, self)
+        self.verticalLayout_10.addWidget(self.toolbar_4)
+        self.verticalLayout_10.addWidget(self.canvas_4)
         
         # Signals
         self.stackedWidget.currentChanged.connect(self.update_stabox)
@@ -187,14 +244,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.skin_plythickness_input.textChanged.connect(self.secInputChanged)
         self.skin_overlaptarget_input.textChanged.connect(self.secInputChanged)
         self.skin_tethickness_input.textChanged.connect(self.secInputChanged)
+        self.skin_bond_input.textChanged.connect(self.secInputChanged)
+        self.skin_jiggle_toggle.checkStateChanged.connect(self.secInputChanged)
         self.skin_savefig_input.checkStateChanged.connect(self.secInputChanged)
         
         self.skin_saveSection_button.clicked.connect(self.saveSection)
+        self.skin_saveAll_button.clicked.connect(self.saveAllSections)
         
         # ---------------------------------------------------------------------
         # Page 6 (EXPORT)
         self.stackedWidget.currentChanged.connect(self.update_sectionList)
         self.export_export_button.clicked.connect(self.exportSections)
+        
+        # Export type
+        self.export_toggles = QButtonGroup(self)
+        self.export_toggles.addButton(self.export_json_toggle)
+        self.export_toggles.addButton(self.export_csv_toggle)
+        self.export_toggles.setExclusive(True)
+        
+        # Signals
+        self.export_toggles.buttonToggled.connect(self.changeExportType)
         
     ### AIRFOIL METHODS (Page 1)
     def update_parameters(self):
@@ -345,8 +414,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.airfoil_ax.set_ylabel('y/c [-]', fontsize='x-large')
         self.airfoil_ax.minorticks_on()
         self.airfoil_ax.tick_params(axis='both', which='both', direction='in',
-                            top=True, right=True, labelsize='x-large')
-        self.airfoil_ax.grid(visible=True, which='major', linestyle='-', linewidth=0.75)
+                            top=True, right=True, labelsize='medium')
+        self.airfoil_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
         self.airfoil_ax.set_aspect('equal', adjustable='datalim')
         self.airfoil_ax.legend(loc = 'best')
         
@@ -628,6 +697,56 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     ### PARAMETERS METHODS (Page 3)
     
+    def showHideLOC(self, button, checked):
+        if not checked:
+            return
+        
+        if button is self.skin_loc_radio1:
+            self.blade_skinolpsta_table.show()
+            self.loc_widget.hide()
+            self.blade_skinolpsta_selected.show()
+            self.label_38.show()
+            
+            self.blade_order_input.show()
+            self.label_41.show()
+            self.label_40.show()
+        
+        elif button is self.skin_loc_radio2:
+            self.blade_skinolpsta_table.hide()
+            self.loc_widget.show()
+            self.blade_skinolpsta_selected.hide()
+            self.label_38.hide()
+            
+            if self.skin_len_radio2.isChecked():
+                self.blade_order_input.hide()
+                self.label_41.hide()
+                self.label_40.hide()
+            
+    def showHideLEN(self, button, checked):
+        if not checked:
+            return
+        
+        if button is self.skin_len_radio1:
+            self.blade_skinolplen_table.show()
+            self.len_widget.hide()
+            self.blade_skinolplen_selected.show()
+            self.label_39.show()
+            
+            self.blade_order_input.show()
+            self.label_41.show()
+            self.label_40.show()
+        
+        elif button is self.skin_len_radio2:
+            self.blade_skinolplen_table.hide()
+            self.len_widget.show()
+            self.blade_skinolplen_selected.hide()
+            self.label_39.hide()
+            
+            if self.skin_len_radio2.isChecked():
+                self.blade_order_input.hide()
+                self.label_41.hide()
+                self.label_40.hide()
+    
     def new_row_table(self, table, row, col):
         last_row = table.rowCount() - 1
         last_col = table.columnCount() - 1
@@ -648,43 +767,52 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 i.insertRow(last_row+1)
     
     def interpolate_overlap(self):
+        order = int(self.blade_order_input.text())
         
         # OLP_STA
         data = []
-        for row in range(self.blade_skinolpsta_table.rowCount()-1):
-            row_data = []
-            for col in range(self.blade_skinolpsta_table.columnCount()):
-                item = self.blade_skinolpsta_table.item(row, col)
-                row_data.append(float(item.text()))
-            data.append(tuple(row_data))
-        coords = tuple(data)
+        y_axis_label = 'Overlap loc. from LE [c]' if self.skin_loc_radio1.isChecked() else 'Distance from LE [d]'
         
-        x_target = [float(x[4:]) for x in self.db.stations.keys()]
-        # Handling error in case no stations have been created
-        if len(x_target) < len(coords):
-            x_target, _ = zip(*coords)
+        if self.skin_loc_radio1.isChecked():
             
-        order = int(self.blade_order_input.text())
-        
-        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
-        
-        # Update graphs
-        line_series = [QLineSeries() for x in range(len(y_target))]
-        scatter_series = [QScatterSeries() for x in range(len(y_target))]
-        x_line = np.linspace(x_target[0],x_target[-1],100)
-        y_line = [splev(x_line, x) for x in tck]
-        
-        xy_line = [list(zip(x_line,y)) for y in y_line]
-        xy_pts = [list(zip(x_target,y)) for y in y_target]
+            for row in range(self.blade_skinolpsta_table.rowCount()-1):
+                row_data = []
+                for col in range(self.blade_skinolpsta_table.columnCount()):
+                    item = self.blade_skinolpsta_table.item(row, col)
+                    row_data.append(float(item.text()))
+                data.append(tuple(row_data))
+            coords = tuple(data)
+            
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            # Handling error in case no stations have been created
+            if len(x_target) < len(coords):
+                x_target, _ = zip(*coords)   
+            
+            y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
+            
+            x_line = np.linspace(x_target[0],x_target[-1],100)
+            y_line = [splev(x_line, x) for x in tck]
+            
+            xy_line = [list(zip(x_line,y)) for y in y_line]
+            xy_pts = [list(zip(x_target,y)) for y in y_target]
+            
+        else: # If location is constant
+            distance = float(self.skin_olp_loc_const.text())
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            y_target = np.full_like(x_target, distance).tolist()
+            xy_pts = [list(zip(x_target, y_target)),]
+            xy_line = xy_pts
         
         # save in temporary database
-        self.edits['__olp_sta__'] = np.array(xy_pts)
+        self.edits['__olp_sta__'] = xy_pts
         
         # Add points to series
+        line_series = [QLineSeries() for x in range(len(y_target))]
         for i in range(len(xy_line)):
             for j in xy_line[i]:
                 line_series[i].append(float(j[0]), float(j[1]))
                 
+        scatter_series = [QScatterSeries() for x in range(len(y_target))]
         for i in range(len(xy_pts)):
             for j in xy_pts[i]:
                 scatter_series[i].append(float(j[0]), float(j[1]))
@@ -702,42 +830,66 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
         self.blade_olpsta_chart.createDefaultAxes()
         self.blade_olpsta_chart.zoom(0.9)
+        x_axis = self.blade_olpsta_chart.axes(Qt.Horizontal)[0]
+        y_axis = self.blade_olpsta_chart.axes(Qt.Vertical)[0]
+        x_axis.setTitleText('Blade length [d]')
+        y_axis.setTitleText(y_axis_label)
+        x_axis.setTitleFont(QFont('Helvetica',10))
+        y_axis.setTitleFont(QFont('Helvetica',10))
+        
+        # # Legend
+        # series.setName(airfoil_name)
+        # self.blade_olpsta_chart.legend().setVisible(True)
+        # self.blade_olpsta_chart.legend().setAlignment(Qt.AlignBottom)
         
         # OLP_LEN
         data = []
-        for row in range(self.blade_skinolplen_table.rowCount()-1):
-            row_data = []
-            for col in range(self.blade_skinolplen_table.columnCount()):
-                item = self.blade_skinolplen_table.item(row, col)
-                row_data.append(float(item.text()))
-            data.append(tuple(row_data))
-        coords = tuple(data)
         
-        x_target = [float(x[4:]) for x in self.db.stations.keys()]
-        # Handling error in case no stations have been created
-        if len(x_target) < len(coords) :
-            x_target, _ = zip(*coords)
+        if self.skin_loc_radio1.isChecked():
+            for row in range(self.blade_skinolplen_table.rowCount()-1):
+                row_data = []
+                for col in range(self.blade_skinolplen_table.columnCount()):
+                    item = self.blade_skinolplen_table.item(row, col)
+                    row_data.append(float(item.text()))
+                data.append(tuple(row_data))
+            coords = tuple(data)
+            
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            # Handling error in case no stations have been created
+            if len(x_target) < len(coords) :
+                x_target, _ = zip(*coords)
+            
+            y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
         
-        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
+            x_plot = np.linspace(x_target[0],x_target[-1],100)
+            y_plot = [splev(x_plot, x) for x in tck]
+            
+            xy_line = [list(zip(x_plot,y)) for y in y_plot]
+            xy_pts = [list(zip(x_target,y)) for y in y_target]
         
-        # Update graphs
-        series = [QLineSeries() for x in range(len(y_target))]
-        points = [QScatterSeries() for x in range(len(y_target))]
-        
-        x_plot = np.linspace(x_target[0],x_target[-1],100)
-        y_plot = [splev(x_plot, x) for x in tck]
-        
-        xy = [list(zip(x_plot,y)) for y in y_plot]
-        xy_pts = [list(zip(x_target,y)) for y in y_target]
+        else: # If length is constant
+            distance = float(self.skin_olp_len_const.text())
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            y_target = np.full_like(x_target, distance).tolist()
+            xy_pts = [list(zip(x_target, y_target)),]
+            xy_line = xy_pts
         
         # save in temporary database
-        self.edits['__olp_len__'] = xy
+        self.edits['__olp_len__'] = {key:pd.DataFrame(
+            xy_pts[key],
+            columns=['station','value'],
+        )
+        for key in range(len(xy_pts))}
         
-        for i in range(len(xy)):
-            for j in xy[i]:
+        ## Line
+        series = [QLineSeries() for x in range(len(y_target))]
+        for i in range(len(xy_line)):
+            for j in xy_line[i]:
                 series[i].append(float(j[0]), float(j[1]))
-                
-        for i in range(len(xy)):
+        
+        ## Scatter 
+        points = [QScatterSeries() for x in range(len(y_target))]
+        for i in range(len(xy_pts)):
             for j in xy_pts[i]:
                 points[i].append(float(j[0]), float(j[1]))
         
@@ -752,6 +904,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
         self.blade_olplen_chart.createDefaultAxes()
         self.blade_olplen_chart.zoom(0.9)
+        x_axis = self.blade_olplen_chart.axes(Qt.Horizontal)[0]
+        y_axis = self.blade_olplen_chart.axes(Qt.Vertical)[0]
+        x_axis.setTitleText('Blade length [d]')
+        y_axis.setTitleText('Overlap len. from LE [c]')
+        x_axis.setTitleFont(QFont('Helvetica',10))
+        y_axis.setTitleFont(QFont('Helvetica',10))
         
         # Update QComboBox with order selection
         self.blade_skinolpsta_selected.clear()
@@ -759,6 +917,69 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.blade_skinolplen_selected.clear()
         self.blade_skinolplen_selected.addItems([str(x+1) for x in range(order)])
+        
+    def table_interpolation_vals(self):
+        n_stations = len(list(self.db.stations.keys()))
+        z = [sta.parameters['offset'][2] for sta in self.db.stations.values()]
+        
+        # Interpolation order selected
+        if self.skin_loc_radio1.isChecked():
+            k1 = int(self.blade_skinolpsta_selected.currentText())
+        else:
+            k1 = 1
+        
+        if self.skin_len_radio1.isChecked():
+            try:
+                k2 = int(self.blade_skinolplen_selected.currentText())
+            except ValueError: # Because the box is not populated at the same time.
+                k2 = 1
+                print(f'k1 = {k1}, k2 = {k2}')
+        else:
+            k2 = 1
+        
+        y1 = self.edits['__olp_sta__'][k1-1]
+        y2 = self.edits['__olp_len__'][k2-1]
+        
+        # Interpolation array
+        y1 = np.array([row[1] for row in y1])
+        # y2 = np.array([row[1] for row in y2])
+        y2 = y2['value'].to_numpy()
+        blade_ilp = np.array(list(zip(z,y1,y2)))
+        chord = [sta.parameters['chord'] for sta in self.db.stations.values()]
+        
+        if self.skin_loc_radio1.isChecked():
+            blade_ilp[:,1] *= chord
+            self.db.blade['ovp_text'] = pd.DataFrame(
+                zip(blade_ilp[:,1],[f'{x:.2f}' for x in blade_ilp[:,1]]),
+                columns = ['value', 'text'],
+            )
+        else:
+            print(y1[0])
+            self.db.blade['ovp_text'] = pd.DataFrame([{
+                'value': y1[0],'text': f'{y1[0]:.2f}'}])
+            
+        if self.skin_len_radio1.isChecked():
+            blade_ilp[:,2] *= chord
+        
+        # else:
+        #     self.db.blade['']
+            
+        self.db.blade['overlap'] = pd.DataFrame(
+            blade_ilp,
+            columns=['z','olp_sta','olp_len'],
+        )
+        # Show interpolation values
+
+        print(self.db.blade['ovp_text'])
+        model = QStandardItemModel(n_stations,3)
+        model.setHorizontalHeaderLabels(['Station', 'OLP Start', 'OLP Length'])
+        
+        for i in range(n_stations):
+            model.setItem(i, 0, QStandardItem(f'{z[i]:.0f}'))
+            model.setItem(i, 1, QStandardItem(f'{blade_ilp[i][1]:.2f}'))
+            model.setItem(i, 2, QStandardItem(f'{blade_ilp[i][2]:.2f}'))
+            
+        self.tableView.setModel(model)
     
     def save_bladeparams(self):
         idx_olp_sta = self.blade_skinolpsta_selected.currentIndex()
@@ -767,6 +988,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.db.blade['olp_sta'] = self.edits['__olp_sta__'][idx_olp_sta]
         # print(self.db.blade['olp_sta'])
         self.db.blade['olp_len'] = self.edits['__olp_len__'][idx_olp_len]
+        if self.skin_len_radio1.isChecked():
+            chord = [sta.parameters['chord'] for sta in self.db.stations.values()]
+            self.db.blade['olp_len']['value'] *= chord
         # print(self.db.blade['olp_len'])
         
         self.handle_msgbar(f'Parameters saved.')
@@ -780,14 +1004,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.skin_liststations.addItems(names_stations)
         
     def update_olptgt(self):
-        olp_sta = self.db.blade['olp_sta']
+        try:
+            df = self.db.blade['overlap']
+        except KeyError:
+            self.handle_msgbar('Error: Blade interpolation was not saved.')
+            
         n_station = float(self.skin_liststations.currentText()[4:])
+        # station = self.db.stations[self.skin_liststations.currentText()]
         
         try:
-            norm_olp_tgt = float(olp_sta[np.where(olp_sta[:,0]==n_station)[0],1][0])
-            station = self.db.stations[self.skin_liststations.currentText()]
-            olp_target = norm_olp_tgt*station.parameters['chord']
-            self.skin_overlaptarget_input.setText(str(olp_target))
+            olp_target = df.loc[df['z'] == n_station, 'olp_sta'].item()
+            print(f'olp_target (new): {olp_target:.2f}')
+            
+            # olp_sta = np.array(self.db.blade['olp_sta'])
+            # norm_olp_tgt = float(olp_sta[np.where(olp_sta[:,0]==n_station)[0],1][0])
+            # olp_target = norm_olp_tgt*station.parameters['chord']
+            # print(f'olp_target (old): {olp_target:.2f}')
+            self.skin_overlaptarget_input.setText(f'{olp_target:.2f}')
             
         except ValueError:
             self.handle_msgbar('Error: Overlap target could not be interpolated.')
@@ -798,73 +1031,127 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 station = self.db.stations[self.skin_liststations.currentText()] if self.skin_liststations.currentText() != '' else None
                 n_plies = int(self.skin_nplies_input.text()) if self.skin_nplies_input.text() else 1
                 ply_thk = float(self.skin_plythickness_input.text()) if self.skin_plythickness_input.text() else 1
-                olp_tgt = float(self.skin_overlaptarget_input.text()) if self.skin_overlaptarget_input.text() else 10
                 te_thkn = float(self.skin_tethickness_input.text()) if self.skin_tethickness_input.text() else n_plies*ply_thk
+                bond_th = float(self.skin_bond_input.text()) if self.skin_bond_input.text() else 1
                 saveFig = self.skin_savefig_input.isChecked()
                 
-                data = Section(station = station,
-                            n_plies = n_plies,
-                            ply_thickness = ply_thk,
-                            overlap_target = olp_tgt,
-                            te_thickness = te_thkn,
-                            saveFig = saveFig,
+                df_olp = self.db.blade['ovp_text']
+                olp_txt = df_olp.loc[df_olp['text'] == self.skin_overlaptarget_input.text(), 'value'].item()
+                olp_tgt = float(olp_txt) if olp_txt else 10
+                print(f'olp_tgt: {olp_tgt}')
+                section = Section(
+                    station = station,
+                    n_plies = n_plies,
+                    ply_thickness = ply_thk,
+                    overlap_target = olp_tgt,
+                    te_thickness = te_thkn,
+                    bond_thickness= bond_th,
+                    saveFig = saveFig,
+                )
+                
+                # Jiggle method
+                if section.parameters['isCircle']:
+                    self.handle_msgbar(f'Jiggle method is not implemented on circular shapes.')
+                
+                if self.skin_jiggle_toggle.isChecked() and not section.parameters['isCircle']:
+                    
+                    # Retrieve overlap distance
+                    df_len = self.db.blade['olp_len']
+                    z_sta = float(self.skin_liststations.currentText()[4:])
+                    print(f'name_sta: {z_sta}')
+                    print(df_len)
+                    olp_len = df_len.loc[df_len['station'] == z_sta]['value'].item()
+                    
+                    
+                    section.jiggle(
+                        overlap_dist = olp_len,
+                        bond_thickness = bond_th,
+                    )
+                    
+                    # Plot
+                    self.skin_ax.clear()
+                    colours = section.parameters['colours']
+                    p_bot1 = section.points['bot_1']
+                    p_bot2 = section.points['bot_2']
+                    p_bot3 = section.points['bot_3']
+                    p_top  = section.points['top_1']
+                    p_bond = section.points['bond']
+                    
+                    for i in range(1, n_plies+1):
+                        # BOT_2 - JIGGLE
+                        self.skin_ax.plot(p_bot2[i]['x'], p_bot2[i]['y'], label = f'Ply {i}', c = colours[i-1])
+                        
+                        for j in range(4):
+                            
+                            # BOT_1
+                            self.skin_ax.plot(
+                                p_bot1[i][j]['x'], p_bot1[i][j]['y'],
+                                c = colours[i-1], label = None)            
+                            
+                            # BOT_3
+                            self.skin_ax.plot(
+                                p_bot3[i][j]['x'], p_bot3[i][j]['y'],
+                                c = colours[i-1], label = None)
+                            
+                            # TOP_1 
+                            self.skin_ax.plot(
+                                p_top[i][j]['x'], p_top[i][j]['y'],
+                                c = colours[i-1], label = None)
+                            
+                    # BOND
+                    self.skin_ax.plot(p_bond[1]['x'], p_bond[1]['y'], label = f'Bond', c = 'black')
+                    
+                    for i in range(4):
+                        self.skin_ax.plot(p_bond[0][i]['x'], p_bond[0][i]['y'],
+                                c = 'black', label = None)
+                
+                else:
+                    
+                    self.skin_ax.clear()
+                    n_plies = section.parameters['n_plies']
+            
+                    cmap = plt.get_cmap('rainbow')
+                    colours = [cmap(x/n_plies) for x in range(n_plies)]
+                    
+                    for i in range(1,n_plies+1):    
+                        self.skin_ax.plot(
+                            section.points['bot_1'][i][0]['x'], 
+                            section.points['bot_1'][i][0]['y'],
+                            label = f'Ply {i}', c = colours[i-1]
+                        )
+                        
+                        self.skin_ax.plot(
+                            section.points['top_1'][i][0]['x'],
+                            section.points['top_1'][i][0]['y'],
+                            label = None, c = colours[i-1]
+                        )
+                        
+                        for j in range(1,4):
+                            self.skin_ax.plot(
+                                section.points['bot_1'][i][j]['x'], 
+                                section.points['bot_1'][i][j]['y'],
+                                label = None, c = colours[i-1]
                             )
-                print('Section generated.')
+                            self.skin_ax.plot(
+                                section.points['top_1'][i][j]['x'], 
+                                section.points['top_1'][i][j]['y'],
+                                label = None, c = colours[i-1]
+                            )
                 
-                # Generate colours
-                colours = self.generate_colours(num_curves=n_plies, cmap_name='viridis')
+                self.skin_ax.set_xlabel('x [d]', fontsize='x-large')
+                self.skin_ax.set_ylabel('y [d]', fontsize='x-large')
+                self.skin_ax.minorticks_on()
+                self.skin_ax.tick_params(axis='both', which='both', direction='in',
+                                    top=True, right=True, labelsize='medium')
+                self.skin_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
+                self.skin_ax.set_aspect('equal', adjustable='datalim')
+                self.skin_ax.legend(loc = 'best')
                 
-                # Plots
-                plies = list(data.t['bot_plies'].keys())
-                ply_series = {}
-                for i in (plies):
-                    ply = data.t['bot_plies'][i]
-                    ply_series[i] = {x:QLineSeries() for x in list(ply.keys())}
-                
-                    for j in list(ply.keys()):
-                        x = data.splines[j]['x'](ply[j]).tolist()
-                        y = data.splines[j]['y'](ply[j]).tolist()
-                        xy = list(zip(x,y))
-                        points = [QPointF(float(x), float(y)) for x, y in xy]
-                        ply_series[i][j].append(points)
-                        # ply_series[i][j].setName(f'Curve {j}')
-                        ply_series[i][j].setColor(colours[i-1])
-                
-                # Full graph
-                chart = QChart()
-                chart.setAnimationOptions(QChart.SeriesAnimations)
-                for i in list(ply_series.keys()):
-                    for j in list(ply_series[i].keys()):
-                        chart.addSeries(ply_series[i][j])
-                chart.createDefaultAxes()
-                
-                x_axis = chart.axes(Qt.Horizontal)[0]
-                y_axis = chart.axes(Qt.Vertical)[0]
-                x_axis.setTitleText('x [d]')
-                y_axis.setTitleText('y [d]')
-                x_axis.setTitleFont(QFont('Helvetica',14))
-                y_axis.setTitleFont(QFont('Helvetica',14))
-                self.skin_full_chartview.setChart(chart)
-                self.equal_axes(chart, station.xyRange())
-                
-                # Zoomed graph     
-                x = [
-                    data.points['bot_1'][1][2]['x'][0],
-                    data.points['top_1'][1][3]['x'][0],
-                ]
-                
-                y = [
-                    data.points['bot_1'][1][2]['y'][0],
-                    data.points['top_1'][1][3]['y'][0],
-                ]
-                
-                x.sort()
-                y.sort()
-                print(f'x: {x}\n y: {y}')
+                self.canvas_4.draw_idle()
                 
                 # Temporary save
-                self.edits['__section__'] = data
-                self.handle_msgbar(f'Number of curves: {len(data.splines.keys())}')
+                self.edits['__section__'] = section
+                self.handle_msgbar(f'Number of curves: {len(section.splines.keys())}')
             
             except NameError:
                 print('Skin section: Error - Wrong input.')
@@ -874,37 +1161,147 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.db.sections[section_name] = self.edits['__section__']
         self.handle_msgbar(f'Section "{section_name}" saved.')
     
-    ### ABAQUS EXPORT METHODS
+    def saveAllSections(self):
+        n = self.skin_liststations.count()
+        # Progress bar
+        self.progressBar.setRange(0, 100)  # normalised 0–100%
+        
+        for i in range(n):
+            station = self.db.stations[self.skin_liststations.itemText(i)]    
+            n_plies = int(self.skin_nplies_input.text()) if self.skin_nplies_input.text() else 1
+            ply_thk = float(self.skin_plythickness_input.text()) if self.skin_plythickness_input.text() else 1
+            te_thkn = float(self.skin_tethickness_input.text()) if self.skin_tethickness_input.text() else n_plies*ply_thk
+            bond_th = float(self.skin_bond_input.text()) if self.skin_bond_input.text() else 1
+            gen_olp = self.skin_jiggle_toggle.isChecked()
+            saveFig = self.skin_savefig_input.isChecked()
+            
+            df = self.db.blade['overlap']
+            z = station.parameters['offset'][2]
+            olp_target = df.loc[df['z'] == z, 'olp_sta'].item()
+            olp_tgt = olp_target if olp_target else 10
+            
+            section = Section(
+                    station = station,
+                    n_plies = n_plies,
+                    ply_thickness = ply_thk,
+                    overlap_target = olp_tgt,
+                    te_thickness = te_thkn,
+                    bond_thickness= bond_th,
+                    saveFig = saveFig,
+                )
+            
+            if gen_olp:
+                
+                # Retrieve overlap distance
+                df_len = self.db.blade['olp_len']
+                z_sta = float(self.skin_liststations.currentText()[4:])
+                olp_len = df_len.loc[df_len['station'] == z_sta]['value'].item()
+                
+                section.jiggle(
+                    overlap_dist = olp_len,
+                    bond_thickness = bond_th,
+                )
+            
+            # Save section
+            self.db.sections[f'sec_{int(z)}'] = section
+            
+            # Update progress bar
+            progress = int((i + 1) / n * 100)
+            self.progressBar.setValue(progress)
+            
+        self.handle_msgbar(f'{i+1} stations saved.')
+    
+    ### EXPORT METHODS
     
     def update_sectionList(self):
-        if self.stackedWidget.currentIndex() == 6:
+        if self.stackedWidget.currentIndex() == 5:
             self.export_sectionsList.clear()
             list_sections = list(self.db.sections.keys())
             self.export_sectionsList.insertItems(0,list_sections)
             
     def exportSections(self):
+        
         if len(self.export_sectionsList.selectedItems()) > 0:
             items = self.export_sectionsList.selectedItems()
-            dict_sections = {int(sec.text()[4:]):skinSection(self.db.sections[sec.text()]) for sec in items}
-            filename = f'{self.export_expFileName_input.text()}'
-            skinPart(sections=dict_sections, filename=filename)
-            
-            self.handle_msgbar(f'File "{filename}.json" exported succesfully.')
         else:
             self.handle_msgbar('No sections selected.')
+            return
+            
+        # JSON option
+        if self.export_json_toggle.isChecked():
+            dict_sections = {
+                int(sec.text()[4:]):skinSection(self.db.sections[sec.text()]) 
+                for sec in items
+            }
+            filename = f'{self.export_expFileName_input.text()}'
+            skinPart(sections=dict_sections, path= self.main_path, filename=filename)
+              
+            self.handle_msgbar(f'File "{filename}.json" exported succesfully.')
+        
+        elif self.export_csv_toggle.isChecked():
+            
+            foldername = self.export_expFileName_input.text()
+            
+            # Base folder
+            skin_dir = os.path.join(self.main_path,foldername,'Skin')
+            os.makedirs(skin_dir, exist_ok=True)
+            
+            dict_sections = {
+                int(sec.text()[4:]):self.db.sections[sec.text()]
+                for sec in items
+            }
+            
+            for key, sec in dict_sections.items():
+                z = sec.parameters['z']
+                n_plies = sec.parameters['n_plies']
+
+                for side in ['top', 'bot']:
+                    for ply in range(1, n_plies + 1):
+                        # Create ply subfolder (zero-padded)
+                        ply_dir = os.path.join(skin_dir, f'Ply_{ply:02d}')
+                        os.makedirs(ply_dir, exist_ok=True)
+
+                        for spline in [0, 1]:
+                            x = sec.points[f'{side}_1'][ply][spline]['x']
+                            y = sec.points[f'{side}_1'][ply][spline]['y']
+                            z_col = [z] * len(x)
+
+                            df = pd.DataFrame({'x': x, 'y': y, 'z': z_col})
+
+                            # Include section id (or z) to avoid overwriting across sections
+                            filename = f"{side}_sec{key}_{spline}.txt"
+                            df.to_csv(
+                                os.path.join(ply_dir, filename),
+                                index=False,
+                                header=False,
+                            )
+            
+            self.handle_msgbar(f'Folder "{foldername}" exported succesfully.')
+        
+        else:
+            return
+            
+    def changeExportType(self, button, checked):
+        if not checked:
+            return
+        
+        if button is self.export_json_toggle:
+            self.label_46.setText('Export file name:')
+            self.label_47.setText('.json')
+            self.label_47.show()
+        
+        if button is self.export_csv_toggle:
+            self.label_46.setText('Export folder name:')
+            self.label_47.hide()
     
     ### GENERAL UI METHODS
     
     def load_default_airfoils(self):
-        
-        self.paths_airfoils = {}
         for i in [x for x in os.listdir(resource_path('edfoil/airfoils'))]:
             airfoil_path = resource_path(f'edfoil/airfoils/{i}')
             airfoil = Airfoil()
             airfoil.importCoords(airfoil_path)
             self.db.airfoils[airfoil.name] = airfoil
-            # TODO: Get rid of path airfoils
-            self.paths_airfoils[airfoil.name] = airfoil_path
             
             # Debug
             # print(list(self.db.airfoils.keys()))
@@ -912,38 +1309,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         names = [f'{x.family} {x.profile}' for x in self.db.airfoils.values()]
         self.airfoil_listairfoils_widget.clear()
         self.airfoil_listairfoils_widget.addItems(names)
-    
-    # def airfoil_mousecoords(self, event: QMouseEvent) -> None:
-    #     # coords = event.position()
-    #     # x,y = coords.x(), coords.y()
-    #     # coord_lims = self.airfoil_chart.plotArea().getCoords()
-        
-    #     # if (x >= coord_lims[0] and x <= coord_lims[2] and
-    #     #     y >= coord_lims[1] and y <= coord_lims[3]):
-            
-    #     #     coords_scaled = self.airfoil_chart.mapToValue(coords)
-    #     #     x_scaled = coords_scaled.x()
-    #     #     y_scaled = coords_scaled.y()
-            
-    #     #     self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
-        
-    #     chart = self.airfoil_chartview.chart()
-    #     if chart is None or not chart.series():
-    #         return
-          
-    #     series = chart.series()[0]  # or find the one you want
-    #     pos = event.position()      # QChartView coords
-
-    #     # Map to data using the series-aware overload
-    #     value_pt = chart.mapToValue(pos, series)
-
-    #     # Check that the mapped point is inside the plotArea by re-mapping back
-    #     back = chart.mapToPosition(value_pt, series)  # chart coords
-    #     if chart.plotArea().contains(back):
-    #         self.airfoil_xy_current.setText(f'({value_pt.x():.2f}, {value_pt.y():.2f})')
-    #     else:
-    #         # Optional: clear or ignore when outside
-    #         pass
             
     def station_mousecoords(self, event: QMouseEvent) -> None:
         coords = event.position()
@@ -1073,6 +1438,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(1)
         self.page_title_label.setText(self.airfoil_page_button.text())
         
+        # :TODO Update airfoil list
+        
+        
     def switch_to_stationPage(self):
         self.stackedWidget.setCurrentIndex(2)
         self.page_title_label.setText(self.station_page_button.text())
@@ -1082,7 +1450,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_listairfoils_box.clear()
         self.station_listairfoils_box.addItems(names_airfoils)
         
-        # Update dropwn menu in advanced tab
+        # Update dropdown menu in advanced tab
         n_rows = self.station_tableStations_input.rowCount()
         for row in range(n_rows):
             list_airfoils = QComboBox()
@@ -1102,26 +1470,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.page_title_label.setText(self.spar_page_button.text())
     
     def switch_to_exportPage(self):
-        self.stackedWidget.setCurrentIndex(6)
+        self.stackedWidget.setCurrentIndex(5)
         self.page_title_label.setText(self.export_page_button.text())
     
     def upload_airfoil_file(self):
         # TODO: Update this to not clash with Airfoil Creator Tab
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFiles)
-        dialog.setNameFilter(self.tr('Files (*.csv *.txt)'))
+        dialog.setNameFilter(self.tr('Files (*.csv *.txt *.dat)'))
         dialog.setViewMode(QFileDialog.Detail)
         fileNames = []
         if dialog.exec():
             fileNames = dialog.selectedFiles()
         
-        # Add new files to the QComboBox
-        airfoil_names = [x.split('/')[-1][:-4] for x in fileNames]
-        n_items_current = self.station_listairfoils_box.count()
-        self.station_listairfoils_box.insertItems(n_items_current, airfoil_names)
+        airfoil_files = [x.split('/')[-1][:-4] for x in fileNames]
+        airfoil_names = {}
+        for i, file in enumerate(fileNames):
+            try:
+                temp = Airfoil()
+                print(f'Importing: {file}')
+                temp.importCoords(path = file)
+                self.db.airfoils[temp.name] = temp
+                airfoil_names[temp.name] = temp.name
+                
+            except:
+                self.handle_msgbar(f'File ({i} of {len(airfoil_files)}): {file} could not be imported.')
         
-        for i in range(len(fileNames)):
-            self.paths_airfoils[airfoil_names[i]] = fileNames[i]
+        self.handle_msgbar(f'Number of files imported: {i}.')
+        
+        # Add new files to the QComboBox
+        n_items_current = self.station_listairfoils_box.count()
+        self.station_listairfoils_box.insertItems(n_items_current, list(airfoil_names.keys()))
+        
     
     def onTextChanged(self):
         # Restart the timer whenever the text changes
@@ -1212,3 +1592,12 @@ class NumericItem(QTableWidgetItem):
             return float(self.text()) < float(other.text())
         except ValueError:
             return super().__lt__(other)
+
+# For only allowing floats in certain QTableWidgets
+class FloatDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+        editor = QLineEdit(parent)
+        validator = QDoubleValidator(-1e9, 1e9, 3, editor)  # min, max, decimals
+        validator.setNotation(QDoubleValidator.StandardNotation)
+        editor.setValidator(validator)
+        return editor

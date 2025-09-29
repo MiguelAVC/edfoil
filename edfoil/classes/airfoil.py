@@ -48,7 +48,6 @@ class Airfoil:
     # --- Methods ---
     
     def importCoords(self, path:str) -> None:
-        coords = np.genfromtxt(path)
         filename = Path(path).stem
         self.path = path
         self.family, self.profile = strip_name(filename)
@@ -59,23 +58,69 @@ class Airfoil:
         else:
             self.name = self.family or self.profile
         
-        # Split at min x (leading edge)
-        # Big Assumption: Coordinates are ordered from TE to LE
-        le_index = np.argmin(coords[:,0])
+        # Try to read .dat allowing: header line, commas, blank-line split
+        blocks, current = [], []
+        with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            for ln in f:
+                s = ln.strip()
+                if not s:
+                    if current:
+                        blocks.append(current); current = []
+                    continue
+                parts = re.findall(r"[-+]?\d*\.\d+|\d+", s)
+                if len(parts) != 2:
+                    continue
+                try:
+                    x = float(parts[0]); y = float(parts[1])
+                    current.append([x, y])
+                except ValueError:
+                    # header or junk line → skip
+                    continue
+        if current:
+            blocks.append(current)
         
-        side_1 = coords[:le_index+1]
-        side_2 = coords[le_index:]
-        
-        if np.mean(side_1[:,1]) >= np.mean(side_2[:,1]):
-            self.upper = side_1.tolist()[::-1]
-            self.lower = side_2.tolist()[::-1]
-        else:
-            self.upper = side_2.tolist()
-            self.lower = side_1.tolist()
+        if len(blocks) == 2: # Common practice .dat airfoil files
+            # Two blocks: assume split upper/lower surfaces
+            b1 = np.asarray(blocks[0], dtype=float)
+            b2 = np.asarray(blocks[1], dtype=float)
+
+            # Decide which is upper by mean(y)
+            if np.mean(b1[:, 1]) >= np.mean(b2[:, 1]):
+                upper_raw, lower_raw = b1, b2
+            else:
+                upper_raw, lower_raw = b2, b1
             
-        self.xy = self.lower + self.upper[1:]
-        # self.xy = coords.tolist()
-        self.n_points = len(coords)
+            # CW orientation from TE
+            if upper_raw[0,0] == 1:
+                upper_raw = upper_raw[::-1]
+            if lower_raw[0,0] == 0:
+                lower_raw = lower_raw[::-1]
+            
+            self.upper = upper_raw.tolist()
+            self.lower = lower_raw.tolist()
+            
+            self.xy = self.lower + self.upper[1:]
+            self.n_points = len(self.xy)
+        
+        else:
+            coords = np.genfromtxt(path)
+            # Split at min x (leading edge)
+            # Big Assumption: Coordinates are ordered from TE to LE
+            le_index = np.argmin(coords[:,0])
+            
+            side_1 = coords[:le_index+1]
+            side_2 = coords[le_index:]
+            
+            if np.mean(side_1[:,1]) >= np.mean(side_2[:,1]):
+                self.upper = side_1.tolist()[::-1]
+                self.lower = side_2.tolist()[::-1]
+            else:
+                self.upper = side_2.tolist()
+                self.lower = side_1.tolist()
+                
+            self.xy = self.lower + self.upper[1:]
+            # self.xy = coords.tolist()
+            self.n_points = len(coords)
         
     def update(self,coords:list) -> None:
         self.xy = coords
@@ -326,7 +371,7 @@ class Airfoil:
         
 if __name__ == '__main__':
     
-    test = 3
+    test = 4
     
     if test == 1:
     
@@ -362,3 +407,13 @@ if __name__ == '__main__':
         )
         print(foil.name, foil.profile, foil.n_points)
         foil.plotAirfoil()
+    
+    elif test == 4:
+        
+        # Test 4
+        # Task: importCoords method can import dat files.
+        
+        path = 'C:/Users/totob/OneDrive/Desktop/NACA 63-015A.dat'
+        airfoil = Airfoil(name='example')
+        airfoil.importCoords(path=path)
+        airfoil.plotAirfoil()
