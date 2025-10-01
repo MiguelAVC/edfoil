@@ -577,6 +577,7 @@ class Ui_MainWindow(object):
 "QLineEdit{\n"
 "	background-color:white;\n"
 "	color:#193d4e;\n"
+"	padding-left:0.5em;\n"
 "	border-radius:5px;\n"
 "}")
         self.gridLayout_18 = QGridLayout(self.airfoil_parameters_widget)
@@ -735,6 +736,10 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addItem(self.horizontalSpacer_3, 6, 2, 1, 1)
 
         self.airfoil_listairfoils_widget = QListWidget(self.airfoil_page)
+        QListWidgetItem(self.airfoil_listairfoils_widget)
+        QListWidgetItem(self.airfoil_listairfoils_widget)
+        QListWidgetItem(self.airfoil_listairfoils_widget)
+        QListWidgetItem(self.airfoil_listairfoils_widget)
         self.airfoil_listairfoils_widget.setObjectName(u"airfoil_listairfoils_widget")
         self.airfoil_listairfoils_widget.setStyleSheet(u"/* Widget frame */\n"
 "QListWidget {\n"
@@ -743,13 +748,17 @@ class Ui_MainWindow(object):
 "    border-radius: 10px;\n"
 "    color: #193d4e;                    /* text colour for unselected items */\n"
 "    outline: 0;                        /* optional: remove focus dotted outline */\n"
+"	padding: 0.5em;\n"
 "}\n"
 "\n"
 "/* Item text padding so it isn\u2019t glued to the border */\n"
 "QListWidget::item,\n"
 "QListWidget::item:selected,\n"
 "QListWidget::item:hover {\n"
-"    padding: 2px 10px;   /* top/bottom 6, left/right 10 */\n"
+"	padding-top:0.1em;\n"
+"	padding-bottom:0.1em;\n"
+"    padding-left: 0.5em;\n"
+"    padding-right: 0.5em;\n"
 "}\n"
 "\n"
 "/* Selection colours */\n"
@@ -1670,6 +1679,11 @@ class Ui_MainWindow(object):
 
         self.widget_10 = QWidget(self.blade_page)
         self.widget_10.setObjectName(u"widget_10")
+        sizePolicy11 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.MinimumExpanding)
+        sizePolicy11.setHorizontalStretch(0)
+        sizePolicy11.setVerticalStretch(0)
+        sizePolicy11.setHeightForWidth(self.widget_10.sizePolicy().hasHeightForWidth())
+        self.widget_10.setSizePolicy(sizePolicy11)
         self.widget_10.setStyleSheet(u"")
         self.verticalLayout_7 = QVBoxLayout(self.widget_10)
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
@@ -1680,11 +1694,11 @@ class Ui_MainWindow(object):
 
         self.tableView = QTableView(self.widget_10)
         self.tableView.setObjectName(u"tableView")
-        sizePolicy11 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
-        sizePolicy11.setHorizontalStretch(0)
-        sizePolicy11.setVerticalStretch(0)
-        sizePolicy11.setHeightForWidth(self.tableView.sizePolicy().hasHeightForWidth())
-        self.tableView.setSizePolicy(sizePolicy11)
+        sizePolicy12 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
+        sizePolicy12.setHorizontalStretch(0)
+        sizePolicy12.setVerticalStretch(0)
+        sizePolicy12.setHeightForWidth(self.tableView.sizePolicy().hasHeightForWidth())
+        self.tableView.setSizePolicy(sizePolicy12)
         self.tableView.horizontalHeader().setCascadingSectionResizes(True)
         self.tableView.verticalHeader().setVisible(False)
 
@@ -1712,11 +1726,11 @@ class Ui_MainWindow(object):
         self.gridLayout_15.setObjectName(u"gridLayout_15")
         self.label_53 = QLabel(self.skin_zoomedgraph_widget)
         self.label_53.setObjectName(u"label_53")
-        sizePolicy12 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Minimum)
-        sizePolicy12.setHorizontalStretch(0)
-        sizePolicy12.setVerticalStretch(0)
-        sizePolicy12.setHeightForWidth(self.label_53.sizePolicy().hasHeightForWidth())
-        self.label_53.setSizePolicy(sizePolicy12)
+        sizePolicy13 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Minimum)
+        sizePolicy13.setHorizontalStretch(0)
+        sizePolicy13.setVerticalStretch(0)
+        sizePolicy13.setHeightForWidth(self.label_53.sizePolicy().hasHeightForWidth())
+        self.label_53.setSizePolicy(sizePolicy13)
         self.label_53.setStyleSheet(u"")
         self.label_53.setPixmap(QPixmap(u":/resources/images/skin_help.png"))
         self.label_53.setScaledContents(True)
@@ -1760,11 +1774,11 @@ class Ui_MainWindow(object):
 
         self.skin_full_chart = QWidget(self.skin_maingraph_widget)
         self.skin_full_chart.setObjectName(u"skin_full_chart")
-        sizePolicy13 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
-        sizePolicy13.setHorizontalStretch(0)
-        sizePolicy13.setVerticalStretch(0)
-        sizePolicy13.setHeightForWidth(self.skin_full_chart.sizePolicy().hasHeightForWidth())
-        self.skin_full_chart.setSizePolicy(sizePolicy13)
+        sizePolicy14 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
+        sizePolicy14.setHorizontalStretch(0)
+        sizePolicy14.setVerticalStretch(0)
+        sizePolicy14.setHeightForWidth(self.skin_full_chart.sizePolicy().hasHeightForWidth())
+        self.skin_full_chart.setSizePolicy(sizePolicy14)
         self.skin_full_chart.setStyleSheet(u"QWidget{\n"
 "	color:black;\n"
 "	background-color:white;\n"
@@ -2023,6 +2037,7 @@ class Ui_MainWindow(object):
 "	padding-top:1em;\n"
 "	padding-bottom: 1em;\n"
 "	padding-left:1em;\n"
+"	padding-right:1em;\n"
 "	border-radius:10px;\n"
 "	font: 12pt;\n"
 "}\n"
@@ -2074,11 +2089,11 @@ class Ui_MainWindow(object):
 
         self.widget_13 = QWidget(self.export_page)
         self.widget_13.setObjectName(u"widget_13")
-        sizePolicy14 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy14.setHorizontalStretch(0)
-        sizePolicy14.setVerticalStretch(0)
-        sizePolicy14.setHeightForWidth(self.widget_13.sizePolicy().hasHeightForWidth())
-        self.widget_13.setSizePolicy(sizePolicy14)
+        sizePolicy15 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy15.setHorizontalStretch(0)
+        sizePolicy15.setVerticalStretch(0)
+        sizePolicy15.setHeightForWidth(self.widget_13.sizePolicy().hasHeightForWidth())
+        self.widget_13.setSizePolicy(sizePolicy15)
         self.verticalLayout_8 = QVBoxLayout(self.widget_13)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.label_58 = QLabel(self.widget_13)
@@ -2284,6 +2299,19 @@ class Ui_MainWindow(object):
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"2nd digit (pos max camber)", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Last two digits (thickness):", None))
         self.airfoil_delAirfoil_button.setText(QCoreApplication.translate("MainWindow", u"Delete airfoil", None))
+
+        __sortingEnabled = self.airfoil_listairfoils_widget.isSortingEnabled()
+        self.airfoil_listairfoils_widget.setSortingEnabled(False)
+        ___qlistwidgetitem = self.airfoil_listairfoils_widget.item(0)
+        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem1 = self.airfoil_listairfoils_widget.item(1)
+        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem2 = self.airfoil_listairfoils_widget.item(2)
+        ___qlistwidgetitem2.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        ___qlistwidgetitem3 = self.airfoil_listairfoils_widget.item(3)
+        ___qlistwidgetitem3.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
+        self.airfoil_listairfoils_widget.setSortingEnabled(__sortingEnabled)
+
 #if QT_CONFIG(tooltip)
         self.station_tab_widget.setToolTip("")
 #endif // QT_CONFIG(tooltip)
@@ -2349,9 +2377,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem10 = self.station_tableStations_input.horizontalHeaderItem(10)
         ___qtablewidgetitem10.setText(QCoreApplication.translate("MainWindow", u"y-mirror", None));
 
-        __sortingEnabled = self.station_tableStations_input.isSortingEnabled()
+        __sortingEnabled1 = self.station_tableStations_input.isSortingEnabled()
         self.station_tableStations_input.setSortingEnabled(False)
-        self.station_tableStations_input.setSortingEnabled(__sortingEnabled)
+        self.station_tableStations_input.setSortingEnabled(__sortingEnabled1)
 
         self.label_44.setText(QCoreApplication.translate("MainWindow", u"Number of stations:", None))
 #if QT_CONFIG(tooltip)

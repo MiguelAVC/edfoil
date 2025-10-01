@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Added a table showing the interpolation values for the saved stations in the "Blade Parameters" tab.
 - Added full implementation of the jiggle method from the section class.
 - Added a guide image to understand the Section class parameters.
+- Examples (A and B) and a user guide.
 
 ### Fixed
 - Fixed correct implementation of blade parameters for different interpolation orders.
@@ -19,11 +20,13 @@ All notable changes to this project will be documented in this file.
 - Fixed "airfoil.py" in the importCoords method when the files are not ordered from TE to LE.
 - Fixed the list sections to export to select multiple sections.
 - Fixed an issue when clicking the "Export Stations" button did not trigger the signal.
+- Wrong signal when the toggle for the skin overlap length was sent.
 
 ### Changed
 - Changed chart in the Airfoil Creator tab from QSS to matplotlib.
 - Changed chart in Skin tab from QSS to matplotlib.
 - Deactivated the Spar page until further implementation.
+- Simplified the hide methods in the skin tab.
 
 ---
 

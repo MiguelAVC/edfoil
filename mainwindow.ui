@@ -1028,6 +1028,7 @@ QSpinBox{
 QLineEdit{
 	background-color:white;
 	color:#193d4e;
+	padding-left:0.5em;
 	border-radius:5px;
 }</string>
                 </property>
@@ -1364,13 +1365,17 @@ QListWidget {
     border-radius: 10px;
     color: #193d4e;                    /* text colour for unselected items */
     outline: 0;                        /* optional: remove focus dotted outline */
+	padding: 0.5em;
 }
 
 /* Item text padding so it isn’t glued to the border */
 QListWidget::item,
 QListWidget::item:selected,
 QListWidget::item:hover {
-    padding: 2px 10px;   /* top/bottom 6, left/right 10 */
+	padding-top:0.1em;
+	padding-bottom:0.1em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
 }
 
 /* Selection colours */
@@ -1387,6 +1392,26 @@ QListWidget::item:hover {
                 <property name="spacing">
                  <number>0</number>
                 </property>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>
@@ -3631,6 +3656,7 @@ QPushButton:hover{
 	padding-top:1em;
 	padding-bottom: 1em;
 	padding-left:1em;
+	padding-right:1em;
 	border-radius:10px;
 	font: 12pt;
 }

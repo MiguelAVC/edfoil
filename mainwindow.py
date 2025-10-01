@@ -184,6 +184,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.skin_grp_len.addButton(self.skin_len_radio2)
         self.skin_grp_len.setExclusive(True)
         self.len_widget.hide()
+        self.update_skin_ui()
         
         # Valditors
         self.blade_skinolpsta_table.setItemDelegate(FloatDelegate(self.blade_skinolpsta_table))
@@ -198,8 +199,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.blade_skinolplen_table.cellChanged.connect(lambda row, col:
             self.new_row_table(self.blade_skinolplen_table, row, col))
         
-        self.skin_grp_loc.buttonToggled.connect(self.showHideLOC)
-        self.skin_grp_len.buttonToggled.connect(self.showHideLEN)
+        self.skin_grp_loc.buttonToggled.connect(self.update_skin_ui)
+        self.skin_grp_len.buttonToggled.connect(self.update_skin_ui)
         self.blade_order_input.valueChanged.connect(self.resize_blade_table)
         self.blade_interpolate_button.clicked.connect(self.interpolate_overlap)
         self.blade_saveparams_button.clicked.connect(self.save_bladeparams)
@@ -697,55 +698,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     ### PARAMETERS METHODS (Page 3)
     
-    def showHideLOC(self, button, checked):
-        if not checked:
-            return
-        
-        if button is self.skin_loc_radio1:
-            self.blade_skinolpsta_table.show()
-            self.loc_widget.hide()
-            self.blade_skinolpsta_selected.show()
-            self.label_38.show()
-            
-            self.blade_order_input.show()
-            self.label_41.show()
-            self.label_40.show()
-        
-        elif button is self.skin_loc_radio2:
-            self.blade_skinolpsta_table.hide()
-            self.loc_widget.show()
-            self.blade_skinolpsta_selected.hide()
-            self.label_38.hide()
-            
-            if self.skin_len_radio2.isChecked():
-                self.blade_order_input.hide()
-                self.label_41.hide()
-                self.label_40.hide()
-            
-    def showHideLEN(self, button, checked):
-        if not checked:
-            return
-        
-        if button is self.skin_len_radio1:
-            self.blade_skinolplen_table.show()
-            self.len_widget.hide()
-            self.blade_skinolplen_selected.show()
-            self.label_39.show()
-            
-            self.blade_order_input.show()
-            self.label_41.show()
-            self.label_40.show()
-        
-        elif button is self.skin_len_radio2:
-            self.blade_skinolplen_table.hide()
-            self.len_widget.show()
-            self.blade_skinolplen_selected.hide()
-            self.label_39.hide()
-            
-            if self.skin_len_radio2.isChecked():
-                self.blade_order_input.hide()
-                self.label_41.hide()
-                self.label_40.hide()
+    def update_skin_ui(self, *args):
+        """Single source of truth for the LOC/LEN UI."""
+        # LOC side
+        loc_uses_table = self.skin_loc_radio1.isChecked()
+        self.blade_skinolpsta_table.setVisible(loc_uses_table)
+        self.loc_widget.setVisible(not loc_uses_table)
+        self.blade_skinolpsta_selected.setVisible(loc_uses_table)
+        self.label_38.setVisible(loc_uses_table)
+
+        # LEN side
+        len_uses_table = self.skin_len_radio1.isChecked()
+        self.blade_skinolplen_table.setVisible(len_uses_table)
+        self.len_widget.setVisible(not len_uses_table)
+        self.blade_skinolplen_selected.setVisible(len_uses_table)
+        self.label_39.setVisible(len_uses_table)
+
+        # Shared controls: show if EITHER side uses a table
+        show_order_controls = loc_uses_table or len_uses_table
+        self.blade_order_input.setVisible(show_order_controls)
+        self.label_41.setVisible(show_order_controls)
+        self.label_40.setVisible(show_order_controls)
+    
     
     def new_row_table(self, table, row, col):
         last_row = table.rowCount() - 1
@@ -845,7 +819,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # OLP_LEN
         data = []
         
-        if self.skin_loc_radio1.isChecked():
+        if self.skin_len_radio1.isChecked():
             for row in range(self.blade_skinolplen_table.rowCount()-1):
                 row_data = []
                 for col in range(self.blade_skinolplen_table.columnCount()):
@@ -1269,7 +1243,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             df = pd.DataFrame({'x': x, 'y': y, 'z': z_col})
 
                             # Include section id (or z) to avoid overwriting across sections
-                            filename = f"{side}_sec{key}_{spline}.txt"
+                            filename = f"{side}_sec{key}_{spline}.csv"
                             df.to_csv(
                                 os.path.join(ply_dir, filename),
                                 index=False,
@@ -1601,3 +1575,37 @@ class FloatDelegate(QStyledItemDelegate):
         validator.setNotation(QDoubleValidator.StandardNotation)
         editor.setValidator(validator)
         return editor
+
+# General table reader
+def _coerce_float(text: str) -> float:
+    # tolerate commas and whitespace
+    return float(text.replace(',', '').strip())
+
+def read_table_as_tuples(table: QTableWidget, *, skip_blank_rows: bool = True) -> tuple[tuple[float, ...], ...]:
+    rows_out = []
+    n_rows, n_cols = table.rowCount(), table.columnCount()
+
+    for r in range(n_rows):
+        vals_str = []
+        all_blank = True
+        for c in range(n_cols):
+            it = table.item(r, c)
+            s = it.text() if it is not None else ""
+            s = s.strip()
+            if s != "":
+                all_blank = False
+            vals_str.append(s)
+
+        if skip_blank_rows and all_blank:
+            continue
+
+        try:
+            vals = tuple(_coerce_float(s) for s in vals_str)
+        except ValueError:
+            # You can surface a friendly message, highlight the bad cell, etc.
+            # For now, skip rows that aren't fully numeric.
+            continue
+
+        rows_out.append(vals)
+
+    return tuple(rows_out)
