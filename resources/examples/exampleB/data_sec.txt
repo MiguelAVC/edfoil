@@ -1,0 +1,6 @@
+n_plies,ply_thickness,overlap_target,te_thickness,bond_thickness,genFig,saveFig,tolerance
+8,1,0.030703703703703716,2,1,True,False,6
+8,1,0.03148559670781894,2,1,True,False,6
+8,1,0.03373251028806585,2,1,True,False,6
+8,1,0.03514814814814815,2,1,True,False,6
+8,1,0.04884362139917697,2,1,True,False,6

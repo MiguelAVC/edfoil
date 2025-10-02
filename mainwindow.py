@@ -1,10 +1,15 @@
 from ui_mainwindow import Ui_MainWindow
 from PySide6.QtWidgets import (QMainWindow, QFileDialog, QMessageBox, 
-                               QCheckBox, QComboBox, QTableWidgetItem)
+                               QCheckBox, QComboBox, QTableWidgetItem,
+                               QTableView, QApplication, QButtonGroup,
+                               QTableWidget, QStyledItemDelegate, QLineEdit)
 from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
                               QValueAxis, QScatterSeries, QAreaSeries)
-from PySide6.QtGui import QPainter, QFont, QPen, QBrush, QColor, Qt, QMouseEvent
-from PySide6.QtCore import QTimer, Qt, QPointF, QSizeF
+from PySide6.QtGui import (QPainter, QFont, QPen, QBrush, QColor, Qt, 
+                           QMouseEvent, QStandardItemModel, QStandardItem,
+                           QIntValidator, QDoubleValidator)
+from PySide6.QtCore import (QTimer, Qt, QPointF, QSizeF, QObject, Signal,
+                            QItemSelectionModel)
 
 
 from edfoil.classes.airfoil import Airfoil
@@ -46,13 +51,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.edits = {}
         self.handle_msgbar(message='New database created.')
         
+        # Signals
+        self.db.airfoils.airfoilsChanged.connect(self._sync_airfoil_widgets)
+        self.db.stations.stationsChanged.connect(self._sync_station_widgets)
+        
         # Tab switching
         self.home_page_button.clicked.connect(self.switch_to_homePage)
         self.airfoil_page_button.clicked.connect(self.switch_to_airfoilPage)
         self.station_page_button.clicked.connect(self.switch_to_stationPage)
         self.blade_page_button.clicked.connect(self.switch_to_bladePage)
         self.skin_page_button.clicked.connect(self.switch_to_skinPage)
-        self.spar_page_button.clicked.connect(self.switch_to_sparPage)
+        # self.spar_page_button.clicked.connect(self.switch_to_sparPage)
         self.export_page_button.clicked.connect(self.switch_to_exportPage)
         
         # Lower sidebar buttons
@@ -73,19 +82,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # ---------------------------------------------------------------------
         # Page 1 (Airfoil Creator)
         
-        # List of airfoils
-        self.load_default_airfoils()
-        
         # Main chart
         # self.airfoil_chart = self.graph_template()
         # self.airfoil_chartview.setChart(self.airfoil_chart)
         # self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
         self.airfoil_fig = Figure(figsize=(10, 3), tight_layout=True)
         self.airfoil_ax = self.airfoil_fig.add_subplot(111)
+        self.airfoil_ax.set_xlabel('x/c [-]', fontsize='x-large')
+        self.airfoil_ax.set_ylabel('y/c [-]', fontsize='x-large')
+        self.airfoil_ax.minorticks_on()
+        self.airfoil_ax.tick_params(axis='both', which='both', direction='in',
+                            top=True, right=True, labelsize='medium')
+        self.airfoil_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
         self.canvas = FigureCanvasQTAgg(self.airfoil_fig)
         self.toolbar = NavigationToolbar2QT(self.canvas, self)
         self.verticalLayout_9.addWidget(self.toolbar)
         self.verticalLayout_9.addWidget(self.canvas)
+        
+        # List of airfoils
+        self.load_default_airfoils()
         
         # Signals
         self.airfoil_nacaseries_input.currentTextChanged.connect(self.update_parameters)
@@ -103,7 +118,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_station.timeout.connect(self.update_airfoil_chart)
         
         # Airfoil list
-        self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
+        # self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
+        self._sync_airfoil_widgets()
         
         # Upload additional airfoils
         self.station_uploadairfoil_button.clicked.connect(self.upload_airfoil_file)
@@ -112,6 +128,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_chart_empty = self.graph_template()
         self.station_chartview.setChart(self.station_chart_empty)
         self.station_chartview.mouseMoveEvent = self.station_mousecoords
+        
+        # Validators
+        self.station_chordlength_input.setValidator(QDoubleValidator(1.,1e6,3))
+        self.station_twistangle_input.setValidator(QDoubleValidator(-1e6,1e6,3))
+        self.station_offsetx_input.setValidator(QDoubleValidator(-1e6,1e6,3))
+        self.station_offsety_input.setValidator(QDoubleValidator(-1e6,1e6,3))
+        self.station_offsetz_input.setValidator(QDoubleValidator(0,1e6,3))
+        self.station_multx_input.setValidator(QDoubleValidator(0.1,1e6,3))
+        self.station_multy_input.setValidator(QDoubleValidator(0.1,1e6,3))
+        self.station_multz_input.setValidator(QDoubleValidator(0.1,1e6,3))
         
         # Signals
         self.station_listairfoils_box.currentTextChanged.connect(self.onTextChanged)
@@ -127,10 +153,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_mirrory_input.checkStateChanged.connect(self.onTextChanged)
         
         self.station_savestation_button.clicked.connect(self.save_station)
+        self.station_delstation_button.clicked.connect(self.del_station)
+        
+        self.station_liststation_box.currentTextChanged.connect(self.update_station_params)
         
         # Advanced tab
         # ------------
-        self.stations_insert_row(def_row=True)
+        self.stations_insert_row(None, def_row=True)
         self.station_tableStations_input.setColumnWidth(0, 130)
         self.station_tableStations_input.setColumnWidth(1, 100)
         self.station_tableStations_input.setSortingEnabled(True)
@@ -151,17 +180,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.blade_olplen_chart = self.graph_template()
         self.blade_olplen_chartview.setChart(self.blade_olplen_chart)
         
+        # Radio Buttons LOC
+        self.skin_grp_loc = QButtonGroup(self)
+        self.skin_grp_loc.addButton(self.skin_loc_radio1)
+        self.skin_grp_loc.addButton(self.skin_loc_radio2)
+        self.skin_grp_loc.setExclusive(True)
+        self.loc_widget.hide()
+        
+        # Radio Buttons LEN
+        self.skin_grp_len = QButtonGroup(self)
+        self.skin_grp_len.addButton(self.skin_len_radio1)
+        self.skin_grp_len.addButton(self.skin_len_radio2)
+        self.skin_grp_len.setExclusive(True)
+        self.len_widget.hide()
+        self.update_skin_ui()
+        
+        # Valditors
+        self.blade_skinolpsta_table.setItemDelegate(FloatDelegate(self.blade_skinolpsta_table))
+        self.blade_skinolplen_table.setItemDelegate(FloatDelegate(self.blade_skinolplen_table))
+        # TODO: Hardcoded top values
+        self.skin_olp_loc_const.setValidator(QDoubleValidator(0.1,200,3))
+        self.skin_olp_len_const.setValidator(QDoubleValidator(1,200,3))
+        
         # Signals
         self.blade_skinolpsta_table.cellChanged.connect(lambda row, col:
             self.new_row_table(self.blade_skinolpsta_table, row, col))
         self.blade_skinolplen_table.cellChanged.connect(lambda row, col:
             self.new_row_table(self.blade_skinolplen_table, row, col))
         
+        self.skin_grp_loc.buttonToggled.connect(self.update_skin_ui)
+        self.skin_grp_len.buttonToggled.connect(self.update_skin_ui)
         self.blade_order_input.valueChanged.connect(self.resize_blade_table)
-        
         self.blade_interpolate_button.clicked.connect(self.interpolate_overlap)
-        
         self.blade_saveparams_button.clicked.connect(self.save_bladeparams)
+        self.blade_skinolplen_selected.currentTextChanged.connect(self.table_interpolation_vals)
+        self.blade_skinolpsta_selected.currentTextChanged.connect(self.table_interpolation_vals)
         
         # ---------------------------------------------------------------------
         # Page 4 (Skin)
@@ -171,12 +224,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_skin.setSingleShot(True)
         self.timer_skin.timeout.connect(self.build_section)
         
-        # Charts
-        self.skin_zoom_chart = self.graph_template()
-        self.skin_zoom_chartview.setChart(self.skin_zoom_chart)
+        # Validators
+        # TODO: Top values are hardcoded for now
+        self.skin_nplies_input.setValidator(QIntValidator(1, 10))
+        self.skin_plythickness_input.setValidator(QDoubleValidator(0.1,20,3))
+        self.skin_tethickness_input.setValidator(QDoubleValidator(0.1,200,3))
+        self.skin_bond_input.setValidator(QDoubleValidator(0.1,20,3))
         
-        self.skin_full_chart = self.graph_template()
-        self.skin_full_chartview.setChart(self.skin_full_chart)
+        # Chart
+        self.skin_fig = Figure(figsize=(10, 3), tight_layout=True)
+        self.skin_ax = self.skin_fig.add_subplot(111)
+        self.skin_ax.set_xlabel('x [d]', fontsize='x-large')
+        self.skin_ax.set_ylabel('y [d]', fontsize='x-large')
+        self.skin_ax.minorticks_on()
+        self.skin_ax.tick_params(axis='both', which='both', direction='in',
+                            top=True, right=True, labelsize='medium')
+        self.skin_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
+        self.canvas_4 = FigureCanvasQTAgg(self.skin_fig)
+        self.toolbar_4 = NavigationToolbar2QT(self.canvas_4, self)
+        self.verticalLayout_10.addWidget(self.toolbar_4)
+        self.verticalLayout_10.addWidget(self.canvas_4)
         
         # Signals
         self.stackedWidget.currentChanged.connect(self.update_stabox)
@@ -187,14 +254,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.skin_plythickness_input.textChanged.connect(self.secInputChanged)
         self.skin_overlaptarget_input.textChanged.connect(self.secInputChanged)
         self.skin_tethickness_input.textChanged.connect(self.secInputChanged)
+        self.skin_bond_input.textChanged.connect(self.secInputChanged)
+        self.skin_jiggle_toggle.checkStateChanged.connect(self.secInputChanged)
         self.skin_savefig_input.checkStateChanged.connect(self.secInputChanged)
         
         self.skin_saveSection_button.clicked.connect(self.saveSection)
+        self.skin_saveAll_button.clicked.connect(self.saveAllSections)
         
         # ---------------------------------------------------------------------
         # Page 6 (EXPORT)
         self.stackedWidget.currentChanged.connect(self.update_sectionList)
         self.export_export_button.clicked.connect(self.exportSections)
+        
+        # Export type
+        self.export_toggles = QButtonGroup(self)
+        self.export_toggles.addButton(self.export_json_toggle)
+        self.export_toggles.addButton(self.export_csv_toggle)
+        self.export_toggles.setExclusive(True)
+        
+        # Signals
+        self.export_toggles.buttonToggled.connect(self.changeExportType)
         
     ### AIRFOIL METHODS (Page 1)
     def update_parameters(self):
@@ -258,15 +337,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.handle_msgbar('No airfoil to save.')
             return
         
-        self.db.airfoils[airfoil.name] = airfoil
+        # self.db.airfoils[airfoil.name] = airfoil
+        self.db.airfoils.add(name=airfoil.name, airfoil=airfoil)
         del self.edits['__airfoil__']
         
         # Update airfoil list (remove asterisk)
-        items = [self.airfoil_listairfoils_widget.item(i).text() 
-            for i in range(self.airfoil_listairfoils_widget.count())]
-        index = items.index(f'{airfoil.family} {airfoil.profile}*')
-        new_text = f'{airfoil.family} {airfoil.profile}'
-        self.airfoil_listairfoils_widget.item(index).setText(new_text)
+        # items = [self.airfoil_listairfoils_widget.item(i).text() 
+        #     for i in range(self.airfoil_listairfoils_widget.count())]
+        # index = items.index(f'{airfoil.family} {airfoil.profile}*')
+        # new_text = f'{airfoil.family} {airfoil.profile}'
+        # self.airfoil_listairfoils_widget.item(index).setText(new_text)
         
         # Print message
         self.handle_msgbar(f'Airfoil {airfoil.name} saved.')
@@ -345,8 +425,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.airfoil_ax.set_ylabel('y/c [-]', fontsize='x-large')
         self.airfoil_ax.minorticks_on()
         self.airfoil_ax.tick_params(axis='both', which='both', direction='in',
-                            top=True, right=True, labelsize='x-large')
-        self.airfoil_ax.grid(visible=True, which='major', linestyle='-', linewidth=0.75)
+                            top=True, right=True, labelsize='medium')
+        self.airfoil_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
         self.airfoil_ax.set_aspect('equal', adjustable='datalim')
         self.airfoil_ax.legend(loc = 'best')
         
@@ -377,6 +457,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.handle_msgbar('Airfoil not found in database.')
     
     ### STATION METHODS (Page 2a)
+    def update_station_params(self):
+        name_station = self.station_liststation_box.currentText()
+        station = self.db.stations.get(name_station)
+        
+        self.station_listairfoils_box.setCurrentText(station.airfoil)
+        
+        self.station_chordlength_input.setText(f'{station.parameters['chord']}')
+        self.station_twistangle_input.setText(f'{np.degrees(station.parameters['twist_angle']):.2f}')
+        
+        offset = station.parameters['offset']
+        self.station_offsetx_input.setText(f'{offset[0]}')
+        self.station_offsety_input.setText(f'{offset[1]}')
+        self.station_offsetz_input.setText(f'{offset[2]}')
+        
+        multip = station.parameters['multiplier']
+        self.station_multx_input.setText(f'{multip[0]}')
+        self.station_multy_input.setText(f'{multip[1]}')
+        self.station_multz_input.setText(f'{multip[2]}')
+        
+        mirror = station.parameters['mirror']
+        self.station_mirrorx_input.setChecked(mirror[0])
+        self.station_mirrory_input.setChecked(mirror[1])
+        
     
     def update_airfoil_chart(self):
         
@@ -492,20 +595,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def save_station(self):
         station = self.edits['__station__']
         station_name  = 'sta_' + str(int(station.parameters['offset'][2]))
-        self.db.stations[station_name] = station
+        # self.db.stations[station_name] = station
+        self.db.stations.add(station_name, station)
         self.handle_msgbar(f'Station {station_name} saved.')
-        n_stations = len(self.db.stations.keys())
-        sorted_stations = sorted(list(self.db.stations.keys()), key=len)
+        # n_stations = len(self.db.stations.keys())
+        # sorted_stations = sorted(list(self.db.stations.keys()), key=len)
         # self.handle_msgbar(f'Number of stations: {n_stations}')
-        self.station_liststation_box.clear()
-        self.station_liststation_box.insertItems(0,sorted_stations)
+        # self.station_liststation_box.clear()
+        # self.station_liststation_box.insertItems(0,sorted_stations)
         self.station_liststation_box.setCurrentText(station_name)
         # print(self.station_liststation_box.currentIndex())
+        
+    def del_station(self):
+        station_name = self.station_liststation_box.currentText()
+        
+        if not station_name:
+            return self.handle_msgbar('No station to delete.')
+        
+        self.db.stations.remove(station_name)
+        self.update_station_params()
+        # self.update_airfoil_chart()
+        
+        print(f'Station "{station_name}" deleted.')
+        return self.handle_msgbar(f'Station "{station_name}" deleted.')
     
     ### ADVANCED TAB METHODS (Page 2b)
     
     def stations_insert_row(
         self,
+        row: int | None = None,
         airfoil: str | None = None,
         def_row: bool = False,
         data_row: list | None = None,
@@ -514,32 +632,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ):
         
         t = self.station_tableStations_input
+        
         if def_row:
-            n_rows = 0
+            insert_at = 0
         else:
-            n_rows = t.rowCount()
-            t.insertRow(n_rows)
+            if row is None:
+                insert_at = t.rowCount()
+            else:
+                insert_at = min(max(0, row), t.rowCount())
+        
+        t.insertRow(insert_at)
         
         # Column 0: Airfoil
         c0 = QComboBox()
-        c0.addItems(list(self.db.airfoils.keys()))
-        if airfoil in list(self.db.airfoils.keys()):
+        c0.addItems(self.db.airfoils.keys())
+        if airfoil in self.db.airfoils.keys():
             c0.setCurrentText(airfoil)
         else: c0.setCurrentIndex(0)
-        t.setCellWidget(n_rows, 0, c0)
+        t.setCellWidget(insert_at, 0, c0)
         
         # Column 1-8: Numeric items
         num_default = data_row if data_row else [1., 0., 0., 0., 0., 1., 1., 1.]
-        for c, val in enumerate(num_default, start=1):
-            t.setItem(n_rows, c, NumericItem(f"{val:.6g}"))
+        
+        for col, val in enumerate(num_default, start=1):
+            t.setItem(insert_at, col, NumericItem(f"{val:.6g}"))
             
         # Column 9-10: Checkboxes
-        x_mir = QCheckBox()
-        x_mir.setChecked(xmirror)
-        y_mir = QCheckBox()
-        y_mir.setChecked(ymirror)
-        t.setCellWidget(n_rows, 9, x_mir)
-        t.setCellWidget(n_rows, 10, y_mir)
+        x_mir = QCheckBox(); x_mir.setChecked(bool(xmirror))
+        y_mir = QCheckBox(); y_mir.setChecked(bool(ymirror))
+        t.setCellWidget(insert_at, 9, x_mir)
+        t.setCellWidget(insert_at, 10, y_mir)
     
     def sort_advanced_stations_table(self):
         self.station_tableStations_input.sortItems(5)
@@ -566,44 +688,51 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         t.setSortingEnabled(False)
         t.clearContents()
         t.setRowCount(0)
-        t.setSortingEnabled(True)
-        self.db.cleanStations()
+        self.db.stations.clear()
         
         # Populate station table
         rows, _ = df.shape
         for r in range(rows):
             self.stations_insert_row(
-                airfoil=df.iloc[r]['airfoil'],
-                def_row=False,
-                data_row=df.iloc[r].tolist()[1:-2],
-                xmirror=df.iloc[r]['mirror_x'],
-                ymirror=df.iloc[r]['mirror_y'],
+                row = None,
+                airfoil = df.at[r, 'airfoil'],
+                def_row = False,
+                data_row = df.iloc[r].tolist()[1:-2],
+                xmirror = df.iloc[r]['mirror_x'],
+                ymirror = df.iloc[r]['mirror_y'],
             )
         
-        self.station_nStationsAdv_input.setValue(rows)
-        self.handle_msgbar(f'File imported succesfully: {filepath}')
+        t.setSortingEnabled(True)
+        self.station_nStationsAdv_input.setValue(len(df))
+        self.handle_msgbar(f'File imported succesfully: {filepath}.')
     
     def update_stations_table(self, value):
         n_rows = self.station_tableStations_input.rowCount()
         
         if value > n_rows:
-            self.stations_insert_row()
+            self.stations_insert_row(row=value)
             
         elif value < n_rows:
             self.station_tableStations_input.removeRow(value)
         
     def save_multiple_stations(self):
-        n_rows = self.station_tableStations_input.rowCount()
-        n_cols = self.station_tableStations_input.columnCount()
+        t = self.station_tableStations_input
+        
+        if not hasattr(self, "_suspend_station_sync"):
+            self._suspend_station_sync = False
+        self._suspend_station_sync = True
+        
+        n_rows = t.rowCount()
+        n_cols = t.columnCount()
         sta_data = {}
         for row in range(n_rows):
             for col in range(n_cols):
                 if col < 1:
-                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).currentText()
+                    sta_data[col] = t.cellWidget(row, col).currentText()
                 elif col > 0 and col < 9:
-                    sta_data[col] = self.station_tableStations_input.item(row, col).text()
+                    sta_data[col] = t.item(row, col).text()
                 else:
-                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).isChecked()
+                    sta_data[col] = t.cellWidget(row, col).isChecked()
             
             station = Station(
                 airfoil=self.db.airfoils[sta_data[0]],
@@ -622,11 +751,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             station_name = f'sta_{int(sta_data[5])}'
             
-            self.db.stations[station_name] = station
+            # self.db.stations[station_name] = station
+            self.db.stations.add(station_name, station)
             
         self.handle_msgbar(f'Total stations created: {n_rows}.')
+        
+        self._suspend_station_sync = False
+        self._sync_station_widgets()
     
     ### PARAMETERS METHODS (Page 3)
+    
+    def update_skin_ui(self, *args):
+        """Single source of truth for the LOC/LEN UI."""
+        # LOC side
+        loc_uses_table = self.skin_loc_radio1.isChecked()
+        self.blade_skinolpsta_table.setVisible(loc_uses_table)
+        self.loc_widget.setVisible(not loc_uses_table)
+        self.blade_skinolpsta_selected.setVisible(loc_uses_table)
+        self.label_38.setVisible(loc_uses_table)
+
+        # LEN side
+        len_uses_table = self.skin_len_radio1.isChecked()
+        self.blade_skinolplen_table.setVisible(len_uses_table)
+        self.len_widget.setVisible(not len_uses_table)
+        self.blade_skinolplen_selected.setVisible(len_uses_table)
+        self.label_39.setVisible(len_uses_table)
+
+        # Shared controls: show if EITHER side uses a table
+        show_order_controls = loc_uses_table or len_uses_table
+        self.blade_order_input.setVisible(show_order_controls)
+        self.label_41.setVisible(show_order_controls)
+        self.label_40.setVisible(show_order_controls)
+    
     
     def new_row_table(self, table, row, col):
         last_row = table.rowCount() - 1
@@ -648,43 +804,52 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 i.insertRow(last_row+1)
     
     def interpolate_overlap(self):
+        order = int(self.blade_order_input.text())
         
         # OLP_STA
         data = []
-        for row in range(self.blade_skinolpsta_table.rowCount()-1):
-            row_data = []
-            for col in range(self.blade_skinolpsta_table.columnCount()):
-                item = self.blade_skinolpsta_table.item(row, col)
-                row_data.append(float(item.text()))
-            data.append(tuple(row_data))
-        coords = tuple(data)
+        y_axis_label = 'Overlap loc. from LE [c]' if self.skin_loc_radio1.isChecked() else 'Distance from LE [d]'
         
-        x_target = [float(x[4:]) for x in self.db.stations.keys()]
-        # Handling error in case no stations have been created
-        if len(x_target) < len(coords):
-            x_target, _ = zip(*coords)
+        if self.skin_loc_radio1.isChecked():
             
-        order = int(self.blade_order_input.text())
-        
-        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
-        
-        # Update graphs
-        line_series = [QLineSeries() for x in range(len(y_target))]
-        scatter_series = [QScatterSeries() for x in range(len(y_target))]
-        x_line = np.linspace(x_target[0],x_target[-1],100)
-        y_line = [splev(x_line, x) for x in tck]
-        
-        xy_line = [list(zip(x_line,y)) for y in y_line]
-        xy_pts = [list(zip(x_target,y)) for y in y_target]
+            for row in range(self.blade_skinolpsta_table.rowCount()-1):
+                row_data = []
+                for col in range(self.blade_skinolpsta_table.columnCount()):
+                    item = self.blade_skinolpsta_table.item(row, col)
+                    row_data.append(float(item.text()))
+                data.append(tuple(row_data))
+            coords = tuple(data)
+            
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            # Handling error in case no stations have been created
+            if len(x_target) < len(coords):
+                x_target, _ = zip(*coords)   
+            
+            y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
+            
+            x_line = np.linspace(x_target[0],x_target[-1],100)
+            y_line = [splev(x_line, x) for x in tck]
+            
+            xy_line = [list(zip(x_line,y)) for y in y_line]
+            xy_pts = [list(zip(x_target,y)) for y in y_target]
+            
+        else: # If location is constant
+            distance = float(self.skin_olp_loc_const.text())
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            y_target = np.full_like(x_target, distance).tolist()
+            xy_pts = [list(zip(x_target, y_target)),]
+            xy_line = xy_pts
         
         # save in temporary database
-        self.edits['__olp_sta__'] = np.array(xy_pts)
+        self.edits['__olp_sta__'] = xy_pts
         
         # Add points to series
+        line_series = [QLineSeries() for x in range(len(y_target))]
         for i in range(len(xy_line)):
             for j in xy_line[i]:
                 line_series[i].append(float(j[0]), float(j[1]))
                 
+        scatter_series = [QScatterSeries() for x in range(len(y_target))]
         for i in range(len(xy_pts)):
             for j in xy_pts[i]:
                 scatter_series[i].append(float(j[0]), float(j[1]))
@@ -702,42 +867,66 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
         self.blade_olpsta_chart.createDefaultAxes()
         self.blade_olpsta_chart.zoom(0.9)
+        x_axis = self.blade_olpsta_chart.axes(Qt.Horizontal)[0]
+        y_axis = self.blade_olpsta_chart.axes(Qt.Vertical)[0]
+        x_axis.setTitleText('Blade length [d]')
+        y_axis.setTitleText(y_axis_label)
+        x_axis.setTitleFont(QFont('Helvetica',10))
+        y_axis.setTitleFont(QFont('Helvetica',10))
+        
+        # # Legend
+        # series.setName(airfoil_name)
+        # self.blade_olpsta_chart.legend().setVisible(True)
+        # self.blade_olpsta_chart.legend().setAlignment(Qt.AlignBottom)
         
         # OLP_LEN
         data = []
-        for row in range(self.blade_skinolplen_table.rowCount()-1):
-            row_data = []
-            for col in range(self.blade_skinolplen_table.columnCount()):
-                item = self.blade_skinolplen_table.item(row, col)
-                row_data.append(float(item.text()))
-            data.append(tuple(row_data))
-        coords = tuple(data)
         
-        x_target = [float(x[4:]) for x in self.db.stations.keys()]
-        # Handling error in case no stations have been created
-        if len(x_target) < len(coords) :
-            x_target, _ = zip(*coords)
+        if self.skin_len_radio1.isChecked():
+            for row in range(self.blade_skinolplen_table.rowCount()-1):
+                row_data = []
+                for col in range(self.blade_skinolplen_table.columnCount()):
+                    item = self.blade_skinolplen_table.item(row, col)
+                    row_data.append(float(item.text()))
+                data.append(tuple(row_data))
+            coords = tuple(data)
+            
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            # Handling error in case no stations have been created
+            if len(x_target) < len(coords) :
+                x_target, _ = zip(*coords)
+            
+            y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
         
-        y_target, tck = norm_olp(coords=coords, x_target=x_target, order=order)
+            x_plot = np.linspace(x_target[0],x_target[-1],100)
+            y_plot = [splev(x_plot, x) for x in tck]
+            
+            xy_line = [list(zip(x_plot,y)) for y in y_plot]
+            xy_pts = [list(zip(x_target,y)) for y in y_target]
         
-        # Update graphs
-        series = [QLineSeries() for x in range(len(y_target))]
-        points = [QScatterSeries() for x in range(len(y_target))]
-        
-        x_plot = np.linspace(x_target[0],x_target[-1],100)
-        y_plot = [splev(x_plot, x) for x in tck]
-        
-        xy = [list(zip(x_plot,y)) for y in y_plot]
-        xy_pts = [list(zip(x_target,y)) for y in y_target]
+        else: # If length is constant
+            distance = float(self.skin_olp_len_const.text())
+            x_target = [float(x[4:]) for x in self.db.stations.keys()]
+            y_target = np.full_like(x_target, distance).tolist()
+            xy_pts = [list(zip(x_target, y_target)),]
+            xy_line = xy_pts
         
         # save in temporary database
-        self.edits['__olp_len__'] = xy
+        self.edits['__olp_len__'] = {key:pd.DataFrame(
+            xy_pts[key],
+            columns=['station','value'],
+        )
+        for key in range(len(xy_pts))}
         
-        for i in range(len(xy)):
-            for j in xy[i]:
+        ## Line
+        series = [QLineSeries() for x in range(len(y_target))]
+        for i in range(len(xy_line)):
+            for j in xy_line[i]:
                 series[i].append(float(j[0]), float(j[1]))
-                
-        for i in range(len(xy)):
+        
+        ## Scatter 
+        points = [QScatterSeries() for x in range(len(y_target))]
+        for i in range(len(xy_pts)):
             for j in xy_pts[i]:
                 points[i].append(float(j[0]), float(j[1]))
         
@@ -752,6 +941,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
         self.blade_olplen_chart.createDefaultAxes()
         self.blade_olplen_chart.zoom(0.9)
+        x_axis = self.blade_olplen_chart.axes(Qt.Horizontal)[0]
+        y_axis = self.blade_olplen_chart.axes(Qt.Vertical)[0]
+        x_axis.setTitleText('Blade length [d]')
+        y_axis.setTitleText('Overlap len. from LE [c]')
+        x_axis.setTitleFont(QFont('Helvetica',10))
+        y_axis.setTitleFont(QFont('Helvetica',10))
         
         # Update QComboBox with order selection
         self.blade_skinolpsta_selected.clear()
@@ -759,6 +954,69 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.blade_skinolplen_selected.clear()
         self.blade_skinolplen_selected.addItems([str(x+1) for x in range(order)])
+        
+    def table_interpolation_vals(self):
+        n_stations = len(self.db.stations)
+        z = [sta.parameters['offset'][2] for sta in self.db.stations.values()]
+        
+        # Interpolation order selected
+        if self.skin_loc_radio1.isChecked():
+            k1 = int(self.blade_skinolpsta_selected.currentText())
+        else:
+            k1 = 1
+        
+        if self.skin_len_radio1.isChecked():
+            try:
+                k2 = int(self.blade_skinolplen_selected.currentText())
+            except ValueError: # Because the box is not populated at the same time.
+                k2 = 1
+                print(f'k1 = {k1}, k2 = {k2}')
+        else:
+            k2 = 1
+        
+        y1 = self.edits['__olp_sta__'][k1-1]
+        y2 = self.edits['__olp_len__'][k2-1]
+        
+        # Interpolation array
+        y1 = np.array([row[1] for row in y1])
+        # y2 = np.array([row[1] for row in y2])
+        y2 = y2['value'].to_numpy()
+        blade_ilp = np.array(list(zip(z,y1,y2)))
+        chord = [sta.parameters['chord'] for sta in self.db.stations.values()]
+        
+        if self.skin_loc_radio1.isChecked():
+            blade_ilp[:,1] *= chord
+            self.db.blade['ovp_text'] = pd.DataFrame(
+                zip(blade_ilp[:,1],[f'{x:.2f}' for x in blade_ilp[:,1]]),
+                columns = ['value', 'text'],
+            )
+        else:
+            print(y1[0])
+            self.db.blade['ovp_text'] = pd.DataFrame([{
+                'value': y1[0],'text': f'{y1[0]:.2f}'}])
+            
+        if self.skin_len_radio1.isChecked():
+            blade_ilp[:,2] *= chord
+        
+        # else:
+        #     self.db.blade['']
+            
+        self.db.blade['overlap'] = pd.DataFrame(
+            blade_ilp,
+            columns=['z','olp_sta','olp_len'],
+        )
+        # Show interpolation values
+
+        print(self.db.blade['ovp_text'])
+        model = QStandardItemModel(n_stations,3)
+        model.setHorizontalHeaderLabels(['Station', 'OLP Start', 'OLP Length'])
+        
+        for i in range(n_stations):
+            model.setItem(i, 0, QStandardItem(f'{z[i]:.0f}'))
+            model.setItem(i, 1, QStandardItem(f'{blade_ilp[i][1]:.2f}'))
+            model.setItem(i, 2, QStandardItem(f'{blade_ilp[i][2]:.2f}'))
+            
+        self.tableView.setModel(model)
     
     def save_bladeparams(self):
         idx_olp_sta = self.blade_skinolpsta_selected.currentIndex()
@@ -767,6 +1025,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.db.blade['olp_sta'] = self.edits['__olp_sta__'][idx_olp_sta]
         # print(self.db.blade['olp_sta'])
         self.db.blade['olp_len'] = self.edits['__olp_len__'][idx_olp_len]
+        if self.skin_len_radio1.isChecked():
+            chord = [sta.parameters['chord'] for sta in self.db.stations.values()]
+            self.db.blade['olp_len']['value'] *= chord
         # print(self.db.blade['olp_len'])
         
         self.handle_msgbar(f'Parameters saved.')
@@ -775,19 +1036,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def update_stabox(self):
         if self.stackedWidget.currentIndex() == 4:
-            names_stations = list(self.db.stations.keys())
+            names_stations = self.db.stations.keys()
             self.skin_liststations.clear()
             self.skin_liststations.addItems(names_stations)
         
     def update_olptgt(self):
-        olp_sta = self.db.blade['olp_sta']
+        try:
+            df = self.db.blade['overlap']
+        except KeyError:
+            self.handle_msgbar('Error: Blade interpolation was not saved.')
+            
         n_station = float(self.skin_liststations.currentText()[4:])
+        # station = self.db.stations[self.skin_liststations.currentText()]
         
         try:
-            norm_olp_tgt = float(olp_sta[np.where(olp_sta[:,0]==n_station)[0],1][0])
-            station = self.db.stations[self.skin_liststations.currentText()]
-            olp_target = norm_olp_tgt*station.parameters['chord']
-            self.skin_overlaptarget_input.setText(str(olp_target))
+            olp_target = df.loc[df['z'] == n_station, 'olp_sta'].item()
+            print(f'olp_target (new): {olp_target:.2f}')
+            
+            # olp_sta = np.array(self.db.blade['olp_sta'])
+            # norm_olp_tgt = float(olp_sta[np.where(olp_sta[:,0]==n_station)[0],1][0])
+            # olp_target = norm_olp_tgt*station.parameters['chord']
+            # print(f'olp_target (old): {olp_target:.2f}')
+            self.skin_overlaptarget_input.setText(f'{olp_target:.2f}')
             
         except ValueError:
             self.handle_msgbar('Error: Overlap target could not be interpolated.')
@@ -798,73 +1068,127 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 station = self.db.stations[self.skin_liststations.currentText()] if self.skin_liststations.currentText() != '' else None
                 n_plies = int(self.skin_nplies_input.text()) if self.skin_nplies_input.text() else 1
                 ply_thk = float(self.skin_plythickness_input.text()) if self.skin_plythickness_input.text() else 1
-                olp_tgt = float(self.skin_overlaptarget_input.text()) if self.skin_overlaptarget_input.text() else 10
                 te_thkn = float(self.skin_tethickness_input.text()) if self.skin_tethickness_input.text() else n_plies*ply_thk
+                bond_th = float(self.skin_bond_input.text()) if self.skin_bond_input.text() else 1
                 saveFig = self.skin_savefig_input.isChecked()
                 
-                data = Section(station = station,
-                            n_plies = n_plies,
-                            ply_thickness = ply_thk,
-                            overlap_target = olp_tgt,
-                            te_thickness = te_thkn,
-                            saveFig = saveFig,
+                df_olp = self.db.blade['ovp_text']
+                olp_txt = df_olp.loc[df_olp['text'] == self.skin_overlaptarget_input.text(), 'value'].item()
+                olp_tgt = float(olp_txt) if olp_txt else 10
+                print(f'olp_tgt: {olp_tgt}')
+                section = Section(
+                    station = station,
+                    n_plies = n_plies,
+                    ply_thickness = ply_thk,
+                    overlap_target = olp_tgt,
+                    te_thickness = te_thkn,
+                    bond_thickness= bond_th,
+                    saveFig = saveFig,
+                )
+                
+                # Jiggle method
+                if section.parameters['isCircle']:
+                    self.handle_msgbar(f'Jiggle method is not implemented on circular shapes.')
+                
+                if self.skin_jiggle_toggle.isChecked() and not section.parameters['isCircle']:
+                    
+                    # Retrieve overlap distance
+                    df_len = self.db.blade['olp_len']
+                    z_sta = float(self.skin_liststations.currentText()[4:])
+                    print(f'name_sta: {z_sta}')
+                    print(df_len)
+                    olp_len = df_len.loc[df_len['station'] == z_sta]['value'].item()
+                    
+                    
+                    section.jiggle(
+                        overlap_dist = olp_len,
+                        bond_thickness = bond_th,
+                    )
+                    
+                    # Plot
+                    self.skin_ax.clear()
+                    colours = section.parameters['colours']
+                    p_bot1 = section.points['bot_1']
+                    p_bot2 = section.points['bot_2']
+                    p_bot3 = section.points['bot_3']
+                    p_top  = section.points['top_1']
+                    p_bond = section.points['bond']
+                    
+                    for i in range(1, n_plies+1):
+                        # BOT_2 - JIGGLE
+                        self.skin_ax.plot(p_bot2[i]['x'], p_bot2[i]['y'], label = f'Ply {i}', c = colours[i-1])
+                        
+                        for j in range(4):
+                            
+                            # BOT_1
+                            self.skin_ax.plot(
+                                p_bot1[i][j]['x'], p_bot1[i][j]['y'],
+                                c = colours[i-1], label = None)            
+                            
+                            # BOT_3
+                            self.skin_ax.plot(
+                                p_bot3[i][j]['x'], p_bot3[i][j]['y'],
+                                c = colours[i-1], label = None)
+                            
+                            # TOP_1 
+                            self.skin_ax.plot(
+                                p_top[i][j]['x'], p_top[i][j]['y'],
+                                c = colours[i-1], label = None)
+                            
+                    # BOND
+                    self.skin_ax.plot(p_bond[1]['x'], p_bond[1]['y'], label = f'Bond', c = 'black')
+                    
+                    for i in range(4):
+                        self.skin_ax.plot(p_bond[0][i]['x'], p_bond[0][i]['y'],
+                                c = 'black', label = None)
+                
+                else:
+                    
+                    self.skin_ax.clear()
+                    n_plies = section.parameters['n_plies']
+            
+                    cmap = plt.get_cmap('rainbow')
+                    colours = [cmap(x/n_plies) for x in range(n_plies)]
+                    
+                    for i in range(1,n_plies+1):    
+                        self.skin_ax.plot(
+                            section.points['bot_1'][i][0]['x'], 
+                            section.points['bot_1'][i][0]['y'],
+                            label = f'Ply {i}', c = colours[i-1]
+                        )
+                        
+                        self.skin_ax.plot(
+                            section.points['top_1'][i][0]['x'],
+                            section.points['top_1'][i][0]['y'],
+                            label = None, c = colours[i-1]
+                        )
+                        
+                        for j in range(1,4):
+                            self.skin_ax.plot(
+                                section.points['bot_1'][i][j]['x'], 
+                                section.points['bot_1'][i][j]['y'],
+                                label = None, c = colours[i-1]
                             )
-                print('Section generated.')
+                            self.skin_ax.plot(
+                                section.points['top_1'][i][j]['x'], 
+                                section.points['top_1'][i][j]['y'],
+                                label = None, c = colours[i-1]
+                            )
                 
-                # Generate colours
-                colours = self.generate_colours(num_curves=n_plies, cmap_name='viridis')
+                self.skin_ax.set_xlabel('x [d]', fontsize='x-large')
+                self.skin_ax.set_ylabel('y [d]', fontsize='x-large')
+                self.skin_ax.minorticks_on()
+                self.skin_ax.tick_params(axis='both', which='both', direction='in',
+                                    top=True, right=True, labelsize='medium')
+                self.skin_ax.grid(visible=True, which='major', linestyle='--', linewidth=0.75)
+                self.skin_ax.set_aspect('equal', adjustable='datalim')
+                self.skin_ax.legend(loc = 'best')
                 
-                # Plots
-                plies = list(data.t['bot_plies'].keys())
-                ply_series = {}
-                for i in (plies):
-                    ply = data.t['bot_plies'][i]
-                    ply_series[i] = {x:QLineSeries() for x in list(ply.keys())}
-                
-                    for j in list(ply.keys()):
-                        x = data.splines[j]['x'](ply[j]).tolist()
-                        y = data.splines[j]['y'](ply[j]).tolist()
-                        xy = list(zip(x,y))
-                        points = [QPointF(float(x), float(y)) for x, y in xy]
-                        ply_series[i][j].append(points)
-                        # ply_series[i][j].setName(f'Curve {j}')
-                        ply_series[i][j].setColor(colours[i-1])
-                
-                # Full graph
-                chart = QChart()
-                chart.setAnimationOptions(QChart.SeriesAnimations)
-                for i in list(ply_series.keys()):
-                    for j in list(ply_series[i].keys()):
-                        chart.addSeries(ply_series[i][j])
-                chart.createDefaultAxes()
-                
-                x_axis = chart.axes(Qt.Horizontal)[0]
-                y_axis = chart.axes(Qt.Vertical)[0]
-                x_axis.setTitleText('x [d]')
-                y_axis.setTitleText('y [d]')
-                x_axis.setTitleFont(QFont('Helvetica',14))
-                y_axis.setTitleFont(QFont('Helvetica',14))
-                self.skin_full_chartview.setChart(chart)
-                self.equal_axes(chart, station.xyRange())
-                
-                # Zoomed graph     
-                x = [
-                    data.points['bot_1'][1][2]['x'][0],
-                    data.points['top_1'][1][3]['x'][0],
-                ]
-                
-                y = [
-                    data.points['bot_1'][1][2]['y'][0],
-                    data.points['top_1'][1][3]['y'][0],
-                ]
-                
-                x.sort()
-                y.sort()
-                print(f'x: {x}\n y: {y}')
+                self.canvas_4.draw_idle()
                 
                 # Temporary save
-                self.edits['__section__'] = data
-                self.handle_msgbar(f'Number of curves: {len(data.splines.keys())}')
+                self.edits['__section__'] = section
+                self.handle_msgbar(f'Number of curves: {len(section.splines.keys())}')
             
             except NameError:
                 print('Skin section: Error - Wrong input.')
@@ -874,76 +1198,242 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.db.sections[section_name] = self.edits['__section__']
         self.handle_msgbar(f'Section "{section_name}" saved.')
     
-    ### ABAQUS EXPORT METHODS
+    def saveAllSections(self):
+        n = self.skin_liststations.count()
+        # Progress bar
+        self.progressBar.setRange(0, 100)  # normalised 0–100%
+        
+        for i in range(n):
+            station = self.db.stations[self.skin_liststations.itemText(i)]    
+            n_plies = int(self.skin_nplies_input.text()) if self.skin_nplies_input.text() else 1
+            ply_thk = float(self.skin_plythickness_input.text()) if self.skin_plythickness_input.text() else 1
+            te_thkn = float(self.skin_tethickness_input.text()) if self.skin_tethickness_input.text() else n_plies*ply_thk
+            bond_th = float(self.skin_bond_input.text()) if self.skin_bond_input.text() else 1
+            gen_olp = self.skin_jiggle_toggle.isChecked()
+            saveFig = self.skin_savefig_input.isChecked()
+            
+            df = self.db.blade['overlap']
+            z = station.parameters['offset'][2]
+            olp_target = df.loc[df['z'] == z, 'olp_sta'].item()
+            olp_tgt = olp_target if olp_target else 10
+            
+            section = Section(
+                    station = station,
+                    n_plies = n_plies,
+                    ply_thickness = ply_thk,
+                    overlap_target = olp_tgt,
+                    te_thickness = te_thkn,
+                    bond_thickness= bond_th,
+                    saveFig = saveFig,
+                )
+            
+            if gen_olp:
+                
+                # Retrieve overlap distance
+                df_len = self.db.blade['olp_len']
+                z_sta = float(self.skin_liststations.currentText()[4:])
+                olp_len = df_len.loc[df_len['station'] == z_sta]['value'].item()
+                
+                section.jiggle(
+                    overlap_dist = olp_len,
+                    bond_thickness = bond_th,
+                )
+            
+            # Save section
+            self.db.sections[f'sec_{int(z)}'] = section
+            
+            # Update progress bar
+            progress = int((i + 1) / n * 100)
+            self.progressBar.setValue(progress)
+            
+        self.handle_msgbar(f'{i+1} stations saved.')
+    
+    ### EXPORT METHODS
     
     def update_sectionList(self):
-        if self.stackedWidget.currentIndex() == 6:
+        if self.stackedWidget.currentIndex() == 5:
             self.export_sectionsList.clear()
             list_sections = list(self.db.sections.keys())
             self.export_sectionsList.insertItems(0,list_sections)
             
     def exportSections(self):
+        
         if len(self.export_sectionsList.selectedItems()) > 0:
             items = self.export_sectionsList.selectedItems()
-            dict_sections = {int(sec.text()[4:]):skinSection(self.db.sections[sec.text()]) for sec in items}
-            filename = f'{self.export_expFileName_input.text()}'
-            skinPart(sections=dict_sections, filename=filename)
-            
-            self.handle_msgbar(f'File "{filename}.json" exported succesfully.')
         else:
             self.handle_msgbar('No sections selected.')
+            return
+            
+        # JSON option
+        if self.export_json_toggle.isChecked():
+            dict_sections = {
+                int(sec.text()[4:]):skinSection(self.db.sections[sec.text()]) 
+                for sec in items
+            }
+            filename = f'{self.export_expFileName_input.text()}'
+            skinPart(sections=dict_sections, path= self.main_path, filename=filename)
+              
+            self.handle_msgbar(f'File "{filename}.json" exported succesfully.')
+        
+        elif self.export_csv_toggle.isChecked():
+            
+            foldername = self.export_expFileName_input.text()
+            
+            # Base folder
+            skin_dir = os.path.join(self.main_path,foldername,'Skin')
+            os.makedirs(skin_dir, exist_ok=True)
+            
+            dict_sections = {
+                int(sec.text()[4:]):self.db.sections[sec.text()]
+                for sec in items
+            }
+            
+            for key, sec in dict_sections.items():
+                z = sec.parameters['z']
+                n_plies = sec.parameters['n_plies']
+
+                for side in ['top', 'bot']:
+                    for ply in range(1, n_plies + 1):
+                        # Create ply subfolder (zero-padded)
+                        ply_dir = os.path.join(skin_dir, f'Ply_{ply:02d}')
+                        os.makedirs(ply_dir, exist_ok=True)
+
+                        for spline in [0, 1]:
+                            x = sec.points[f'{side}_1'][ply][spline]['x']
+                            y = sec.points[f'{side}_1'][ply][spline]['y']
+                            z_col = [z] * len(x)
+
+                            df = pd.DataFrame({'x': x, 'y': y, 'z': z_col})
+
+                            # Include section id (or z) to avoid overwriting across sections
+                            filename = f"{side}_sec{key}_{spline}.csv"
+                            df.to_csv(
+                                os.path.join(ply_dir, filename),
+                                index=False,
+                                header=False,
+                            )
+            
+            self.handle_msgbar(f'Folder "{foldername}" exported succesfully.')
+        
+        else:
+            return
+            
+    def changeExportType(self, button, checked):
+        if not checked:
+            return
+        
+        if button is self.export_json_toggle:
+            self.label_46.setText('Export file name:')
+            self.label_47.setText('.json')
+            self.label_47.show()
+        
+        if button is self.export_csv_toggle:
+            self.label_46.setText('Export folder name:')
+            self.label_47.hide()
     
     ### GENERAL UI METHODS
     
-    def load_default_airfoils(self):
+    def _sync_airfoil_widgets(self):
+        names = self.db.airfoils.keys()
         
-        self.paths_airfoils = {}
+        display_names = [f'{a.family} {a.profile}' for a in self.db.airfoils.values()]
+        self.airfoil_listairfoils_widget.blockSignals(True)
+        self.airfoil_listairfoils_widget.clear()
+        self.airfoil_listairfoils_widget.addItems(display_names)
+        self.airfoil_listairfoils_widget.blockSignals(False)
+        
+        self.station_listairfoils_box.blockSignals(True)
+        self.station_listairfoils_box.clear()
+        self.station_listairfoils_box.addItems(names)
+        self.station_listairfoils_box.blockSignals(False)
+    
+    def _sync_station_widgets(self, stations:dict | None = None):
+        if getattr(self, "_suspend_station_sync", False):
+            return
+    
+        if stations is None:
+            stations = self.db.stations.all()
+        
+        names = self.db.stations.keys()
+        self.station_liststation_box.blockSignals(True)
+        self.station_liststation_box.clear()
+        self.station_liststation_box.addItems(names)
+        self.station_liststation_box.blockSignals(False)
+        self.update_station_params()
+        
+        # ---- Rebuild the Advanced table from the snapshot ----
+        t = self.station_tableStations_input
+
+        # preserve sort & scroll
+        sort_enabled = t.isSortingEnabled()
+        if sort_enabled:
+            hdr = t.horizontalHeader()
+            sort_col = hdr.sortIndicatorSection()
+            sort_order = hdr.sortIndicatorOrder()
+        vpos = t.verticalScrollBar().value()
+
+        t.setUpdatesEnabled(False)
+        t.setSortingEnabled(False)
+        t.clearContents()
+        t.setRowCount(0)
+
+        for name, sta in stations.items():
+            # airfoil name
+            airfoil_name = getattr(sta, "airfoil", None)
+            
+            p = sta.parameters
+            offset = p.get("offset", (0.0, 0.0, 0.0))
+            multp  = p.get("multiplier", (1.0, 1.0, 1.0))
+            mirror = p.get("mirror", (False, True))
+            # numeric columns (8 numbers: cols 1–8)
+            nums = [
+                float(p.get("chord", 1.0)),
+                np.degrees(p.get("twist_angle", 0.0)),
+                float(offset[0]),
+                float(offset[1]),
+                float(offset[2]),  # col 5
+                float(multp[0]),
+                float(multp[1]),
+                float(multp[2]),
+            ]
+
+            self.stations_insert_row(
+                row=None,
+                airfoil=airfoil_name,
+                def_row=False,
+                data_row=nums,
+                xmirror=bool(mirror[0]),
+                ymirror=bool(mirror[1]),
+            )
+
+        # restore sort & scroll
+        t.setSortingEnabled(sort_enabled)
+        if sort_enabled:
+            t.sortItems(sort_col, sort_order)
+        t.setUpdatesEnabled(True)
+        t.verticalScrollBar().setValue(vpos)
+        
+    
+    def load_default_airfoils(self):
         for i in [x for x in os.listdir(resource_path('edfoil/airfoils'))]:
             airfoil_path = resource_path(f'edfoil/airfoils/{i}')
             airfoil = Airfoil()
             airfoil.importCoords(airfoil_path)
-            self.db.airfoils[airfoil.name] = airfoil
-            # TODO: Get rid of path airfoils
-            self.paths_airfoils[airfoil.name] = airfoil_path
+            # self.db.airfoils[airfoil.name] = airfoil
+            self.db.airfoils.add(airfoil.name, airfoil)
             
             # Debug
             # print(list(self.db.airfoils.keys()))
         
-        names = [f'{x.family} {x.profile}' for x in self.db.airfoils.values()]
-        self.airfoil_listairfoils_widget.clear()
-        self.airfoil_listairfoils_widget.addItems(names)
-    
-    # def airfoil_mousecoords(self, event: QMouseEvent) -> None:
-    #     # coords = event.position()
-    #     # x,y = coords.x(), coords.y()
-    #     # coord_lims = self.airfoil_chart.plotArea().getCoords()
-        
-    #     # if (x >= coord_lims[0] and x <= coord_lims[2] and
-    #     #     y >= coord_lims[1] and y <= coord_lims[3]):
-            
-    #     #     coords_scaled = self.airfoil_chart.mapToValue(coords)
-    #     #     x_scaled = coords_scaled.x()
-    #     #     y_scaled = coords_scaled.y()
-            
-    #     #     self.airfoil_xy_current.setText(f'({x_scaled:.2f}, {y_scaled:.2f})')
-        
-    #     chart = self.airfoil_chartview.chart()
-    #     if chart is None or not chart.series():
-    #         return
-          
-    #     series = chart.series()[0]  # or find the one you want
-    #     pos = event.position()      # QChartView coords
-
-    #     # Map to data using the series-aware overload
-    #     value_pt = chart.mapToValue(pos, series)
-
-    #     # Check that the mapped point is inside the plotArea by re-mapping back
-    #     back = chart.mapToPosition(value_pt, series)  # chart coords
-    #     if chart.plotArea().contains(back):
-    #         self.airfoil_xy_current.setText(f'({value_pt.x():.2f}, {value_pt.y():.2f})')
-    #     else:
-    #         # Optional: clear or ignore when outside
-    #         pass
+        # Select first by default
+        print(f'Number of default airfoils uploaded: {len(self.db.airfoils)}.')
+        if len(self.db.airfoils) > 0:
+            self.airfoil_listairfoils_widget.setCurrentRow(0, QItemSelectionModel.ClearAndSelect)
+            print(f'Current index selected in Airfoil Creator: {self.airfoil_listairfoils_widget.currentItem().text()}')
+            self.update_naca_chart()
+        # names = [f'{x.family} {x.profile}' for x in self.db.airfoils.values()]
+        # self.airfoil_listairfoils_widget.clear()
+        # self.airfoil_listairfoils_widget.addItems(names)
             
     def station_mousecoords(self, event: QMouseEvent) -> None:
         coords = event.position()
@@ -1073,21 +1563,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(1)
         self.page_title_label.setText(self.airfoil_page_button.text())
         
+        # :TODO Update airfoil list
+        
+        
     def switch_to_stationPage(self):
         self.stackedWidget.setCurrentIndex(2)
         self.page_title_label.setText(self.station_page_button.text())
         
         # Update airfoil list in station page
-        names_airfoils = list(self.db.airfoils.keys())
-        self.station_listairfoils_box.clear()
-        self.station_listairfoils_box.addItems(names_airfoils)
-        
-        # Update dropwn menu in advanced tab
-        n_rows = self.station_tableStations_input.rowCount()
-        for row in range(n_rows):
-            list_airfoils = QComboBox()
-            list_airfoils.addItems(list(self.db.airfoils.keys()))
-            self.station_tableStations_input.setCellWidget(row,0,list_airfoils)
+        # names_airfoils = list(self.db.airfoils.keys())
+        # self.station_listairfoils_box.clear()
+        # self.station_listairfoils_box.addItems(names_airfoils)
+        self.update_airfoil_chart()
+        # Update dropdown menu in advanced tab
+        # n_rows = self.station_tableStations_input.rowCount()
+        # for row in range(n_rows):
+        #     list_airfoils = QComboBox()
+        #     list_airfoils.addItems(list(self.db.airfoils.keys()))
+        #     self.station_tableStations_input.setCellWidget(row,0,list_airfoils)
         
     def switch_to_bladePage(self):
         self.stackedWidget.setCurrentIndex(3)
@@ -1102,26 +1595,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.page_title_label.setText(self.spar_page_button.text())
     
     def switch_to_exportPage(self):
-        self.stackedWidget.setCurrentIndex(6)
+        self.stackedWidget.setCurrentIndex(5)
         self.page_title_label.setText(self.export_page_button.text())
     
     def upload_airfoil_file(self):
         # TODO: Update this to not clash with Airfoil Creator Tab
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFiles)
-        dialog.setNameFilter(self.tr('Files (*.csv *.txt)'))
+        dialog.setNameFilter(self.tr('Files (*.csv *.txt *.dat)'))
         dialog.setViewMode(QFileDialog.Detail)
         fileNames = []
         if dialog.exec():
             fileNames = dialog.selectedFiles()
         
-        # Add new files to the QComboBox
-        airfoil_names = [x.split('/')[-1][:-4] for x in fileNames]
-        n_items_current = self.station_listairfoils_box.count()
-        self.station_listairfoils_box.insertItems(n_items_current, airfoil_names)
+        airfoil_files = [x.split('/')[-1][:-4] for x in fileNames]
+        # airfoil_names = {}
+        for i, file in enumerate(fileNames):
+            try:
+                temp = Airfoil()
+                print(f'Importing: {file}')
+                temp.importCoords(path = file)
+                self.db.airfoils.add(temp.name, temp)
+                # airfoil_names[temp.name] = temp.name
+                
+            except:
+                self.handle_msgbar(f'File ({i} of {len(airfoil_files)}): {file} could not be imported.')
         
-        for i in range(len(fileNames)):
-            self.paths_airfoils[airfoil_names[i]] = fileNames[i]
+        self.handle_msgbar(f'Number of files imported: {i}.')
+        
+        # Add new files to the QComboBox
+        # n_items_current = self.station_listairfoils_box.count()
+        # self.station_listairfoils_box.insertItems(n_items_current, list(airfoil_names.keys()))
+        
     
     def onTextChanged(self):
         # Restart the timer whenever the text changes
@@ -1194,16 +1699,137 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
 
 # Main database in every session.       
-class session():
-    def __init__(self):
-        self.airfoils = {}
-        self.stations = {}
+class session(QObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.airfoils = AirfoilDB(self)
+        self.stations = StationDB(self)
         self.sections = {}
         self.skin = {}
         self.blade = {}
     
-    def cleanStations(self):
-        self.stations = {}
+    # def cleanStations(self):
+    #     self.stations.clear()
+
+# QObject for emitting signals
+class AirfoilDB(QObject):
+    airfoilsChanged = Signal(object)    # whole dict changed
+    airfoilAdded    = Signal(str)          # key
+    airfoilRemoved  = Signal(str)        # key
+    airfoilUpdated  = Signal(str)        # key
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._airfoils: dict[str,object] = {}  # {name: Airfoil}
+    
+    def all(self):
+        return dict(self._airfoils)
+
+    def keys(self):
+        return list(self._airfoils.keys())
+
+    def add(self, name:str, airfoil: object):
+        self._airfoils[name] = airfoil
+        self.airfoilAdded.emit(name)
+        self.airfoilsChanged.emit(self._airfoils.copy())
+
+    def remove(self, name:str):
+        if name in self._airfoils:
+            del self._airfoils[name]
+            self.airfoilRemoved.emit(name)
+            self.airfoilsChanged.emit(self._airfoils.copy())
+
+    def update(self, name:str, airfoil:object):
+        self._airfoils[name] = airfoil
+        self.airfoilUpdated.emit(name)
+        self.airfoilsChanged.emit(self._airfoils.copy())
+        
+    def values(self):
+        return self._airfoils.values()
+
+    def items(self):
+        return self._airfoils.items()
+
+    def get(self, key, default=None):
+        return self._airfoils.get(key, default)
+
+    def __contains__(self, key):
+        return key in self._airfoils
+
+    def __len__(self):
+        return len(self._airfoils)
+
+    def __iter__(self):
+        return iter(self._airfoils)
+
+    def __getitem__(self, key):
+        return self._airfoils[key]
+
+class StationDB(QObject):
+    stationsChanged = Signal(object)     # whole dict changed
+    stationAdded    = Signal(str)        # key
+    stationRemoved  = Signal(str)        # key
+    stationUpdated  = Signal(str)        # key
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._stations: dict[str,object] = {}  # {name: Station}
+    
+    def all(self):
+        return dict(self._stations)
+
+    def keys(self):
+        return list(self._stations.keys())
+
+    def add(self, name:str, station: object):
+        self._stations[name] = station
+        self.stationAdded.emit(name)
+        self.stationsChanged.emit(self._stations.copy())
+
+    def remove(self, name:str):
+        if name in self._stations:
+            del self._stations[name]
+            self.stationRemoved.emit(name)
+            self.stationsChanged.emit(self._stations.copy())
+
+    def update(self, name:str, station:object):
+        self._stations[name] = station
+        self.stationUpdated.emit(name)
+        self.stationsChanged.emit(self._stations.copy())
+        
+    def values(self):
+        return self._stations.values()
+
+    def items(self):
+        return self._stations.items()
+
+    def get(self, key, default=None):
+        return self._stations.get(key, default)
+    
+    def clear(self, emit_individual: bool = False):
+        if not self._stations:
+            return
+        
+        names = list(self._stations.keys())
+        self._stations.clear()
+
+        if emit_individual:
+            for name in names:
+                self.stationRemoved.emit(name)
+
+        self.stationsChanged.emit({})
+
+    def __contains__(self, key):
+        return key in self._stations
+
+    def __len__(self):
+        return len(self._stations)
+
+    def __iter__(self):
+        return iter(self._stations)
+
+    def __getitem__(self, key):
+        return self._stations[key]
 
 # For turning string inputs to floats inside QTableWidget instances
 class NumericItem(QTableWidgetItem):
@@ -1212,3 +1838,46 @@ class NumericItem(QTableWidgetItem):
             return float(self.text()) < float(other.text())
         except ValueError:
             return super().__lt__(other)
+
+# For only allowing floats in certain QTableWidgets
+class FloatDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+        editor = QLineEdit(parent)
+        validator = QDoubleValidator(-1e9, 1e9, 3, editor)  # min, max, decimals
+        validator.setNotation(QDoubleValidator.StandardNotation)
+        editor.setValidator(validator)
+        return editor
+
+# General table reader
+def _coerce_float(text: str) -> float:
+    # tolerate commas and whitespace
+    return float(text.replace(',', '').strip())
+
+def read_table_as_tuples(table: QTableWidget, *, skip_blank_rows: bool = True) -> tuple[tuple[float, ...], ...]:
+    rows_out = []
+    n_rows, n_cols = table.rowCount(), table.columnCount()
+
+    for r in range(n_rows):
+        vals_str = []
+        all_blank = True
+        for c in range(n_cols):
+            it = table.item(r, c)
+            s = it.text() if it is not None else ""
+            s = s.strip()
+            if s != "":
+                all_blank = False
+            vals_str.append(s)
+
+        if skip_blank_rows and all_blank:
+            continue
+
+        try:
+            vals = tuple(_coerce_float(s) for s in vals_str)
+        except ValueError:
+            # You can surface a friendly message, highlight the bad cell, etc.
+            # For now, skip rows that aren't fully numeric.
+            continue
+
+        rows_out.append(vals)
+
+    return tuple(rows_out)

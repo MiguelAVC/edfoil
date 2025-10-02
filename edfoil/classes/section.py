@@ -75,7 +75,7 @@ class Section:
         genFig:bool = True,
         saveFig:bool = False,
         tolerance:int = 6, # Tolerance for decimal places ACIS in LE
-        ini_u0:int = 21, # Initial guess for splineIntersection starting from LE
+        ini_u0:int = 21, # Initial guess for splineIntersection starting from TE
     ) -> None:
         
         # Parameters
@@ -664,7 +664,6 @@ class Section:
         
         # Error handling for circular airfoil
         if self.parameters['isCircle']:
-            
             return print(f'Method is not implemented for circular airfoils.')
         
         # Variables
@@ -682,23 +681,55 @@ class Section:
         curve_0 = Polygon(lspl_xy)
         c_offset = {}
         
+        # BUG SOLUTION (when the starting vertex is not the TE when using
+        # the buffer method)
+        # TE coordinate as reference
+        p_te = curve_0.exterior.coords[0]
+        # print(f'Reference TE: {p_te}')
+        # fig,ax = plt.subplots(figsize=(10,6))
+        
         for i in range(n_plies+1):
             
             thk = round(self.parameters['ply_thickness']*(i+n_plies) + bond_thickness, 2)
             c_buffer = curve_0.buffer(-thk)
+            rp = p_te if i == 0 else xy[0,:]
             c_simplified = c_buffer.simplify(tolerance = 0.01)
-            c_offset[i] = splineConstructor(np.array(c_simplified.exterior.coords))
+            coords = list(c_simplified.exterior.coords)
+            # Check if first vertex is TE
+            distances = [np.linalg.norm(np.array(c) - np.array(list(rp))) for c in coords]
+            min_index = np.argmin(distances)
+    
+            # Only reorder if the closest point is not already the first coordinate
+            if min_index != 0:
+                xy = np.array(coords[min_index:] + coords[1:min_index+1])
+            else:
+                # If the first coordinate is already the closest, return the original coordinates
+                xy = np.array(coords)
+            
+            c_offset[i] = splineConstructor(xy)
+            # c_offset[i] = splineConstructor(np.array(c_simplified.exterior.coords))
+            # ax.plot(xy[:,0], xy[:,1], label=i, marker='x')
+            # print(f'c[{i}] segments: {c_offset[i]['u']}')
+            # print(f'Geom type: {c_buffer.geom_type}')
+            # print(f'is CCW: {LinearRing(c_simplified.exterior.coords).is_ccw}')
+            # print(f'First coord: [{c_offset[i]['x'](0):.2f},{c_offset[i]['y'](0):.2f}]')
+            # print(f'Last  coord: [{c_offset[i]['x'](c_offset[i]['u']//2):.2f},{c_offset[i]['y'](c_offset[i]['u']//2):.2f}]')
+            # u4 = c_offset[i]['u'] // 4
+            # print(f'u = {u4}: [{c_offset[i]['x'](u4):.2f},{c_offset[i]['y'](u4):.2f}]')
+        # ax.set_aspect('equal')
+        # ax.legend()
+        # fig.show()
         
         # Overlap end guide
         p_olp_sta = self.guides['overlap_start']['p']
         
         u0 = splineIntersection(spline = c_offset[0], 
             line = self.guides['chord'], u0 = u0_ini)
-        # print(f't: {u0:.2f}, xy = [{c_offset[0]['x'](u0):.2f},{c_offset[0]['y'](u0):.2f}]')
+        print(f't: {u0:.2f}, xy = [{c_offset[0]['x'](u0):.2f},{c_offset[0]['y'](u0):.2f}]')
         
         t_target = skinOverlapLocator(d_target = overlap_dist, p0 = p_olp_sta,
             twist_ang = self.parameters['twist_angle'], spline = c_offset[0], u0 = u0)
-        # print(f't_olp: {t_target:.2f}, xy = [{c_offset[0]['x'](t_target):.2f},{c_offset[0]['y'](t_target):.2f}]')
+        print(f't_olp: {t_target:.2f}, xy = [{c_offset[0]['x'](t_target):.2f},{c_offset[0]['y'](t_target):.2f}]')
         
         # Intersection coordinates
         p0 = np.array([c_offset[0]['x'](t_target,0),
@@ -713,6 +744,7 @@ class Section:
         # Finding t-parameter (per ply)
         t_target = {}
         
+        print(f'Chord Line LE intersection:')
         for i in range(1, n_plies+1):
             
             t_target[i] = {}
@@ -723,12 +755,14 @@ class Section:
             # First curve of ply
             u0 = splineIntersection(spline = c_offset[i-1],
                 line = self.guides['chord'], u0 = u0_ini)
+            print(f'\n[Ply {i}] u0: {u0:.2f} - xy: [{c_offset[i-1]['x'](u0,0):.2f},{c_offset[i-1]['y'](u0,0):.2f}]')
             
             t_target[i][i-1] = {}
             t_target[i][i-1][0] = splineIntersection(spline = c_offset[i-1], 
                 line = line_start, u0 = u0)
             t_target[i][i-1][1] = splineIntersection(spline = c_offset[i-1],
                 line = line_end, u0 = t_target[i][i-1][0])
+            print(f't_target [c0]: [sta] = {t_target[i][i-1][0]:.2f}, [end] = {t_target[i][i-1][1]:.2f}')
             
             # Second curve of ply
             u0 = splineIntersection(spline = c_offset[i],
@@ -749,7 +783,8 @@ class Section:
             
             for j in list(t_target[i].keys()):
                 
-                if t_target[i][j][0] % int(t_target[i][j][0]) == 0:
+                # if t_target[i][j][0] % int(t_target[i][j][0]) == 0:
+                if t_target[i][j][0].is_integer():
                     
                     t_bot_3[i][j] = []
                     
@@ -1262,7 +1297,7 @@ class Section:
 
 if __name__ == '__main__':
     
-    switch = 3
+    switch = 5
     
     # Debug (#3)
     if switch == 1:
@@ -1363,3 +1398,90 @@ if __name__ == '__main__':
         
         sec.jiggle(overlap_dist = 72.422, bond_thickness = 1)
         sec.teSpar(te_distance=140, thickness=1, flange_distance=50, n_tePlies=2)
+        
+    # Bug for jiggle when it doesnt find t_target
+    elif switch == 4:
+        # Last station
+        data = ['NACA63416',739,4.8,-260,20,6250,1,1,1,False,True]
+        data_sec = [8,1,100,8,1,True,False,6]
+        
+        from edfoil.classes.airfoil import Airfoil
+        path = 'edfoil/airfoils/NACA63416.txt'
+        airfoil = Airfoil(name='example')
+        airfoil.importCoords(path=path)
+        
+        sta = Station(
+            airfoil=airfoil,
+            chord = data[1],
+            twist_angle = data[2],
+            x_offset = data[3],
+            y_offset = data[4],
+            z_offset = data[5],
+            x_multiplier = data[6],
+            y_multiplier = data[7],
+            z_multiplier = data[8],
+            x_mirror = data[9],
+            y_mirror = data[10],
+            # path=os.path.join(os.getcwd(),'edfoil','airfoils',f'{data[0]}.txt'),
+        )
+        
+        sec = Section(
+            station = sta,
+            n_plies = data_sec[0],
+            ply_thickness = data_sec[1],
+            overlap_target = data_sec[2],
+            te_thickness = data_sec[3],
+            bond_thickness = data_sec[4],
+            genFig = data_sec[5],
+            saveFig = data_sec[6],
+            tolerance = data_sec[7],
+        )
+        
+        # sec.figs['section'].show()
+        sec.jiggle(overlap_dist = 200, bond_thickness = 1)
+        sec.teSpar(te_distance=140, thickness=1, flange_distance=50, n_tePlies=2)
+        
+    # Bug in jiggle method line 792.
+    # t_bot_3[i][j] += np.arange(np.ceil(t_target[i][j][0]),np.ceil(t_target[i][j][1]))
+    # TypeError: must be real number, not NoneType
+    elif switch == 5:
+        
+        # station n.3
+        data = ['NACA63430',1334,24.3,-474.26,255,1500,1,1.55,1,False,True]
+        
+        from edfoil.classes.airfoil import Airfoil
+        path = 'edfoil/airfoils/NACA63430.txt'
+        airfoil = Airfoil(name='example')
+        airfoil.importCoords(path=path)
+        
+        sta = Station(
+            airfoil=airfoil,
+            chord = data[1],
+            twist_angle = data[2],
+            x_offset = data[3],
+            y_offset = data[4],
+            z_offset = data[5],
+            x_multiplier = data[6],
+            y_multiplier = data[7],
+            z_multiplier = data[8],
+            x_mirror = data[9],
+            y_mirror = data[10],
+            # path=os.path.join(os.getcwd(),'edfoil','airfoils',f'{data[0]}.txt'),
+        )
+        
+        data_sec = [8,1,44.02,8,1,True,False,6]
+        sec = Section(
+            station = sta,
+            n_plies = data_sec[0],
+            ply_thickness = data_sec[1],
+            overlap_target = data_sec[2],
+            te_thickness = data_sec[3],
+            bond_thickness = data_sec[4],
+            genFig = data_sec[5],
+            saveFig = data_sec[6],
+            tolerance = data_sec[7],
+        )
+        
+        # sec.figs['section'].show()
+        sec.jiggle(overlap_dist = 86.71, bond_thickness = 1)
+        

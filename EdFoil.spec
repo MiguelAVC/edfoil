@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('edfoil','edfoil'),('resources','resources')],
+    datas=[('edfoil','edfoil'),('resources','resources'),('plugins','plugins')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

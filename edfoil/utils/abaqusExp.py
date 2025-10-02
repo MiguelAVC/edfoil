@@ -9,19 +9,19 @@ def skinBot(section:Section) -> dict:
 
     bot = {}
 
-    for i in section.t['t_plies_bot'].keys():
+    for i in section.t['bot_plies'].keys():
         
-        idx_curves = list(section.t['t_plies_bot'][i].keys())
+        idx_curves = list(section.t['bot_plies'][i].keys())
         
         # curve 1
-        t1 = section.t['t_plies_bot'][i][idx_curves[0]]
+        t1 = section.t['bot_plies'][i][idx_curves[0]]
         x1 = section.splines[idx_curves[0]]['x'](t1).tolist()
         y1 = section.splines[idx_curves[0]]['y'](t1).tolist()
         
         xy1 = [[x,y] for x,y in zip(x1,y1)]
         
         # curve 2
-        t2 = section.t['t_plies_bot'][i][idx_curves[1]]
+        t2 = section.t['bot_plies'][i][idx_curves[1]]
         x2 = section.splines[idx_curves[1]]['x'](t2).tolist()
         y2 = section.splines[idx_curves[1]]['y'](t2).tolist()
         
@@ -37,19 +37,19 @@ def skinTop(section:Section) -> dict:
 
     top = {}
 
-    for i in section.t['t_plies_top'].keys():
+    for i in section.t['top_plies'].keys():
         
-        idx_curves = list(section.t['t_plies_top'][i].keys())
+        idx_curves = list(section.t['top_plies'][i].keys())
         
         # curve 1
-        t1 = section.t['t_plies_top'][i][idx_curves[0]]
+        t1 = section.t['top_plies'][i][idx_curves[0]]
         x1 = section.splines[idx_curves[0]]['x'](t1).tolist()
         y1 = section.splines[idx_curves[0]]['y'](t1).tolist()
         
         xy1 = [[x,y] for x,y in zip(x1,y1)]
         
         # curve 2
-        t2 = section.t['t_plies_top'][i][idx_curves[1]]
+        t2 = section.t['top_plies'][i][idx_curves[1]]
         x2 = section.splines[idx_curves[1]]['x'](t2).tolist()
         y2 = section.splines[idx_curves[1]]['y'](t2).tolist()
         
