@@ -8,7 +8,8 @@ from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
 from PySide6.QtGui import (QPainter, QFont, QPen, QBrush, QColor, Qt, 
                            QMouseEvent, QStandardItemModel, QStandardItem,
                            QIntValidator, QDoubleValidator)
-from PySide6.QtCore import QTimer, Qt, QPointF, QSizeF
+from PySide6.QtCore import (QTimer, Qt, QPointF, QSizeF, QObject, Signal,
+                            QItemSelectionModel)
 
 
 from edfoil.classes.airfoil import Airfoil
@@ -50,6 +51,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.edits = {}
         self.handle_msgbar(message='New database created.')
         
+        # Signals
+        self.db.airfoils.airfoilsChanged.connect(self._sync_airfoil_widgets)
+        self.db.stations.stationsChanged.connect(self._sync_station_widgets)
+        
         # Tab switching
         self.home_page_button.clicked.connect(self.switch_to_homePage)
         self.airfoil_page_button.clicked.connect(self.switch_to_airfoilPage)
@@ -77,9 +82,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # ---------------------------------------------------------------------
         # Page 1 (Airfoil Creator)
         
-        # List of airfoils
-        self.load_default_airfoils()
-        
         # Main chart
         # self.airfoil_chart = self.graph_template()
         # self.airfoil_chartview.setChart(self.airfoil_chart)
@@ -97,6 +99,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.verticalLayout_9.addWidget(self.toolbar)
         self.verticalLayout_9.addWidget(self.canvas)
         
+        # List of airfoils
+        self.load_default_airfoils()
+        
         # Signals
         self.airfoil_nacaseries_input.currentTextChanged.connect(self.update_parameters)
         self.airfoil_calculateairfoil_button.clicked.connect(self.calculate_airfoil)
@@ -113,7 +118,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_station.timeout.connect(self.update_airfoil_chart)
         
         # Airfoil list
-        self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
+        # self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
+        self._sync_airfoil_widgets()
         
         # Upload additional airfoils
         self.station_uploadairfoil_button.clicked.connect(self.upload_airfoil_file)
@@ -147,10 +153,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_mirrory_input.checkStateChanged.connect(self.onTextChanged)
         
         self.station_savestation_button.clicked.connect(self.save_station)
+        self.station_delstation_button.clicked.connect(self.del_station)
+        
+        self.station_liststation_box.currentTextChanged.connect(self.update_station_params)
         
         # Advanced tab
         # ------------
-        self.stations_insert_row(def_row=True)
+        self.stations_insert_row(None, def_row=True)
         self.station_tableStations_input.setColumnWidth(0, 130)
         self.station_tableStations_input.setColumnWidth(1, 100)
         self.station_tableStations_input.setSortingEnabled(True)
@@ -328,15 +337,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.handle_msgbar('No airfoil to save.')
             return
         
-        self.db.airfoils[airfoil.name] = airfoil
+        # self.db.airfoils[airfoil.name] = airfoil
+        self.db.airfoils.add(name=airfoil.name, airfoil=airfoil)
         del self.edits['__airfoil__']
         
         # Update airfoil list (remove asterisk)
-        items = [self.airfoil_listairfoils_widget.item(i).text() 
-            for i in range(self.airfoil_listairfoils_widget.count())]
-        index = items.index(f'{airfoil.family} {airfoil.profile}*')
-        new_text = f'{airfoil.family} {airfoil.profile}'
-        self.airfoil_listairfoils_widget.item(index).setText(new_text)
+        # items = [self.airfoil_listairfoils_widget.item(i).text() 
+        #     for i in range(self.airfoil_listairfoils_widget.count())]
+        # index = items.index(f'{airfoil.family} {airfoil.profile}*')
+        # new_text = f'{airfoil.family} {airfoil.profile}'
+        # self.airfoil_listairfoils_widget.item(index).setText(new_text)
         
         # Print message
         self.handle_msgbar(f'Airfoil {airfoil.name} saved.')
@@ -447,6 +457,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.handle_msgbar('Airfoil not found in database.')
     
     ### STATION METHODS (Page 2a)
+    def update_station_params(self):
+        name_station = self.station_liststation_box.currentText()
+        station = self.db.stations.get(name_station)
+        
+        self.station_listairfoils_box.setCurrentText(station.airfoil)
+        
+        self.station_chordlength_input.setText(f'{station.parameters['chord']}')
+        self.station_twistangle_input.setText(f'{np.degrees(station.parameters['twist_angle']):.2f}')
+        
+        offset = station.parameters['offset']
+        self.station_offsetx_input.setText(f'{offset[0]}')
+        self.station_offsety_input.setText(f'{offset[1]}')
+        self.station_offsetz_input.setText(f'{offset[2]}')
+        
+        multip = station.parameters['multiplier']
+        self.station_multx_input.setText(f'{multip[0]}')
+        self.station_multy_input.setText(f'{multip[1]}')
+        self.station_multz_input.setText(f'{multip[2]}')
+        
+        mirror = station.parameters['mirror']
+        self.station_mirrorx_input.setChecked(mirror[0])
+        self.station_mirrory_input.setChecked(mirror[1])
+        
     
     def update_airfoil_chart(self):
         
@@ -562,20 +595,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def save_station(self):
         station = self.edits['__station__']
         station_name  = 'sta_' + str(int(station.parameters['offset'][2]))
-        self.db.stations[station_name] = station
+        # self.db.stations[station_name] = station
+        self.db.stations.add(station_name, station)
         self.handle_msgbar(f'Station {station_name} saved.')
-        n_stations = len(self.db.stations.keys())
-        sorted_stations = sorted(list(self.db.stations.keys()), key=len)
+        # n_stations = len(self.db.stations.keys())
+        # sorted_stations = sorted(list(self.db.stations.keys()), key=len)
         # self.handle_msgbar(f'Number of stations: {n_stations}')
-        self.station_liststation_box.clear()
-        self.station_liststation_box.insertItems(0,sorted_stations)
+        # self.station_liststation_box.clear()
+        # self.station_liststation_box.insertItems(0,sorted_stations)
         self.station_liststation_box.setCurrentText(station_name)
         # print(self.station_liststation_box.currentIndex())
+        
+    def del_station(self):
+        station_name = self.station_liststation_box.currentText()
+        
+        if not station_name:
+            return self.handle_msgbar('No station to delete.')
+        
+        self.db.stations.remove(station_name)
+        self.update_station_params()
+        # self.update_airfoil_chart()
+        
+        print(f'Station "{station_name}" deleted.')
+        return self.handle_msgbar(f'Station "{station_name}" deleted.')
     
     ### ADVANCED TAB METHODS (Page 2b)
     
     def stations_insert_row(
         self,
+        row: int | None = None,
         airfoil: str | None = None,
         def_row: bool = False,
         data_row: list | None = None,
@@ -584,32 +632,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ):
         
         t = self.station_tableStations_input
+        
         if def_row:
-            n_rows = 0
+            insert_at = 0
         else:
-            n_rows = t.rowCount()
-            t.insertRow(n_rows)
+            if row is None:
+                insert_at = t.rowCount()
+            else:
+                insert_at = min(max(0, row), t.rowCount())
+        
+        t.insertRow(insert_at)
         
         # Column 0: Airfoil
         c0 = QComboBox()
-        c0.addItems(list(self.db.airfoils.keys()))
-        if airfoil in list(self.db.airfoils.keys()):
+        c0.addItems(self.db.airfoils.keys())
+        if airfoil in self.db.airfoils.keys():
             c0.setCurrentText(airfoil)
         else: c0.setCurrentIndex(0)
-        t.setCellWidget(n_rows, 0, c0)
+        t.setCellWidget(insert_at, 0, c0)
         
         # Column 1-8: Numeric items
         num_default = data_row if data_row else [1., 0., 0., 0., 0., 1., 1., 1.]
-        for c, val in enumerate(num_default, start=1):
-            t.setItem(n_rows, c, NumericItem(f"{val:.6g}"))
+        
+        for col, val in enumerate(num_default, start=1):
+            t.setItem(insert_at, col, NumericItem(f"{val:.6g}"))
             
         # Column 9-10: Checkboxes
-        x_mir = QCheckBox()
-        x_mir.setChecked(xmirror)
-        y_mir = QCheckBox()
-        y_mir.setChecked(ymirror)
-        t.setCellWidget(n_rows, 9, x_mir)
-        t.setCellWidget(n_rows, 10, y_mir)
+        x_mir = QCheckBox(); x_mir.setChecked(bool(xmirror))
+        y_mir = QCheckBox(); y_mir.setChecked(bool(ymirror))
+        t.setCellWidget(insert_at, 9, x_mir)
+        t.setCellWidget(insert_at, 10, y_mir)
     
     def sort_advanced_stations_table(self):
         self.station_tableStations_input.sortItems(5)
@@ -636,44 +688,51 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         t.setSortingEnabled(False)
         t.clearContents()
         t.setRowCount(0)
-        t.setSortingEnabled(True)
-        self.db.cleanStations()
+        self.db.stations.clear()
         
         # Populate station table
         rows, _ = df.shape
         for r in range(rows):
             self.stations_insert_row(
-                airfoil=df.iloc[r]['airfoil'],
-                def_row=False,
-                data_row=df.iloc[r].tolist()[1:-2],
-                xmirror=df.iloc[r]['mirror_x'],
-                ymirror=df.iloc[r]['mirror_y'],
+                row = None,
+                airfoil = df.at[r, 'airfoil'],
+                def_row = False,
+                data_row = df.iloc[r].tolist()[1:-2],
+                xmirror = df.iloc[r]['mirror_x'],
+                ymirror = df.iloc[r]['mirror_y'],
             )
         
-        self.station_nStationsAdv_input.setValue(rows)
-        self.handle_msgbar(f'File imported succesfully: {filepath}')
+        t.setSortingEnabled(True)
+        self.station_nStationsAdv_input.setValue(len(df))
+        self.handle_msgbar(f'File imported succesfully: {filepath}.')
     
     def update_stations_table(self, value):
         n_rows = self.station_tableStations_input.rowCount()
         
         if value > n_rows:
-            self.stations_insert_row()
+            self.stations_insert_row(row=value)
             
         elif value < n_rows:
             self.station_tableStations_input.removeRow(value)
         
     def save_multiple_stations(self):
-        n_rows = self.station_tableStations_input.rowCount()
-        n_cols = self.station_tableStations_input.columnCount()
+        t = self.station_tableStations_input
+        
+        if not hasattr(self, "_suspend_station_sync"):
+            self._suspend_station_sync = False
+        self._suspend_station_sync = True
+        
+        n_rows = t.rowCount()
+        n_cols = t.columnCount()
         sta_data = {}
         for row in range(n_rows):
             for col in range(n_cols):
                 if col < 1:
-                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).currentText()
+                    sta_data[col] = t.cellWidget(row, col).currentText()
                 elif col > 0 and col < 9:
-                    sta_data[col] = self.station_tableStations_input.item(row, col).text()
+                    sta_data[col] = t.item(row, col).text()
                 else:
-                    sta_data[col] = self.station_tableStations_input.cellWidget(row, col).isChecked()
+                    sta_data[col] = t.cellWidget(row, col).isChecked()
             
             station = Station(
                 airfoil=self.db.airfoils[sta_data[0]],
@@ -692,9 +751,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             station_name = f'sta_{int(sta_data[5])}'
             
-            self.db.stations[station_name] = station
+            # self.db.stations[station_name] = station
+            self.db.stations.add(station_name, station)
             
         self.handle_msgbar(f'Total stations created: {n_rows}.')
+        
+        self._suspend_station_sync = False
+        self._sync_station_widgets()
     
     ### PARAMETERS METHODS (Page 3)
     
@@ -893,7 +956,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.blade_skinolplen_selected.addItems([str(x+1) for x in range(order)])
         
     def table_interpolation_vals(self):
-        n_stations = len(list(self.db.stations.keys()))
+        n_stations = len(self.db.stations)
         z = [sta.parameters['offset'][2] for sta in self.db.stations.values()]
         
         # Interpolation order selected
@@ -973,7 +1036,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def update_stabox(self):
         if self.stackedWidget.currentIndex() == 4:
-            names_stations = list(self.db.stations.keys())
+            names_stations = self.db.stations.keys()
             self.skin_liststations.clear()
             self.skin_liststations.addItems(names_stations)
         
@@ -1270,19 +1333,107 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     ### GENERAL UI METHODS
     
+    def _sync_airfoil_widgets(self):
+        names = self.db.airfoils.keys()
+        
+        display_names = [f'{a.family} {a.profile}' for a in self.db.airfoils.values()]
+        self.airfoil_listairfoils_widget.blockSignals(True)
+        self.airfoil_listairfoils_widget.clear()
+        self.airfoil_listairfoils_widget.addItems(display_names)
+        self.airfoil_listairfoils_widget.blockSignals(False)
+        
+        self.station_listairfoils_box.blockSignals(True)
+        self.station_listairfoils_box.clear()
+        self.station_listairfoils_box.addItems(names)
+        self.station_listairfoils_box.blockSignals(False)
+    
+    def _sync_station_widgets(self, stations:dict | None = None):
+        if getattr(self, "_suspend_station_sync", False):
+            return
+    
+        if stations is None:
+            stations = self.db.stations.all()
+        
+        names = self.db.stations.keys()
+        self.station_liststation_box.blockSignals(True)
+        self.station_liststation_box.clear()
+        self.station_liststation_box.addItems(names)
+        self.station_liststation_box.blockSignals(False)
+        self.update_station_params()
+        
+        # ---- Rebuild the Advanced table from the snapshot ----
+        t = self.station_tableStations_input
+
+        # preserve sort & scroll
+        sort_enabled = t.isSortingEnabled()
+        if sort_enabled:
+            hdr = t.horizontalHeader()
+            sort_col = hdr.sortIndicatorSection()
+            sort_order = hdr.sortIndicatorOrder()
+        vpos = t.verticalScrollBar().value()
+
+        t.setUpdatesEnabled(False)
+        t.setSortingEnabled(False)
+        t.clearContents()
+        t.setRowCount(0)
+
+        for name, sta in stations.items():
+            # airfoil name
+            airfoil_name = getattr(sta, "airfoil", None)
+            
+            p = sta.parameters
+            offset = p.get("offset", (0.0, 0.0, 0.0))
+            multp  = p.get("multiplier", (1.0, 1.0, 1.0))
+            mirror = p.get("mirror", (False, True))
+            # numeric columns (8 numbers: cols 1–8)
+            nums = [
+                float(p.get("chord", 1.0)),
+                np.degrees(p.get("twist_angle", 0.0)),
+                float(offset[0]),
+                float(offset[1]),
+                float(offset[2]),  # col 5
+                float(multp[0]),
+                float(multp[1]),
+                float(multp[2]),
+            ]
+
+            self.stations_insert_row(
+                row=None,
+                airfoil=airfoil_name,
+                def_row=False,
+                data_row=nums,
+                xmirror=bool(mirror[0]),
+                ymirror=bool(mirror[1]),
+            )
+
+        # restore sort & scroll
+        t.setSortingEnabled(sort_enabled)
+        if sort_enabled:
+            t.sortItems(sort_col, sort_order)
+        t.setUpdatesEnabled(True)
+        t.verticalScrollBar().setValue(vpos)
+        
+    
     def load_default_airfoils(self):
         for i in [x for x in os.listdir(resource_path('edfoil/airfoils'))]:
             airfoil_path = resource_path(f'edfoil/airfoils/{i}')
             airfoil = Airfoil()
             airfoil.importCoords(airfoil_path)
-            self.db.airfoils[airfoil.name] = airfoil
+            # self.db.airfoils[airfoil.name] = airfoil
+            self.db.airfoils.add(airfoil.name, airfoil)
             
             # Debug
             # print(list(self.db.airfoils.keys()))
         
-        names = [f'{x.family} {x.profile}' for x in self.db.airfoils.values()]
-        self.airfoil_listairfoils_widget.clear()
-        self.airfoil_listairfoils_widget.addItems(names)
+        # Select first by default
+        print(f'Number of default airfoils uploaded: {len(self.db.airfoils)}.')
+        if len(self.db.airfoils) > 0:
+            self.airfoil_listairfoils_widget.setCurrentRow(0, QItemSelectionModel.ClearAndSelect)
+            print(f'Current index selected in Airfoil Creator: {self.airfoil_listairfoils_widget.currentItem().text()}')
+            self.update_naca_chart()
+        # names = [f'{x.family} {x.profile}' for x in self.db.airfoils.values()]
+        # self.airfoil_listairfoils_widget.clear()
+        # self.airfoil_listairfoils_widget.addItems(names)
             
     def station_mousecoords(self, event: QMouseEvent) -> None:
         coords = event.position()
@@ -1420,16 +1571,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.page_title_label.setText(self.station_page_button.text())
         
         # Update airfoil list in station page
-        names_airfoils = list(self.db.airfoils.keys())
-        self.station_listairfoils_box.clear()
-        self.station_listairfoils_box.addItems(names_airfoils)
-        
+        # names_airfoils = list(self.db.airfoils.keys())
+        # self.station_listairfoils_box.clear()
+        # self.station_listairfoils_box.addItems(names_airfoils)
+        self.update_airfoil_chart()
         # Update dropdown menu in advanced tab
-        n_rows = self.station_tableStations_input.rowCount()
-        for row in range(n_rows):
-            list_airfoils = QComboBox()
-            list_airfoils.addItems(list(self.db.airfoils.keys()))
-            self.station_tableStations_input.setCellWidget(row,0,list_airfoils)
+        # n_rows = self.station_tableStations_input.rowCount()
+        # for row in range(n_rows):
+        #     list_airfoils = QComboBox()
+        #     list_airfoils.addItems(list(self.db.airfoils.keys()))
+        #     self.station_tableStations_input.setCellWidget(row,0,list_airfoils)
         
     def switch_to_bladePage(self):
         self.stackedWidget.setCurrentIndex(3)
@@ -1458,14 +1609,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             fileNames = dialog.selectedFiles()
         
         airfoil_files = [x.split('/')[-1][:-4] for x in fileNames]
-        airfoil_names = {}
+        # airfoil_names = {}
         for i, file in enumerate(fileNames):
             try:
                 temp = Airfoil()
                 print(f'Importing: {file}')
                 temp.importCoords(path = file)
-                self.db.airfoils[temp.name] = temp
-                airfoil_names[temp.name] = temp.name
+                self.db.airfoils.add(temp.name, temp)
+                # airfoil_names[temp.name] = temp.name
                 
             except:
                 self.handle_msgbar(f'File ({i} of {len(airfoil_files)}): {file} could not be imported.')
@@ -1473,8 +1624,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.handle_msgbar(f'Number of files imported: {i}.')
         
         # Add new files to the QComboBox
-        n_items_current = self.station_listairfoils_box.count()
-        self.station_listairfoils_box.insertItems(n_items_current, list(airfoil_names.keys()))
+        # n_items_current = self.station_listairfoils_box.count()
+        # self.station_listairfoils_box.insertItems(n_items_current, list(airfoil_names.keys()))
         
     
     def onTextChanged(self):
@@ -1548,16 +1699,137 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
 
 # Main database in every session.       
-class session():
-    def __init__(self):
-        self.airfoils = {}
-        self.stations = {}
+class session(QObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.airfoils = AirfoilDB(self)
+        self.stations = StationDB(self)
         self.sections = {}
         self.skin = {}
         self.blade = {}
     
-    def cleanStations(self):
-        self.stations = {}
+    # def cleanStations(self):
+    #     self.stations.clear()
+
+# QObject for emitting signals
+class AirfoilDB(QObject):
+    airfoilsChanged = Signal(object)    # whole dict changed
+    airfoilAdded    = Signal(str)          # key
+    airfoilRemoved  = Signal(str)        # key
+    airfoilUpdated  = Signal(str)        # key
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._airfoils: dict[str,object] = {}  # {name: Airfoil}
+    
+    def all(self):
+        return dict(self._airfoils)
+
+    def keys(self):
+        return list(self._airfoils.keys())
+
+    def add(self, name:str, airfoil: object):
+        self._airfoils[name] = airfoil
+        self.airfoilAdded.emit(name)
+        self.airfoilsChanged.emit(self._airfoils.copy())
+
+    def remove(self, name:str):
+        if name in self._airfoils:
+            del self._airfoils[name]
+            self.airfoilRemoved.emit(name)
+            self.airfoilsChanged.emit(self._airfoils.copy())
+
+    def update(self, name:str, airfoil:object):
+        self._airfoils[name] = airfoil
+        self.airfoilUpdated.emit(name)
+        self.airfoilsChanged.emit(self._airfoils.copy())
+        
+    def values(self):
+        return self._airfoils.values()
+
+    def items(self):
+        return self._airfoils.items()
+
+    def get(self, key, default=None):
+        return self._airfoils.get(key, default)
+
+    def __contains__(self, key):
+        return key in self._airfoils
+
+    def __len__(self):
+        return len(self._airfoils)
+
+    def __iter__(self):
+        return iter(self._airfoils)
+
+    def __getitem__(self, key):
+        return self._airfoils[key]
+
+class StationDB(QObject):
+    stationsChanged = Signal(object)     # whole dict changed
+    stationAdded    = Signal(str)        # key
+    stationRemoved  = Signal(str)        # key
+    stationUpdated  = Signal(str)        # key
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._stations: dict[str,object] = {}  # {name: Station}
+    
+    def all(self):
+        return dict(self._stations)
+
+    def keys(self):
+        return list(self._stations.keys())
+
+    def add(self, name:str, station: object):
+        self._stations[name] = station
+        self.stationAdded.emit(name)
+        self.stationsChanged.emit(self._stations.copy())
+
+    def remove(self, name:str):
+        if name in self._stations:
+            del self._stations[name]
+            self.stationRemoved.emit(name)
+            self.stationsChanged.emit(self._stations.copy())
+
+    def update(self, name:str, station:object):
+        self._stations[name] = station
+        self.stationUpdated.emit(name)
+        self.stationsChanged.emit(self._stations.copy())
+        
+    def values(self):
+        return self._stations.values()
+
+    def items(self):
+        return self._stations.items()
+
+    def get(self, key, default=None):
+        return self._stations.get(key, default)
+    
+    def clear(self, emit_individual: bool = False):
+        if not self._stations:
+            return
+        
+        names = list(self._stations.keys())
+        self._stations.clear()
+
+        if emit_individual:
+            for name in names:
+                self.stationRemoved.emit(name)
+
+        self.stationsChanged.emit({})
+
+    def __contains__(self, key):
+        return key in self._stations
+
+    def __len__(self):
+        return len(self._stations)
+
+    def __iter__(self):
+        return iter(self._stations)
+
+    def __getitem__(self, key):
+        return self._stations[key]
 
 # For turning string inputs to floats inside QTableWidget instances
 class NumericItem(QTableWidgetItem):

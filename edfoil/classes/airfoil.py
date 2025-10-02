@@ -112,13 +112,13 @@ class Airfoil:
             side_2 = coords[le_index:]
             
             if np.mean(side_1[:,1]) >= np.mean(side_2[:,1]):
-                self.upper = side_1.tolist()[::-1]
-                self.lower = side_2.tolist()[::-1]
+                self.upper = side_1[side_1[:, 0].argsort()].tolist()
+                self.lower = side_2[side_2[:, 0].argsort()].tolist()
             else:
-                self.upper = side_2.tolist()
-                self.lower = side_1.tolist()
+                self.upper = side_2[side_2[:, 0].argsort()].tolist()
+                self.lower = side_1[side_1[:, 0].argsort()].tolist()
                 
-            self.xy = self.lower + self.upper[1:]
+            self.xy = self.lower[::-1] + self.upper[1:]
             # self.xy = coords.tolist()
             self.n_points = len(coords)
         

@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [0.2.3] - 2025-10-02
 ### Added
 - Added an introduction in the Home page for new users.
 - Added input validators to avoid wrong inputs.
@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Added full implementation of the jiggle method from the section class.
 - Added a guide image to understand the Section class parameters.
 - Examples (A and B) and a user guide.
+- Stations can be deleted and modified in the "Interactive" tab.
 
 ### Fixed
 - Fixed correct implementation of blade parameters for different interpolation orders.
@@ -21,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Fixed the list sections to export to select multiple sections.
 - Fixed an issue when clicking the "Export Stations" button did not trigger the signal.
 - Wrong signal when the toggle for the skin overlap length was sent.
+- Stations table in the "Advanced" tab was not updating when a stations was modified or deleted.
 
 ### Changed
 - Changed chart in the Airfoil Creator tab from QSS to matplotlib.

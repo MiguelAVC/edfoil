@@ -1371,6 +1371,7 @@ QListWidget {
 /* Item text padding so it isn’t glued to the border */
 QListWidget::item,
 QListWidget::item:selected,
+QListWidget::item:selected:!active,
 QListWidget::item:hover {
 	padding-top:0.1em;
 	padding-bottom:0.1em;
@@ -1392,26 +1393,6 @@ QListWidget::item:hover {
                 <property name="spacing">
                  <number>0</number>
                 </property>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>New Item</string>
-                 </property>
-                </item>
                </widget>
               </item>
              </layout>
@@ -2131,7 +2112,7 @@ QComboBox QAbstractItemView {
                      <item row="0" column="0">
                       <widget class="QLabel" name="label">
                        <property name="text">
-                        <string>Airfoil Plot</string>
+                        <string>Station Plot</string>
                        </property>
                       </widget>
                      </item>
@@ -2181,6 +2162,13 @@ QComboBox QAbstractItemView {
                   <property name="bottomMargin">
                    <number>0</number>
                   </property>
+                  <item row="2" column="3">
+                   <widget class="QPushButton" name="station_saveTable_button">
+                    <property name="text">
+                     <string>Save Stations</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="3">
                    <widget class="QSpinBox" name="station_nStationsAdv_input">
                     <property name="mouseTracking">
@@ -2194,23 +2182,13 @@ QComboBox QAbstractItemView {
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="3">
-                   <widget class="QPushButton" name="station_saveTable_button">
-                    <property name="text">
-                     <string>Save Stations</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QPushButton" name="station_impTable_button">
+                  <item row="2" column="2">
+                   <widget class="QPushButton" name="station_sortTable_button">
                     <property name="toolTip">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;IMPORTANT: This deletes all previously saved stations.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                    <property name="whatsThis">
-                     <string/>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Sorts the stations based on the Z axis.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="text">
-                     <string>Import from file...</string>
+                     <string>Sort Stations</string>
                     </property>
                    </widget>
                   </item>
@@ -2249,7 +2227,7 @@ QComboBox QAbstractItemView {
                      <bool>true</bool>
                     </property>
                     <property name="rowCount">
-                     <number>1</number>
+                     <number>0</number>
                     </property>
                     <attribute name="horizontalHeaderCascadingSectionResizes">
                      <bool>false</bool>
@@ -2269,7 +2247,6 @@ QComboBox QAbstractItemView {
                     <attribute name="verticalHeaderStretchLastSection">
                      <bool>false</bool>
                     </attribute>
-                    <row/>
                     <column>
                      <property name="text">
                       <string>Airfoil</string>
@@ -2391,51 +2368,6 @@ QComboBox QAbstractItemView {
                       </font>
                      </property>
                     </column>
-                    <item row="0" column="0">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="3">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="4">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="5">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="6">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="7">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="8">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="9">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
-                    <item row="0" column="10">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </item>
                    </widget>
                   </item>
                   <item row="0" column="5">
@@ -2451,7 +2383,20 @@ QComboBox QAbstractItemView {
                     </property>
                    </spacer>
                   </item>
-                  <item row="0" column="1">
+                  <item row="2" column="1">
+                   <widget class="QPushButton" name="station_impTable_button">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;IMPORTANT: This deletes all previously saved stations.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="whatsThis">
+                     <string/>
+                    </property>
+                    <property name="text">
+                     <string>Import from file...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1" colspan="2">
                    <widget class="QLabel" name="label_44">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -2464,16 +2409,6 @@ QComboBox QAbstractItemView {
                     </property>
                     <property name="buddy">
                      <cstring>station_nStationsAdv_input</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QPushButton" name="station_sortTable_button">
-                    <property name="toolTip">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Sorts the stations based on the Z axis.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                    <property name="text">
-                     <string>Sort Stations</string>
                     </property>
                    </widget>
                   </item>

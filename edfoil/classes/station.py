@@ -85,10 +85,10 @@ class Station:
             if y_mirror:
                 up_temp[:,1] *= -1
                 lo_temp[:,1] *= -1
-                upper_mirr = lo_temp[::-1]
-                lower_mirr = up_temp[::-1]
+                upper_mirr = lo_temp
+                lower_mirr = up_temp
         
-        coordinates : np.ndarray = np.vstack((lower_mirr,upper_mirr[1:]))
+        coordinates : np.ndarray = np.vstack((lower_mirr[::-1],upper_mirr[1:]))
         
         # Generating station
         x_mirr : np.ndarray = coordinates[:,0]

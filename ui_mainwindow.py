@@ -736,10 +736,6 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addItem(self.horizontalSpacer_3, 6, 2, 1, 1)
 
         self.airfoil_listairfoils_widget = QListWidget(self.airfoil_page)
-        QListWidgetItem(self.airfoil_listairfoils_widget)
-        QListWidgetItem(self.airfoil_listairfoils_widget)
-        QListWidgetItem(self.airfoil_listairfoils_widget)
-        QListWidgetItem(self.airfoil_listairfoils_widget)
         self.airfoil_listairfoils_widget.setObjectName(u"airfoil_listairfoils_widget")
         self.airfoil_listairfoils_widget.setStyleSheet(u"/* Widget frame */\n"
 "QListWidget {\n"
@@ -754,6 +750,7 @@ class Ui_MainWindow(object):
 "/* Item text padding so it isn\u2019t glued to the border */\n"
 "QListWidget::item,\n"
 "QListWidget::item:selected,\n"
+"QListWidget::item:selected:!active,\n"
 "QListWidget::item:hover {\n"
 "	padding-top:0.1em;\n"
 "	padding-bottom:0.1em;\n"
@@ -1193,6 +1190,11 @@ class Ui_MainWindow(object):
         self.gridLayout_17 = QGridLayout(self.station_tab2)
         self.gridLayout_17.setObjectName(u"gridLayout_17")
         self.gridLayout_17.setContentsMargins(0, 0, 0, 0)
+        self.station_saveTable_button = QPushButton(self.station_tab2)
+        self.station_saveTable_button.setObjectName(u"station_saveTable_button")
+
+        self.gridLayout_17.addWidget(self.station_saveTable_button, 2, 3, 1, 1)
+
         self.station_nStationsAdv_input = QSpinBox(self.station_tab2)
         self.station_nStationsAdv_input.setObjectName(u"station_nStationsAdv_input")
         self.station_nStationsAdv_input.setMouseTracking(False)
@@ -1201,15 +1203,10 @@ class Ui_MainWindow(object):
 
         self.gridLayout_17.addWidget(self.station_nStationsAdv_input, 0, 3, 1, 1)
 
-        self.station_saveTable_button = QPushButton(self.station_tab2)
-        self.station_saveTable_button.setObjectName(u"station_saveTable_button")
+        self.station_sortTable_button = QPushButton(self.station_tab2)
+        self.station_sortTable_button.setObjectName(u"station_sortTable_button")
 
-        self.gridLayout_17.addWidget(self.station_saveTable_button, 2, 3, 1, 1)
-
-        self.station_impTable_button = QPushButton(self.station_tab2)
-        self.station_impTable_button.setObjectName(u"station_impTable_button")
-
-        self.gridLayout_17.addWidget(self.station_impTable_button, 2, 1, 1, 1)
+        self.gridLayout_17.addWidget(self.station_sortTable_button, 2, 2, 1, 1)
 
         self.station_tableStations_input = QTableWidget(self.station_tab2)
         if (self.station_tableStations_input.columnCount() < 11):
@@ -1250,26 +1247,6 @@ class Ui_MainWindow(object):
         __qtablewidgetitem10 = QTableWidgetItem()
         __qtablewidgetitem10.setFont(font2);
         self.station_tableStations_input.setHorizontalHeaderItem(10, __qtablewidgetitem10)
-        if (self.station_tableStations_input.rowCount() < 1):
-            self.station_tableStations_input.setRowCount(1)
-        __qtablewidgetitem11 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 0, __qtablewidgetitem11)
-        __qtablewidgetitem12 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 3, __qtablewidgetitem12)
-        __qtablewidgetitem13 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 4, __qtablewidgetitem13)
-        __qtablewidgetitem14 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 5, __qtablewidgetitem14)
-        __qtablewidgetitem15 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 6, __qtablewidgetitem15)
-        __qtablewidgetitem16 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 7, __qtablewidgetitem16)
-        __qtablewidgetitem17 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 8, __qtablewidgetitem17)
-        __qtablewidgetitem18 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 9, __qtablewidgetitem18)
-        __qtablewidgetitem19 = QTableWidgetItem()
-        self.station_tableStations_input.setItem(0, 10, __qtablewidgetitem19)
         self.station_tableStations_input.setObjectName(u"station_tableStations_input")
         font3 = QFont()
         font3.setBold(False)
@@ -1285,7 +1262,7 @@ class Ui_MainWindow(object):
         self.station_tableStations_input.setGridStyle(Qt.PenStyle.SolidLine)
         self.station_tableStations_input.setSortingEnabled(True)
         self.station_tableStations_input.setWordWrap(True)
-        self.station_tableStations_input.setRowCount(1)
+        self.station_tableStations_input.setRowCount(0)
         self.station_tableStations_input.horizontalHeader().setCascadingSectionResizes(False)
         self.station_tableStations_input.horizontalHeader().setMinimumSectionSize(40)
         self.station_tableStations_input.horizontalHeader().setDefaultSectionSize(90)
@@ -1299,17 +1276,17 @@ class Ui_MainWindow(object):
 
         self.gridLayout_17.addItem(self.horizontalSpacer_12, 0, 5, 1, 1)
 
+        self.station_impTable_button = QPushButton(self.station_tab2)
+        self.station_impTable_button.setObjectName(u"station_impTable_button")
+
+        self.gridLayout_17.addWidget(self.station_impTable_button, 2, 1, 1, 1)
+
         self.label_44 = QLabel(self.station_tab2)
         self.label_44.setObjectName(u"label_44")
         sizePolicy.setHeightForWidth(self.label_44.sizePolicy().hasHeightForWidth())
         self.label_44.setSizePolicy(sizePolicy)
 
-        self.gridLayout_17.addWidget(self.label_44, 0, 1, 1, 1)
-
-        self.station_sortTable_button = QPushButton(self.station_tab2)
-        self.station_sortTable_button.setObjectName(u"station_sortTable_button")
-
-        self.gridLayout_17.addWidget(self.station_sortTable_button, 2, 2, 1, 1)
+        self.gridLayout_17.addWidget(self.label_44, 0, 1, 1, 2)
 
         self.station_tab_widget.addTab(self.station_tab2, "")
 
@@ -1423,12 +1400,12 @@ class Ui_MainWindow(object):
         self.blade_skinolpsta_table = QTableWidget(self.widget_2)
         if (self.blade_skinolpsta_table.columnCount() < 2):
             self.blade_skinolpsta_table.setColumnCount(2)
-        __qtablewidgetitem20 = QTableWidgetItem()
-        __qtablewidgetitem20.setFont(font4);
-        self.blade_skinolpsta_table.setHorizontalHeaderItem(0, __qtablewidgetitem20)
-        __qtablewidgetitem21 = QTableWidgetItem()
-        __qtablewidgetitem21.setFont(font4);
-        self.blade_skinolpsta_table.setHorizontalHeaderItem(1, __qtablewidgetitem21)
+        __qtablewidgetitem11 = QTableWidgetItem()
+        __qtablewidgetitem11.setFont(font4);
+        self.blade_skinolpsta_table.setHorizontalHeaderItem(0, __qtablewidgetitem11)
+        __qtablewidgetitem12 = QTableWidgetItem()
+        __qtablewidgetitem12.setFont(font4);
+        self.blade_skinolpsta_table.setHorizontalHeaderItem(1, __qtablewidgetitem12)
         if (self.blade_skinolpsta_table.rowCount() < 2):
             self.blade_skinolpsta_table.setRowCount(2)
         self.blade_skinolpsta_table.setObjectName(u"blade_skinolpsta_table")
@@ -1523,12 +1500,12 @@ class Ui_MainWindow(object):
         self.blade_skinolplen_table = QTableWidget(self.widget_6)
         if (self.blade_skinolplen_table.columnCount() < 2):
             self.blade_skinolplen_table.setColumnCount(2)
-        __qtablewidgetitem22 = QTableWidgetItem()
-        __qtablewidgetitem22.setFont(font4);
-        self.blade_skinolplen_table.setHorizontalHeaderItem(0, __qtablewidgetitem22)
-        __qtablewidgetitem23 = QTableWidgetItem()
-        __qtablewidgetitem23.setFont(font4);
-        self.blade_skinolplen_table.setHorizontalHeaderItem(1, __qtablewidgetitem23)
+        __qtablewidgetitem13 = QTableWidgetItem()
+        __qtablewidgetitem13.setFont(font4);
+        self.blade_skinolplen_table.setHorizontalHeaderItem(0, __qtablewidgetitem13)
+        __qtablewidgetitem14 = QTableWidgetItem()
+        __qtablewidgetitem14.setFont(font4);
+        self.blade_skinolplen_table.setHorizontalHeaderItem(1, __qtablewidgetitem14)
         if (self.blade_skinolplen_table.rowCount() < 2):
             self.blade_skinolplen_table.setRowCount(2)
         self.blade_skinolplen_table.setObjectName(u"blade_skinolplen_table")
@@ -2299,19 +2276,6 @@ class Ui_MainWindow(object):
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"2nd digit (pos max camber)", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Last two digits (thickness):", None))
         self.airfoil_delAirfoil_button.setText(QCoreApplication.translate("MainWindow", u"Delete airfoil", None))
-
-        __sortingEnabled = self.airfoil_listairfoils_widget.isSortingEnabled()
-        self.airfoil_listairfoils_widget.setSortingEnabled(False)
-        ___qlistwidgetitem = self.airfoil_listairfoils_widget.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem1 = self.airfoil_listairfoils_widget.item(1)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem2 = self.airfoil_listairfoils_widget.item(2)
-        ___qlistwidgetitem2.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem3 = self.airfoil_listairfoils_widget.item(3)
-        ___qlistwidgetitem3.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        self.airfoil_listairfoils_widget.setSortingEnabled(__sortingEnabled)
-
 #if QT_CONFIG(tooltip)
         self.station_tab_widget.setToolTip("")
 #endif // QT_CONFIG(tooltip)
@@ -2344,16 +2308,13 @@ class Ui_MainWindow(object):
         self.station_delstation_button.setText(QCoreApplication.translate("MainWindow", u"Delete Station", None))
         self.label_35.setText(QCoreApplication.translate("MainWindow", u"Current station:", None))
         self.station_xy_current.setText("")
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Airfoil Plot", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"Station Plot", None))
         self.station_tab_widget.setTabText(self.station_tab_widget.indexOf(self.station_tab1), QCoreApplication.translate("MainWindow", u"Interactive", None))
         self.station_saveTable_button.setText(QCoreApplication.translate("MainWindow", u"Save Stations", None))
 #if QT_CONFIG(tooltip)
-        self.station_impTable_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">IMPORTANT: This deletes all previously saved stations.</span></p></body></html>", None))
+        self.station_sortTable_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">Sorts the stations based on the Z axis.</span></p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-#if QT_CONFIG(whatsthis)
-        self.station_impTable_button.setWhatsThis("")
-#endif // QT_CONFIG(whatsthis)
-        self.station_impTable_button.setText(QCoreApplication.translate("MainWindow", u"Import from file...", None))
+        self.station_sortTable_button.setText(QCoreApplication.translate("MainWindow", u"Sort Stations", None))
         ___qtablewidgetitem = self.station_tableStations_input.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Airfoil", None));
         ___qtablewidgetitem1 = self.station_tableStations_input.horizontalHeaderItem(1)
@@ -2376,16 +2337,14 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem9.setText(QCoreApplication.translate("MainWindow", u"x-mirror", None));
         ___qtablewidgetitem10 = self.station_tableStations_input.horizontalHeaderItem(10)
         ___qtablewidgetitem10.setText(QCoreApplication.translate("MainWindow", u"y-mirror", None));
-
-        __sortingEnabled1 = self.station_tableStations_input.isSortingEnabled()
-        self.station_tableStations_input.setSortingEnabled(False)
-        self.station_tableStations_input.setSortingEnabled(__sortingEnabled1)
-
-        self.label_44.setText(QCoreApplication.translate("MainWindow", u"Number of stations:", None))
 #if QT_CONFIG(tooltip)
-        self.station_sortTable_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">Sorts the stations based on the Z axis.</span></p></body></html>", None))
+        self.station_impTable_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">IMPORTANT: This deletes all previously saved stations.</span></p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.station_sortTable_button.setText(QCoreApplication.translate("MainWindow", u"Sort Stations", None))
+#if QT_CONFIG(whatsthis)
+        self.station_impTable_button.setWhatsThis("")
+#endif // QT_CONFIG(whatsthis)
+        self.station_impTable_button.setText(QCoreApplication.translate("MainWindow", u"Import from file...", None))
+        self.label_44.setText(QCoreApplication.translate("MainWindow", u"Number of stations:", None))
         self.station_tab_widget.setTabText(self.station_tab_widget.indexOf(self.station_tab2), QCoreApplication.translate("MainWindow", u"Advanced", None))
         self.label_48.setText(QCoreApplication.translate("MainWindow", u"Interpolation - Skin Overlap (Start)", None))
         self.label_49.setText(QCoreApplication.translate("MainWindow", u"Interpolation - Skin Overlap (Length)", None))
