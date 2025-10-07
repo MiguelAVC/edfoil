@@ -3,6 +3,27 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.3.0] - 2025-10-07
+### Added
+- Settings dialog to change themes.
+- Graph showing the top view of the blade in the "Blade" tab.
+- Four different themes and a loader method.
+- Icons for future use in the "icons" folder.
+- Completely redesigned the UI.
+- More safeguards displayed in the message bar.
+
+### Fixed
+- QSS priorities changed to increase style consistency.
+- Stations table was only creating one new row even if the input was greater.
+- Interpolation dictionaries were created based on the number of stations rather than the number of interpolations.
+- Path in "themeLoader" module being undefined.
+
+### Changed
+- Charts code transitioned from python to qml. Improvement in performance.
+- Introduced bridge connections to interact with qml files.
+- Eliminated the windows style "Fusion".
+- All tables now fill the width with the contents.
+
 ## [0.2.3] - 2025-10-02
 ### Added
 - Added an introduction in the Home page for new users.

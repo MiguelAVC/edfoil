@@ -1,16 +1,15 @@
 from ui_mainwindow import Ui_MainWindow
-from PySide6.QtWidgets import (QMainWindow, QFileDialog, QMessageBox, 
-                               QCheckBox, QComboBox, QTableWidgetItem,
-                               QTableView, QApplication, QButtonGroup,
-                               QTableWidget, QStyledItemDelegate, QLineEdit)
-from PySide6.QtCharts import (QChart, QLineSeries, QChartView, QCategoryAxis,
-                              QValueAxis, QScatterSeries, QAreaSeries)
-from PySide6.QtGui import (QPainter, QFont, QPen, QBrush, QColor, Qt, 
-                           QMouseEvent, QStandardItemModel, QStandardItem,
-                           QIntValidator, QDoubleValidator)
-from PySide6.QtCore import (QTimer, Qt, QPointF, QSizeF, QObject, Signal,
+from PySide6.QtWidgets import (
+    QMainWindow, QFileDialog, QMessageBox, QLineEdit, QButtonGroup,
+    QCheckBox, QComboBox, QTableWidgetItem, QDialog, QTableWidget, QHeaderView,
+    QStyledItemDelegate)
+from PySide6.QtCharts import (QChart, QLineSeries, QValueAxis, QScatterSeries)
+from PySide6.QtGui import (QFont, QColor, Qt, QIntValidator, QDoubleValidator,
+                           QMouseEvent, QStandardItemModel, QStandardItem)
+from PySide6.QtCore import (QTimer, Qt, QUrl, Slot, QObject, Signal,
                             QItemSelectionModel)
-
+from PySide6.QtQuickWidgets import QQuickWidget
+from PySide6.QtQuick import QQuickItem
 
 from edfoil.classes.airfoil import Airfoil
 from edfoil.classes.station import Station
@@ -18,28 +17,25 @@ from edfoil.classes.section import Section
 from edfoil.utils.bladeparams import norm_olp
 from edfoil.utils.abaqusExp import *
 from edfoil.utils.dev import resource_path
+from edfoil.utils.themeLoader import Theme
+from resources.uis.ui_settingsDialog import Ui_settingsDialog
 
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
 import pandas as pd
-
 from scipy.interpolate import splev
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app) -> None:
         super().__init__()
         self.app = app
-        
-        # Set color palette
-        # color_background = palette.property('background')
-        # color_button = palette.property('color1')
-        # color_text = palette.property('text')
-        
         self.setupUi(self)
         self.setWindowTitle('EdFoil')
+        self._configure_tables()
         
         # Messagebar
         self.timer_msg = QTimer(parent=self)
@@ -50,6 +46,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.db = session() # Class db [not a dictionary]
         self.edits = {}
         self.handle_msgbar(message='New database created.')
+        
+        # Settings dialog
+        self.settings_dialog = SettingsDialog(self)
+        self.settings_button.clicked.connect(self.open_settings)
+        self.settings_dialog.themes_box.currentTextChanged.connect(self.apply_theme)
+        self.load_themes()
+        self.apply_theme()
+        
+        # Station QML Bridge
+        self.graphBridge = GraphBridge()
+        self.station_chartview.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        qml_path = resource_path('edfoil/qml/station.qml')
+        ctx = self.station_chartview.rootContext()
+        ctx.setContextProperty("graphBridge", self.graphBridge)
+        self.station_chartview.setSource(QUrl.fromLocalFile(qml_path))
+        
+        # OLP STA QML Bridge
+        self.olpstaBridge = OverlapBridge()
+        self.blade_olpsta_chartview.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        sta_ctx = self.blade_olpsta_chartview.rootContext()
+        sta_ctx.setContextProperty("olpstaBridge", self.olpstaBridge)
+        olp_sta_qml_path = resource_path('edfoil/qml/olp_sta.qml')
+        self.blade_olpsta_chartview.setSource(QUrl.fromLocalFile(olp_sta_qml_path))
+        
+        # OLP LEN QML Bridge
+        self.olplenBridge = OlpLengthBridge()
+        self.blade_olplen_chartview.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        len_ctx = self.blade_olplen_chartview.rootContext()
+        len_ctx.setContextProperty("olplenBridge", self.olplenBridge)
+        olp_len_qml_path = resource_path('edfoil/qml/olp_factors.qml')
+        self.blade_olplen_chartview.setSource(QUrl.fromLocalFile(olp_len_qml_path))
         
         # Signals
         self.db.airfoils.airfoilsChanged.connect(self._sync_airfoil_widgets)
@@ -83,8 +110,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Page 1 (Airfoil Creator)
         
         # Main chart
-        # self.airfoil_chart = self.graph_template()
-        # self.airfoil_chartview.setChart(self.airfoil_chart)
         # self.airfoil_chartview.mouseMoveEvent = self.airfoil_mousecoords
         self.airfoil_fig = Figure(figsize=(10, 3), tight_layout=True)
         self.airfoil_ax = self.airfoil_fig.add_subplot(111)
@@ -115,7 +140,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Timer for debouncing text input changes
         self.timer_station = QTimer()
         self.timer_station.setSingleShot(True)
-        self.timer_station.timeout.connect(self.update_airfoil_chart)
+        self.timer_station.timeout.connect(self.update_station_chart)
         
         # Airfoil list
         # self.station_listairfoils_box.addItems(list(self.db.airfoils.keys()))
@@ -125,9 +150,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_uploadairfoil_button.clicked.connect(self.upload_airfoil_file)
         
         # Main chart
-        self.station_chart_empty = self.graph_template()
-        self.station_chartview.setChart(self.station_chart_empty)
-        self.station_chartview.mouseMoveEvent = self.station_mousecoords
+        # self.station_chart_empty = self.graph_template()
+        # self.station_chartview.setChart(self.station_chart_empty)
+        # self.station_chartview.mouseMoveEvent = self.station_mousecoords
         
         # Validators
         self.station_chordlength_input.setValidator(QDoubleValidator(1.,1e6,3))
@@ -174,25 +199,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Page 3 (Blade Parameters)
         
         # Charts
-        self.blade_olpsta_chart = self.graph_template()
-        self.blade_olpsta_chartview.setChart(self.blade_olpsta_chart)
+        # self.blade_olpsta_chart = self.graph_template()
+        # self.blade_olpsta_chartview.setChart(self.blade_olpsta_chart)
         
-        self.blade_olplen_chart = self.graph_template()
-        self.blade_olplen_chartview.setChart(self.blade_olplen_chart)
+        # self.blade_olplen_chart = self.graph_template()
+        # self.blade_olplen_chartview.setChart(self.blade_olplen_chart)
         
         # Radio Buttons LOC
         self.skin_grp_loc = QButtonGroup(self)
         self.skin_grp_loc.addButton(self.skin_loc_radio1)
         self.skin_grp_loc.addButton(self.skin_loc_radio2)
         self.skin_grp_loc.setExclusive(True)
-        self.loc_widget.hide()
+        self.loc_frame.hide()
         
         # Radio Buttons LEN
         self.skin_grp_len = QButtonGroup(self)
         self.skin_grp_len.addButton(self.skin_len_radio1)
         self.skin_grp_len.addButton(self.skin_len_radio2)
         self.skin_grp_len.setExclusive(True)
-        self.len_widget.hide()
+        self.len_frame.hide()
         self.update_skin_ui()
         
         # Valditors
@@ -481,7 +506,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.station_mirrory_input.setChecked(mirror[1])
         
     
-    def update_airfoil_chart(self):
+    def update_station_chart(self):
         
         try:
             chord_length = float(self.station_chordlength_input.text()) if \
@@ -508,7 +533,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             # Calculate new values
             airfoil_selected:str = self.station_listairfoils_box.currentText()
-            data = Station(
+            station = Station(
                 airfoil=self.db.airfoils[airfoil_selected],
                 chord=chord_length,
                 twist_angle=twist_angle,
@@ -520,77 +545,86 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 z_multiplier=z_multiplier,
                 x_mirror=x_mirror,
                 y_mirror=y_mirror,
-                # path=self.paths_airfoils[airfoil_selected],
             )
             
-            # Clear the current series data and update with new values
-            airfoil_series = QLineSeries()
-            for i in data.xy:
-                airfoil_series.append(float(i[0]),float(i[1]))
-            
-            # Draw scatter points TE and LE
-            scatter_series = QScatterSeries()
-            if airfoil_selected == 'circle':
-                scatter_series.append(float(data.xy[0][0]), float(data.xy[0][1]))
-            idx_LE:int = int(len(data.xy)/2)
-            scatter_series.append(float(data.xy[idx_LE][0]), float(data.xy[idx_LE][1]))
-            scatter_series.setMarkerShape(QScatterSeries.MarkerShapeRectangle)
-            scatter_series.setMarkerSize(10)
-            
-            # Create new chart
-            chart = QChart()
-            chart.setAnimationOptions(QChart.SeriesAnimations)
-            chart.legend().hide()
-            chart.addSeries(airfoil_series)
-            chart.addSeries(scatter_series)
-            
-            x_axis = QValueAxis()
-            y_axis = QValueAxis()
-            aspect_ratio = QSizeF(16,9)
-            
-            xy_range = data.xyRange()
-            # print(xy_range)
-            x_min, x_max = xy_range[0]
-            y_min, y_max = xy_range[1]
-            
-            dx = x_max - x_min
-            dy = y_max - y_min
-            # print(f'dx: {dx}, dy: {dy}')
-            
-            aspect_ratio.scale(dx,dy,Qt.KeepAspectRatioByExpanding)
-            # print(f'Scaled aspect ratio: {aspect_ratio}')
-            
-            height = aspect_ratio.height()
-            width = aspect_ratio.width()
-            # print(f'height: {height}, width: {width}')
-            
-            x_mid = (x_min + x_max) / 2
-            y_mid = (y_min + y_max) / 2
-            
-            new_x_min = x_mid - width * 0.5 * 1.1
-            new_x_max = x_mid + width * 0.5 * 1.1
-            
-            new_y_min = y_mid - height * 0.5 * 1.1
-            new_y_max = y_mid + height * 0.5 * 1.1
-            
-            x_axis.setRange(new_x_min, new_x_max)
-            y_axis.setRange(new_y_min, new_y_max)
-            
-            chart.addAxis(x_axis, Qt.AlignBottom)
-            chart.addAxis(y_axis, Qt.AlignLeft)
-            airfoil_series.attachAxis(x_axis)
-            airfoil_series.attachAxis(y_axis)
-            scatter_series.attachAxis(x_axis)
-            scatter_series.attachAxis(y_axis)
-
-            self.station_chartview.setChart(chart)
+            self.push_station_to_qml(station)
             
             # Store it as an unsaved station
-            self.edits['__station__'] = data
+            self.edits['__station__'] = station
             
         except ValueError:
             self.handle_msgbar('Station: Wrong input')
     
+    def push_station_to_qml(self, station):
+        """
+        station.xy expected as list[(x,y), ...] (combined).
+        Splits automatically if you stored upper/lower separately you can adapt.
+        """
+        if not hasattr(self, "graphBridge"):
+            return
+        points = [{'x': float(x), 'y': float(y)} for x, y in station.xy]
+        self.graphBridge.updateSeriesRequested.emit(points, station.airfoil)
+        
+        # Leading Edge
+        idx = len(station.xy) // 2
+        le = station.xy[idx]
+        self.graphBridge.updateLE.emit(float(le[0]), float(le[1]))
+        
+        # Set axis ranges
+        x_min, x_max = station.xyRange()[0]
+        y_min, y_max = station.xyRange()[1]
+        padding = 0.05
+        
+        # Aspect ratio
+        dx = x_max - x_min
+        dy = y_max - y_min
+        
+        # Protect zero spans
+        if dx <= 0: dx = 1e-12
+        if dy <= 0: dy = 1e-12
+
+        # Viewport pixel ratio (width / height)
+        w = max(1, self.station_chartview.width())
+        h = max(1, self.station_chartview.height())
+        ratio = w / h  # desired dx/dy
+
+        # Current ratio
+        cur_ratio = dx / dy
+
+        cx = 0.5 * (x_min + x_max)
+        cy = 0.5 * (y_min + y_max)
+
+        if cur_ratio > ratio:
+            # Too wide → enlarge y span
+            dy_new = dx / ratio
+            y_min = cy - dy_new / 2
+            y_max = cy + dy_new / 2
+        else:
+            # Too tall → enlarge x span
+            dx_new = dy * ratio
+            x_min = cx - dx_new / 2
+            x_max = cx + dx_new / 2
+
+        # Padding
+        dx_adj = x_max - x_min
+        dy_adj = y_max - y_min
+        x_min -= dx_adj * padding
+        x_max += dx_adj * padding
+        y_min -= dy_adj * padding
+        y_max += dy_adj * padding
+        
+        # ticks
+        x_span = x_max - x_min
+        y_span = y_max - y_min
+        x_tick = _nice_step(x_span / 5.)
+        y_tick = _nice_step(y_span / 5.)
+        
+        print(f'Scale factor (station graph): x_tick = {x_tick}, y_tick = {y_tick}')
+        
+        self.graphBridge.updateAxesRequested.emit(
+            x_min, x_max, x_tick,
+            y_min, y_max, y_tick
+        )
     
     def save_station(self):
         station = self.edits['__station__']
@@ -614,7 +648,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.db.stations.remove(station_name)
         self.update_station_params()
-        # self.update_airfoil_chart()
+        # self.update_station_chart()
         
         print(f'Station "{station_name}" deleted.')
         return self.handle_msgbar(f'Station "{station_name}" deleted.')
@@ -707,13 +741,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.handle_msgbar(f'File imported succesfully: {filepath}.')
     
     def update_stations_table(self, value):
-        n_rows = self.station_tableStations_input.rowCount()
+        # n_rows = self.station_tableStations_input.rowCount()
         
-        if value > n_rows:
-            self.stations_insert_row(row=value)
+        # if value > n_rows:
+        #     self.stations_insert_row(row=value)
             
-        elif value < n_rows:
-            self.station_tableStations_input.removeRow(value)
+        # elif value < n_rows:
+        #     self.station_tableStations_input.removeRow(value)
+        
+        t = self.station_tableStations_input
+        if value < 0:
+            value = 0
+
+        current = t.rowCount()
+        if value == current:
+            return  # nothing to do
+
+        # Prevent sorting side‑effects while restructuring
+        sorting = t.isSortingEnabled()
+        if sorting:
+            t.setSortingEnabled(False)
+
+        if value > current:
+            # Add required number of rows
+            to_add = value - current
+            for _ in range(to_add):
+                self.stations_insert_row(row=None)  # append at end
+        else:
+            # Remove surplus rows from bottom
+            # (keep top rows stable)
+            for r in range(current - 1, value - 1, -1):
+                t.removeRow(r)
+
+        if sorting:
+            t.setSortingEnabled(True)
         
     def save_multiple_stations(self):
         t = self.station_tableStations_input
@@ -766,14 +827,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # LOC side
         loc_uses_table = self.skin_loc_radio1.isChecked()
         self.blade_skinolpsta_table.setVisible(loc_uses_table)
-        self.loc_widget.setVisible(not loc_uses_table)
+        self.loc_frame.setVisible(not loc_uses_table)
         self.blade_skinolpsta_selected.setVisible(loc_uses_table)
         self.label_38.setVisible(loc_uses_table)
 
         # LEN side
         len_uses_table = self.skin_len_radio1.isChecked()
         self.blade_skinolplen_table.setVisible(len_uses_table)
-        self.len_widget.setVisible(not len_uses_table)
+        self.len_frame.setVisible(not len_uses_table)
         self.blade_skinolplen_selected.setVisible(len_uses_table)
         self.label_39.setVisible(len_uses_table)
 
@@ -842,43 +903,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # save in temporary database
         self.edits['__olp_sta__'] = xy_pts
+
+        # series = []
+        # for n in range(len(xy_line)):
+        #     series.append([])
+        #     for j in range(len(xy_line[n])):
+        #         series[n].append([float(xy_line[n][j][0]), float(xy_line[n][j][1])])
+        series = [
+            [[float(x), float(y)] for x, y in line]
+            for line in xy_line
+        ]
+        self.edits['__olp_sta_line__'] = series
         
-        # Add points to series
-        line_series = [QLineSeries() for x in range(len(y_target))]
-        for i in range(len(xy_line)):
-            for j in xy_line[i]:
-                line_series[i].append(float(j[0]), float(j[1]))
-                
-        scatter_series = [QScatterSeries() for x in range(len(y_target))]
-        for i in range(len(xy_pts)):
-            for j in xy_pts[i]:
-                scatter_series[i].append(float(j[0]), float(j[1]))
-        
-        # Add series to the chart
-        self.blade_olpsta_chart.removeAllSeries()
-        
-        for i in line_series:
-            self.blade_olpsta_chart.addSeries(i)
-        
-        for i in scatter_series:
-            i.setMarkerShape(QScatterSeries.MarkerShapeRectangle)
-            i.setMarkerSize(10)
-            self.blade_olpsta_chart.addSeries(i)
-            
-        self.blade_olpsta_chart.createDefaultAxes()
-        self.blade_olpsta_chart.zoom(0.9)
-        x_axis = self.blade_olpsta_chart.axes(Qt.Horizontal)[0]
-        y_axis = self.blade_olpsta_chart.axes(Qt.Vertical)[0]
-        x_axis.setTitleText('Blade length [d]')
-        y_axis.setTitleText(y_axis_label)
-        x_axis.setTitleFont(QFont('Helvetica',10))
-        y_axis.setTitleFont(QFont('Helvetica',10))
-        
-        # # Legend
-        # series.setName(airfoil_name)
-        # self.blade_olpsta_chart.legend().setVisible(True)
-        # self.blade_olpsta_chart.legend().setAlignment(Qt.AlignBottom)
-        
+        # points = [[] for _ in range(len(y_target))]
+        # for i in range(len(xy_pts)):
+        #     for j in xy_pts[i]:
+        #         points[i].append([float(j[0]), float(j[1])])
+        points = [
+            [[float(x), float(y)] for x, y in line]
+            for line in xy_pts
+        ]
+        self.edits['__olp_sta_pts__'] = points
+
         # OLP_LEN
         data = []
         
@@ -919,41 +965,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for key in range(len(xy_pts))}
         
         ## Line
-        series = [QLineSeries() for x in range(len(y_target))]
-        for i in range(len(xy_line)):
-            for j in xy_line[i]:
-                series[i].append(float(j[0]), float(j[1]))
+        # series = [[] for _ in range(len(y_target))]
+        # for i in range(len(xy_line)):
+        #     for j in xy_line[i]:
+        #         series[i].append([float(j[0]), float(j[1])])
+        series = [
+            [[float(x), float(y)] for x, y in line]
+            for line in xy_line
+        ]
+        self.edits['__olp_len_line__'] = series
         
         ## Scatter 
-        points = [QScatterSeries() for x in range(len(y_target))]
-        for i in range(len(xy_pts)):
-            for j in xy_pts[i]:
-                points[i].append(float(j[0]), float(j[1]))
-        
-        self.blade_olplen_chart.removeAllSeries()
-        for i in series:
-            self.blade_olplen_chart.addSeries(i)
-            
-        for i in points:
-            i.setMarkerShape(QScatterSeries.MarkerShapeRectangle)
-            i.setMarkerSize(10)
-            self.blade_olplen_chart.addSeries(i)
-            
-        self.blade_olplen_chart.createDefaultAxes()
-        self.blade_olplen_chart.zoom(0.9)
-        x_axis = self.blade_olplen_chart.axes(Qt.Horizontal)[0]
-        y_axis = self.blade_olplen_chart.axes(Qt.Vertical)[0]
-        x_axis.setTitleText('Blade length [d]')
-        y_axis.setTitleText('Overlap len. from LE [c]')
-        x_axis.setTitleFont(QFont('Helvetica',10))
-        y_axis.setTitleFont(QFont('Helvetica',10))
+        # points = [[] for _ in range(len(y_target))]
+        # for i in range(len(xy_pts)):
+        #     for j in xy_pts[i]:
+        #         points[i].append([float(j[0]), float(j[1])])
+        points = [
+            [[float(x), float(y)] for x, y in line]
+            for line in xy_pts
+        ]
+        self.edits['__olp_len_pts__'] = points
         
         # Update QComboBox with order selection
         self.blade_skinolpsta_selected.clear()
         self.blade_skinolpsta_selected.addItems([str(x+1) for x in range(order)])
+        self.blade_skinolpsta_selected.setCurrentIndex(0)
         
         self.blade_skinolplen_selected.clear()
         self.blade_skinolplen_selected.addItems([str(x+1) for x in range(order)])
+        self.blade_skinolplen_selected.setCurrentIndex(0)
         
     def table_interpolation_vals(self):
         n_stations = len(self.db.stations)
@@ -970,7 +1010,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 k2 = int(self.blade_skinolplen_selected.currentText())
             except ValueError: # Because the box is not populated at the same time.
                 k2 = 1
-                print(f'k1 = {k1}, k2 = {k2}')
+                print(f'Interpolation selected: k1 = {k1}, k2 = {k2}')
         else:
             k2 = 1
         
@@ -991,7 +1031,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 columns = ['value', 'text'],
             )
         else:
-            print(y1[0])
+            # print(y1[0])
             self.db.blade['ovp_text'] = pd.DataFrame([{
                 'value': y1[0],'text': f'{y1[0]:.2f}'}])
             
@@ -1005,9 +1045,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             blade_ilp,
             columns=['z','olp_sta','olp_len'],
         )
+        
         # Show interpolation values
-
-        print(self.db.blade['ovp_text'])
+        # print(self.db.blade['ovp_text'])
         model = QStandardItemModel(n_stations,3)
         model.setHorizontalHeaderLabels(['Station', 'OLP Start', 'OLP Length'])
         
@@ -1017,6 +1057,64 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             model.setItem(i, 2, QStandardItem(f'{blade_ilp[i][2]:.2f}'))
             
         self.tableView.setModel(model)
+        self._configure_tables()
+        
+        # --- Top Graph
+        # -------------
+        
+        # Send to QML
+        # print(f'olp_sta_line: {self.edits["__olp_sta_line__"]}')
+        self.olplenBridge.updateSeries.emit(
+            self.edits['__olp_sta_line__'], k1-1,
+            self.edits['__olp_len_line__'], k2-1,
+        )
+        
+        # Joined scatter points (for both OLP_STA and OLP_LEN)
+        pts_sta = self.edits['__olp_sta_pts__'][k1-1]
+        pts_len = self.edits['__olp_len_pts__'][k2-1]
+        print(f'OLP_points selected (first value): {pts_sta[0]}')
+        self.olplenBridge.updateScatter.emit(pts_sta + pts_len)
+        
+        # --- Bot Graph
+        # -------------
+        # LE and TE lists
+        le_list = [
+            [sta.parameters['offset'][2], sta.xy[len(sta.xy)//2].tolist()[0]] 
+            for sta in self.db.stations.values()
+        ]
+        te_list = [
+            [sta.parameters['offset'][2], sta.xy[0].tolist()[0]]
+            for sta in self.db.stations.values()
+        ]
+        
+        if self.skin_loc_radio1.isChecked():
+            chord_1 = [sta.parameters['chord'] for sta in self.db.stations.values()]
+        else:
+            chord_1 = [1.0 for _ in self.db.stations.values()]
+        
+        if self.skin_len_radio1.isChecked():
+            chord_2 = [sta.parameters['chord'] for sta in self.db.stations.values()]
+        else:
+            chord_2 = [1.0 for _ in self.db.stations.values()]
+        
+        xy_pts = self.edits['__olp_sta__'][k1-1]
+        xy_sta = [
+            [float(n[0]), float((n[1] * chord_1[i]) + le_list[i][1])]
+            for i, n in enumerate(xy_pts)
+        ]
+        xy_pts = self.edits['__olp_len__'][k2-1]
+        xy_len = [
+            [row.station, (row.value * chord_2[i]) + xy_sta[i][1]]
+            for i, row in enumerate(xy_pts.itertuples(index=False))
+        ]
+        # xy_sta = [[list(t) for t in inner] for inner in xy_line]
+        # print(f'LE points: {le_list}')
+        # print(f'TE points: {te_list}')
+        print(f'OLP_STA points first value: {xy_sta[0][0]}')
+        
+        # Send to QML
+        self.olpstaBridge.updateSeries.emit(xy_sta, xy_len, le_list, te_list)
+        # self.olpstaBridge.updateScatter.emit(xy_pts)
     
     def save_bladeparams(self):
         idx_olp_sta = self.blade_skinolpsta_selected.currentIndex()
@@ -1045,6 +1143,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             df = self.db.blade['overlap']
         except KeyError:
             self.handle_msgbar('Error: Blade interpolation was not saved.')
+            return
             
         n_station = float(self.skin_liststations.currentText()[4:])
         # station = self.db.stations[self.skin_liststations.currentText()]
@@ -1072,7 +1171,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 bond_th = float(self.skin_bond_input.text()) if self.skin_bond_input.text() else 1
                 saveFig = self.skin_savefig_input.isChecked()
                 
-                df_olp = self.db.blade['ovp_text']
+                try:
+                    df_olp = self.db.blade['ovp_text']
+                except KeyError:
+                    self.handle_msgbar('Error: Blade interpolation was not saved.')
+                    return
+                
                 olp_txt = df_olp.loc[df_olp['text'] == self.skin_overlaptarget_input.text(), 'value'].item()
                 olp_tgt = float(olp_txt) if olp_txt else 10
                 print(f'olp_tgt: {olp_tgt}')
@@ -1093,7 +1197,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if self.skin_jiggle_toggle.isChecked() and not section.parameters['isCircle']:
                     
                     # Retrieve overlap distance
-                    df_len = self.db.blade['olp_len']
+                    try:
+                        df_len = self.db.blade['olp_len']
+                    except KeyError:
+                        self.handle_msgbar('Error: Blade interpolation was not saved.')
+                        return
+                    
                     z_sta = float(self.skin_liststations.currentText()[4:])
                     print(f'name_sta: {z_sta}')
                     print(df_len)
@@ -1212,7 +1321,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             gen_olp = self.skin_jiggle_toggle.isChecked()
             saveFig = self.skin_savefig_input.isChecked()
             
-            df = self.db.blade['overlap']
+            try:
+                df = self.db.blade['overlap']
+            except KeyError:
+                self.handle_msgbar('Error: Blade interpolation was not saved.')
+                return
+            
             z = station.parameters['offset'][2]
             olp_target = df.loc[df['z'] == z, 'olp_sta'].item()
             olp_tgt = olp_target if olp_target else 10
@@ -1230,7 +1344,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if gen_olp:
                 
                 # Retrieve overlap distance
-                df_len = self.db.blade['olp_len']
+                try:
+                    df_len = self.db.blade['olp_len']
+                except KeyError:
+                    self.handle_msgbar('Error: Blade interpolation was not saved.')
+                    return
+                
                 z_sta = float(self.skin_liststations.currentText()[4:])
                 olp_len = df_len.loc[df_len['station'] == z_sta]['value'].item()
                 
@@ -1413,6 +1532,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         t.setUpdatesEnabled(True)
         t.verticalScrollBar().setValue(vpos)
         
+    def _configure_tables(self):
+        hdr = self.station_tableStations_input.horizontalHeader()
+        hdr.setSectionResizeMode(0, QHeaderView.Stretch)  # Airfoil
+        
+        # Interpolation values table
+        hh = self.tableView.horizontalHeader()
+        hh.setSectionResizeMode(QHeaderView.Stretch)
+        
+        # Blade overlap table
+        hsl = self.blade_skinolpsta_table.horizontalHeader()
+        hsl.setSectionResizeMode(QHeaderView.Stretch)
+        
+        hsl2 = self.blade_skinolplen_table.horizontalHeader()
+        hsl2.setSectionResizeMode(QHeaderView.Stretch)
     
     def load_default_airfoils(self):
         for i in [x for x in os.listdir(resource_path('edfoil/airfoils'))]:
@@ -1574,7 +1707,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # names_airfoils = list(self.db.airfoils.keys())
         # self.station_listairfoils_box.clear()
         # self.station_listairfoils_box.addItems(names_airfoils)
-        self.update_airfoil_chart()
+        self.update_station_chart()
         # Update dropdown menu in advanced tab
         # n_rows = self.station_tableStations_input.rowCount()
         # for row in range(n_rows):
@@ -1680,9 +1813,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         msgBox = QMessageBox()
         about_text = 'This open source software, has been developed in ' \
         'the School of Engineering, in the University of Edinburgh.\n\n' \
-        'The current version is version 0.2'
+        'The current version is version 0.3.0.'
         
         msgBox.about(self, 'About EdFoil', about_text)
+        
+    def open_settings(self):
+        # Store current theme
+        current_theme = self.settings_dialog.themes_box.currentText()
+        
+        if self.settings_dialog.exec():
+            self.settings_dialog.apply_settings()
+            # Apply theme
+            # theme = self.settings_dialog.themes_box.currentText()
+            # theme_qss = self.themes.get(theme, "")
+            # self.stylesheet.setStyleSheet(theme_qss)
+            # self.handle_msgbar(f"Theme \"{theme}\" applied.")
+        else:
+            # Revert to previous theme if cancelled
+            self.settings_dialog.themes_box.setCurrentText(current_theme)
+            self.handle_msgbar("Settings cancelled.")
+            
+    def load_themes(self):
+        themes = [
+            file.stem for file in Path(resource_path('resources/themes')).glob('*.qss')
+            if file.stem != 'template'
+        ]
+        self.themes = {}
+        for theme in themes:
+            t = Theme(theme)
+            self.themes[theme] = t.load_qss(Path(resource_path(f'resources/themes/{theme}.qss')), sout=True)
+        
+        self.settings_dialog.themes_box.blockSignals(True)
+        self.settings_dialog.themes_box.addItems(themes)
+        self.settings_dialog.themes_box.setCurrentText('edfoil-light')
+        self.settings_dialog.themes_box.blockSignals(False)
+        
+        print(f'Themes loaded.')
+        
+    def apply_theme(self):
+        theme_name = self.settings_dialog.themes_box.currentText()
+        if theme_name in self.themes:
+            self.stylesheet.setStyleSheet(self.themes[theme_name])
+            self.handle_msgbar(f'Theme "{theme_name}" applied.')
+        else:
+            self.handle_msgbar(f'Error: Theme "{theme_name}" not found.')
     
     ### MESSAGE BAR METHODS
     
@@ -1697,7 +1871,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.def_msgbar.show()
             self.msgbar.hide()
         
-
+## CLASSES
 # Main database in every session.       
 class session(QObject):
     def __init__(self, parent=None):
@@ -1848,6 +2022,25 @@ class FloatDelegate(QStyledItemDelegate):
         editor.setValidator(validator)
         return editor
 
+# Graph bridge
+class GraphBridge(QObject):
+    updateSeriesRequested = Signal(list, str)  # (points, name)
+    clearRequested        = Signal()
+    updateAxesRequested   = Signal(float, float, float, float, float, float)
+    updateLE = Signal(float, float)
+
+# OLP STA QML bridge
+class OverlapBridge(QObject):
+    updateSeries = Signal(list, list, list, list)
+    updateScatter = Signal(list)
+    clear        = Signal()
+    
+# OLP END QML bridge
+class OlpLengthBridge(QObject):
+    updateSeries = Signal(list, int, list, int)
+    updateScatter = Signal(list)
+    clear        = Signal()
+
 # General table reader
 def _coerce_float(text: str) -> float:
     # tolerate commas and whitespace
@@ -1881,3 +2074,30 @@ def read_table_as_tuples(table: QTableWidget, *, skip_blank_rows: bool = True) -
         rows_out.append(vals)
 
     return tuple(rows_out)
+
+# Helper for tick intervals in QML
+def _nice_step(raw: float) -> float:
+    if raw <= 0:
+        return 1.0
+    exp10 = 10 ** np.floor(np.log10(raw))
+    frac  = raw / exp10
+    if frac < 1.5: base = 1
+    elif frac < 3: base = 2
+    elif frac < 7: base = 5
+    else: base = 10
+    return base * exp10
+
+# Settings Window
+class SettingsDialog(QDialog, Ui_settingsDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.setWindowTitle("Settings")
+        # Connect dialog buttons if present (example object names)
+        if hasattr(self, "buttonBox"):
+            self.buttonBox.accepted.connect(self.accept)
+            self.buttonBox.rejected.connect(self.reject)
+
+    def apply_settings(self):
+        # TODO: read widgets and store in your session / config
+        pass

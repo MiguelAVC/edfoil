@@ -1,0 +1,614 @@
+/* General Font and Color */
+QWidget{
+	color: {{TEXT}};
+	font: 10pt "Segoe UI";
+}
+
+/* Tooltips */
+QToolTip {
+	color: {{TEXT}};
+	background-color: {{BACKGROUND}};
+	border: 1px solid {{BORDER_LIGHT}};
+	background-image: none;
+	background-position: left center;
+    background-repeat: no-repeat;
+	border: none;
+	border-left: 2px solid {{ACCENT2}};
+	text-align: left;
+	padding-left: 8px;
+	margin: 0px;
+}
+
+/* Main Background */
+#bgApp {	
+	background-color: {{BACKGROUND}};
+	border: 1px solid {{BORDER_LIGHT}};
+    color: #44475a;
+}
+
+/* SIDE BAR */
+#sideBar {
+	background-color: {{PRIMARY}};
+}
+
+#topLogoInfo {
+	border:none;
+	border-bottom: 3px solid {{PRIMARY_HOVER}};
+}
+
+#topLogo {
+	background-color: {{PRIMARY}};
+	background-image: url(:/resources/images/ef-icon.png);
+	background-position: centered;
+	background-repeat: no-repeat;
+}
+
+#topName { font: 700 13pt; color: {{BACKGROUND}}; }
+#topInfo { font: 8pt "Segoe UI"; color: {{ACCENT1}}; }
+
+#sideBar .QPushButton {	
+	background-position: left center; /* when adding icon to button */
+    background-repeat: no-repeat;
+	border: none;
+	border-left: 5px solid transparent;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10 px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-right: 20px;
+    color: {{TEXT_INV}};
+	font: 700;
+}
+#sideBar .QPushButton:hover {
+	background-color: {{ACCENT1}};
+}
+#sideBar .QPushButton:checked {	
+	background-color: {{ACCENT2}};
+	color: {{TEXT_INV}};
+}
+
+#sideBar #home_page_button {
+	padding-left: 25px;
+	border-left: 15px solid transparent;
+	background-image: url(:/resources/icons/cil-home.png);
+}
+
+#sideBar #settings_button {
+	padding-left: 25px;
+	border-left: 10px solid transparent;
+	background-image: url(:/resources/icons/cil-settings.png);
+}
+
+#sideBar #info_button {
+	padding-left: 25px;
+	border-left: 10px solid transparent;
+	background-image: url(:/resources/icons/cil-menu.png);
+}
+
+#sideBar #quit_button {
+	padding-left: 25px;
+	border-left: 10px solid transparent;
+	background-image: url(:/resources/icons/cil-exit-to-app.png);
+}
+
+/* TOP BAR */
+#page_title_label {font: 700 14pt}
+
+#startbar_frame{	
+	background-color: {{PANEL_BG}};
+	border: 1px solid {{PANEL_BORDER}};
+	border-radius: 10px;
+}
+
+#startbar_frame .QPushButton {
+    background-position: left center;
+    background-repeat: no-repeat;
+}
+
+#workpath_lineedit {
+	border: 1px solid {{PANEL_BORDER}};
+	border-radius: 5px;
+}
+
+/* STATUS BAR */
+
+#statusBar{	
+	background-color: {{PANEL_BG}};
+	border: 1px solid {{PANEL_BORDER}};
+	border-radius: 10px;
+}
+
+
+QProgressBar{
+	font: 700;
+	text-align:center;
+}
+
+/* ----------------
+	QPushButton 
+-------------------*/
+#mainFrame QPushButton {
+	border: 2px solid {{PRIMARY}};
+	border-radius: 5px;	
+	background-color: {{PRIMARY}};
+    color: {{TEXT_INV}};
+	padding: 0.1em 0.5em;
+}
+
+#mainFrame QPushButton:hover {
+	background-color: {{PRIMARY_HOVER}};
+	border: 2px solid {{PRIMARY_HOVER}};
+}
+
+#mainFrame QPushButton:pressed {	
+	background-color: {{PRIMARY_PRESS}};
+	border: 2px solid {{ACCENT2}};
+}
+
+#mainFrame QPushButton:checked {	
+	border: 2px solid {{PRIMARY}};
+}
+
+/* -------------
+	ComboBox 
+---------------*/
+QComboBox{
+	background-color: {{PANEL_BG}};
+	border-radius: 5px;
+	border: 1px solid {{BORDER_MED}};
+    color: {{TEXT}};
+	padding-left: 4px;
+	padding-right: 4px;
+}
+QComboBox:hover{
+	border: 1px solid {{PRIMARY_HOVER}};
+}
+QComboBox::drop-down {
+	subcontrol-origin: padding;
+	subcontrol-position: top right;
+	width: 25px;
+	border-left-width: 1px;
+	border-left-color: {{BORDER_MED}};
+	border-left-style: solid;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+	background-image: url(:/resources/icons/cil-arrow-bottom.png);
+	background-position: center;
+	background-repeat: no-repeat;
+ }
+
+QComboBox::drop-down:hover {
+	background-color: {{ACCENT1}};
+}
+
+QComboBox::drop-down:pressed {
+	background-color: {{ACCENT2}};
+}
+
+QComboBox QAbstractItemView {
+	color: {{TEXT_INV}};	
+	background-color: {{PRIMARY_HOVER}};
+	selection-background-color: {{PRIMARY}};
+	padding: 5px 0px;
+	outline: none;
+}
+
+QComboBox QAbstractItemView::item:hover {
+	background-color: {{ACCENT1}};
+	outline: none;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background: {{PRIMARY}};
+    color: {{TEXT_INV}};
+	border-left: 5px solid {{ACCENT1}};
+}
+
+QComboBox QAbstractItemView::item:selected:!active {
+    background: {{PRIMARY}};
+    color: {{TEXT_INV}};
+	border-left: 5px solid {{ACCENT1}};
+}
+
+QComboBox QAbstractItemView::item:pressed {
+    background: {{ACCENT2}};
+    color: {{TEXT_INV}};
+}
+
+/* -------------
+	SpinBox
+------------- */
+
+QSpinBox {
+	background-color: {{PANEL_BG}};
+	border-radius: 5px;
+	border: 1px solid {{BORDER_MED}};
+    color: {{TEXT}};
+	padding-left: 1px;
+	padding-right: 20px;
+}
+
+QSpinBox::up-button {
+	border-left-width: 1px;
+	border-left-color: {{BORDER_MED}};
+	border-left-style: solid;
+	background-image: url(:/resources/icons/cil-arrow-top.png);
+	background-position: center;
+}
+
+QSpinBox::down-button {
+	border-left-width: 1px;
+	border-left-color: {{BORDER_MED}};
+	border-left-style: solid;
+	background-image: url(:/resources/icons/cil-arrow-bottom.png);
+	background-position: center;
+}
+
+QSpinBox::up-button:hover {
+	background-color: {{ACCENT1}};
+}
+
+QSpinBox::down-button:hover {
+	background-color: {{ACCENT1}};
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+QSpinBox::up-button:pressed {
+	background-color: {{ACCENT2}};
+}
+
+QSpinBox::down-button:pressed {
+	background-color: {{ACCENT2}};
+}
+
+/* -------------
+	LineEdit
+------------- */
+QLineEdit {
+	background-color: {{BACKGROUND}};
+	border-radius: 5px;
+	border: 1px solid {{BORDER_MED}};
+	padding-left: 10px;
+	selection-color: {{TEXT_INV}};
+	selection-background-color: {{SELECTION_BG}};
+    color: {{TEXT}};
+}
+QLineEdit:hover {
+	border: 2px solid {{PRIMARY_HOVER}};
+}
+QLineEdit:focus {
+	border: 2px solid {{ACCENT2}};
+}
+
+/* -------------
+	CheckBox
+------------- */
+QCheckBox::indicator {
+    border: 2px solid {{BORDER_MED}};
+	width: 15px;
+	height: 15px;
+    background: {{BACKGROUND}};
+}
+
+QCheckBox::indicator:hover {
+	background: {{PRIMARY_HOVER}};
+}
+
+QCheckBox::indicator:checked {
+    background: {{ACCENT1}};
+	background-image: url(:/resources/icons/cil-check-alt.png);
+}
+
+/* -------------
+	RadioButton
+------------- */
+QRadioButton::indicator {
+	width: 18px;
+	height: 18px;
+    border: 2px solid transparent;
+	border-radius: 10px;
+    background: {{PRIMARY}};
+}
+
+QRadioButton::indicator:hover {
+    border: 2px solid {{ACCENT2}};
+}
+
+QRadioButton::indicator:checked {
+    background-position: center;
+	background-color: {{ACCENT1}};
+	background-image: url(:/resources/icons/cil-x.png);
+}
+
+/* -------------
+	TableWidget
+------------- */
+QTableWidget {	
+	background-color: transparent;
+	padding: 10px;
+	border-radius: 5px;
+	gridline-color: {{GRID_LINE}};
+    outline: none;
+}
+QTableWidget::item{
+	border-color: {{GRID_LINE}};
+	padding-left: 5px;
+	padding-right: 5px;
+	gridline-color: {{GRID_LINE}};
+}
+QTableWidget::item:selected{
+	background-color: {{SELECTION_BG}};
+    color: {{TEXT_INV}};
+}
+QTableWidget QHeaderView::section{
+	background-color: {{PRIMARY}};
+	border: none;
+	border-style: none;
+}
+
+QTableWidget QHeaderView::section:horizontal
+{
+	background-color: {{PRIMARY}};
+	padding: 3px;
+    color: {{TEXT_INV}};
+    border-right: 1px solid {{BORDER_LIGHT}};
+}
+
+QTableWidget QHeaderView::section:horizontal:last {
+	border-right: none;
+}
+
+QTableWidget QHeaderView::section:vertical
+{
+    border: 1px solid {{PRIMARY}};
+    color: {{TEXT_INV}};
+	padding-left: 5px;
+}
+
+/* -------------
+	TableView
+------------- */
+QTableView {	
+	background-color: transparent;
+	padding: 10px;
+	border-radius: 5px;
+	gridline-color: {{GRID_LINE}};
+    outline: none;
+}
+QTableView::item {
+	border-color: {{GRID_LINE}};
+	padding-left: 5px;
+	padding-right: 5px;
+	gridline-color: {{GRID_LINE}};
+}
+QTableView::item:selected {
+	background-color: {{SELECTION_BG}};
+    color: {{TEXT_INV}};
+}
+QTableView QHeaderView::section:horizontal {
+	background-color: {{PRIMARY}};
+	color: {{TEXT_INV}};
+	border: none;
+	border-right: 1px solid {{BORDER_LIGHT}};
+}
+
+QTableView QHeaderView::section:horizontal:last {
+	border-right: none;
+}
+
+/* -------------
+	ListWidget
+------------- */
+
+QListWidget {
+	border: 2px solid {{BORDER_MED}};
+	border-radius: 5px;
+	background-color: transparent;
+	outline: none;
+	padding: 6px;
+	/* show-decoration-selected: 1; */
+}
+
+QListWidget::viewport {
+    background: {{BACKGROUND}};
+    border-radius: 5px;
+}
+
+QListWidget::item {
+	padding-bottom: 0.15em;
+	color: {{TEXT}};
+	border: none;
+}
+
+QListWidget::item:hover {
+	background-color:{{PRIMARY_HOVER}};
+	color: {{TEXT_INV}};
+}
+
+QListWidget::item:selected {
+	background-color: {{ACCENT1}};
+	color: {{TEXT_INV}};
+}
+
+QListWidget::item:selected:!active {
+    /* keep same style when window not focused */
+    background: {{ACCENT1}};
+    color: {{TEXT_INV}};
+}
+
+/* ---------------
+	QProgressBar
+------------------ */
+
+QProgressBar {
+	border: 2px solid {{PRIMARY}};
+	border-radius: 5px;
+	font: 700 10pt;
+}
+
+QProgressBar::chunk {
+	background-color: {{ACCENT1}};
+	width: 10px;
+}
+
+/* ---------------
+	QTabWidget
+------------------ */
+
+QTabWidget::pane {
+	border: 1px solid {{PRIMARY}};
+	border-radius: 10px;
+	border-top-left-radius: 0px;
+}
+
+QTabBar::tab {
+	min-width: 10ex;
+    padding: 2px 10px;
+	border: 1px solid {{PRIMARY}};
+	border-bottom: none;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+QTabBar::tab:selected {
+	background-color: {{PRIMARY}};
+	font-weight:bold;
+	color: {{BACKGROUND}};
+}
+
+/* -------------------------------
+	INDIVIDUAL PAGE DETAILING
+----------------------------------*/
+
+/* HOME PAGE */
+
+#homeLogo {
+	background-image: url(:/resources/images/edfoil.png);
+	background-position: centered;
+	background-repeat: no-repeat;
+}
+#label_6 {font: 700 16pt}
+
+#descriptionMsg {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+/* AIRFOIL PAGE */
+
+#label_14 {font: 700 12pt}
+#label_8 {font: 700 12pt}
+
+#frame_17 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+#frame_18 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+/* STATION PAGE */
+
+#label_15 {font: 700 12pt}
+#label_18 {font: 700 12pt}
+
+#frame_2 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_6 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_10 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_8 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_9 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+/* BLADE PAGE */
+
+#label_37 {font: 700 12pt}
+#label_3 {font: 700 12pt}
+
+#frame_skin_loc {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_skin_len {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_skin_graphs {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_ilp_values {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#frame_ilp_order {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+/* SECTION PAGE */
+#label_29 {font: 700 12pt}
+
+#frame_11 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+#skin_maingraph_frame {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
+
+/* EXPORT PAGE */
+#label_42 {font: 700 12pt}
+
+#frame_12 {
+	background-color: {{PANEL_BG}};
+	border-radius: 10px;
+	border: 1px solid {{PANEL_BORDER}};
+}
