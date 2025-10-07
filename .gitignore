@@ -17,7 +17,7 @@ build/
 dist/
 
 # Ignore EdFoil build artifacts
-EdFoil.spec
+# EdFoil.spec
 
 # Ignore tests
-tests/
+# tests/
