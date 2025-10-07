@@ -37,11 +37,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle('EdFoil')
         self._configure_tables()
         
+        # Messagebar
+        self.timer_msg = QTimer(parent=self)
+        self.timer_msg.setSingleShot(True)
+        self.timer_msg.timeout.connect(self.show_def_msg)
+        
+        # Project start
+        self.db = session() # Class db [not a dictionary]
+        self.edits = {}
+        self.handle_msgbar(message='New database created.')
+        
         # Settings dialog
         self.settings_dialog = SettingsDialog(self)
         self.settings_button.clicked.connect(self.open_settings)
         self.settings_dialog.themes_box.currentTextChanged.connect(self.apply_theme)
         self.load_themes()
+        self.apply_theme()
         
         # Station QML Bridge
         self.graphBridge = GraphBridge()
@@ -66,16 +77,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         len_ctx.setContextProperty("olplenBridge", self.olplenBridge)
         olp_len_qml_path = resource_path('edfoil/qml/olp_factors.qml')
         self.blade_olplen_chartview.setSource(QUrl.fromLocalFile(olp_len_qml_path))
-        
-        # Messagebar
-        self.timer_msg = QTimer(parent=self)
-        self.timer_msg.setSingleShot(True)
-        self.timer_msg.timeout.connect(self.show_def_msg)
-        
-        # Project start
-        self.db = session() # Class db [not a dictionary]
-        self.edits = {}
-        self.handle_msgbar(message='New database created.')
         
         # Signals
         self.db.airfoils.airfoilsChanged.connect(self._sync_airfoil_widgets)
@@ -618,7 +619,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         x_tick = _nice_step(x_span / 5.)
         y_tick = _nice_step(y_span / 5.)
         
-        print(f'x_tick: {x_tick}, y_tick: {y_tick}')
+        print(f'Scale factor (station graph): x_tick = {x_tick}, y_tick = {y_tick}')
         
         self.graphBridge.updateAxesRequested.emit(
             x_min, x_max, x_tick,
@@ -1009,7 +1010,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 k2 = int(self.blade_skinolplen_selected.currentText())
             except ValueError: # Because the box is not populated at the same time.
                 k2 = 1
-                print(f'k1 = {k1}, k2 = {k2}')
+                print(f'Interpolation selected: k1 = {k1}, k2 = {k2}')
         else:
             k2 = 1
         
@@ -1030,7 +1031,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 columns = ['value', 'text'],
             )
         else:
-            print(y1[0])
+            # print(y1[0])
             self.db.blade['ovp_text'] = pd.DataFrame([{
                 'value': y1[0],'text': f'{y1[0]:.2f}'}])
             
@@ -1142,6 +1143,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             df = self.db.blade['overlap']
         except KeyError:
             self.handle_msgbar('Error: Blade interpolation was not saved.')
+            return
             
         n_station = float(self.skin_liststations.currentText()[4:])
         # station = self.db.stations[self.skin_liststations.currentText()]
@@ -1169,7 +1171,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 bond_th = float(self.skin_bond_input.text()) if self.skin_bond_input.text() else 1
                 saveFig = self.skin_savefig_input.isChecked()
                 
-                df_olp = self.db.blade['ovp_text']
+                try:
+                    df_olp = self.db.blade['ovp_text']
+                except KeyError:
+                    self.handle_msgbar('Error: Blade interpolation was not saved.')
+                    return
+                
                 olp_txt = df_olp.loc[df_olp['text'] == self.skin_overlaptarget_input.text(), 'value'].item()
                 olp_tgt = float(olp_txt) if olp_txt else 10
                 print(f'olp_tgt: {olp_tgt}')
@@ -1190,7 +1197,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if self.skin_jiggle_toggle.isChecked() and not section.parameters['isCircle']:
                     
                     # Retrieve overlap distance
-                    df_len = self.db.blade['olp_len']
+                    try:
+                        df_len = self.db.blade['olp_len']
+                    except KeyError:
+                        self.handle_msgbar('Error: Blade interpolation was not saved.')
+                        return
+                    
                     z_sta = float(self.skin_liststations.currentText()[4:])
                     print(f'name_sta: {z_sta}')
                     print(df_len)
@@ -1309,7 +1321,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             gen_olp = self.skin_jiggle_toggle.isChecked()
             saveFig = self.skin_savefig_input.isChecked()
             
-            df = self.db.blade['overlap']
+            try:
+                df = self.db.blade['overlap']
+            except KeyError:
+                self.handle_msgbar('Error: Blade interpolation was not saved.')
+                return
+            
             z = station.parameters['offset'][2]
             olp_target = df.loc[df['z'] == z, 'olp_sta'].item()
             olp_tgt = olp_target if olp_target else 10
@@ -1327,7 +1344,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if gen_olp:
                 
                 # Retrieve overlap distance
-                df_len = self.db.blade['olp_len']
+                try:
+                    df_len = self.db.blade['olp_len']
+                except KeyError:
+                    self.handle_msgbar('Error: Blade interpolation was not saved.')
+                    return
+                
                 z_sta = float(self.skin_liststations.currentText()[4:])
                 olp_len = df_len.loc[df_len['station'] == z_sta]['value'].item()
                 
@@ -1796,6 +1818,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         msgBox.about(self, 'About EdFoil', about_text)
         
     def open_settings(self):
+        # Store current theme
+        current_theme = self.settings_dialog.themes_box.currentText()
+        
         if self.settings_dialog.exec():
             self.settings_dialog.apply_settings()
             # Apply theme
@@ -1804,6 +1829,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # self.stylesheet.setStyleSheet(theme_qss)
             # self.handle_msgbar(f"Theme \"{theme}\" applied.")
         else:
+            # Revert to previous theme if cancelled
+            self.settings_dialog.themes_box.setCurrentText(current_theme)
             self.handle_msgbar("Settings cancelled.")
             
     def load_themes(self):
@@ -1818,7 +1845,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.settings_dialog.themes_box.blockSignals(True)
         self.settings_dialog.themes_box.addItems(themes)
-        self.settings_dialog.themes_box.setCurrentText('default')
+        self.settings_dialog.themes_box.setCurrentText('edfoil-light')
         self.settings_dialog.themes_box.blockSignals(False)
         
         print(f'Themes loaded.')

@@ -1,0 +1,17 @@
+"PRIMARY":        "#375564",
+"PRIMARY_HOVER":  "#42687A",   /* +12% light */
+"PRIMARY_PRESS":  "#2B4350",   /* -12% dark */
+"ACCENT1":        "#5FE081",   /* main accent */
+"ACCENT2":        "#35B56A",   /* secondary accent (deeper green) */
+"BACKGROUND":     "#F4F7F8",
+"PANEL_BG":       "#FFFFFF",
+"PANEL_BORDER":   "#D7E1E5",
+"BORDER_LIGHT":   "#C5D1D6",
+"BORDER_MED":     "#375564",
+"TEXT":           "#2F3940",
+"TEXT_INV":       "#FFFFFF",
+"SELECTION_BG":   "#5FE081",
+"GRID_LINE":      "#B5C6CC",
+"SUCCESS":        "#45C766",
+"WARNING":        "#E8B24A",
+"DANGER":         "#D96060"

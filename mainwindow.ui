@@ -94,6 +94,18 @@ QToolTip {
 	color: rgb(255, 255, 255);
 }
 
+#sideBar #settings_button {
+	padding-left: 25px;
+	border-left: 8px solid transparent;
+	background-image: url(:/resources/icons/cil-settings.png);
+}
+
+#sideBar #home_page_button {
+	padding-left: 25px;
+	border-left: 15px solid transparent;
+	background-image: url(:/resources/icons/cil-home.png);
+}
+
 /* TOP BAR */
 #page_title_label {	font: 700 14pt}
 
@@ -273,14 +285,18 @@ QLineEdit:focus {
 	CheckBox
 ------------- */
 QCheckBox::indicator {
-    border: 1px solid #6272a4;
+    border: 2px solid #6272a4;
 	width: 15px;
 	height: 15px;
-    background: #6272a4;
+    background: #f8f8f2;
+}
+
+QCheckBox::indicator:hover {
+	background: #7082b6;
 }
 
 QCheckBox::indicator:checked {
-    background: 1px solid #bd93f9;
+    background: #bd93f9;
 	background-image: url(:/resources/icons/cil-check-alt.png);
 }
 
@@ -288,19 +304,19 @@ QCheckBox::indicator:checked {
 	RadioButton
 ------------- */
 QRadioButton::indicator {
-    border: 1px solid #6272a4;
-	width: 16px;
-	height: 16px;
-	border-radius:8px;
+	width:  18px;
+	height: 18px;
+	border: 2px solid transparent;
+	border-radius: 10px;
     background: #6272a4;
 }
 QRadioButton::indicator:hover {
-    border: 1px solid rgb(119, 136, 187);
+    border: 2px solid #ff79c6;
 }
 QRadioButton::indicator:checked {
-    background: 1px solid #bd93f9;
-	background-image: url(:/resources/icons/cil-x-circle.png);
-	border: 1px solid #bd93f9;	
+	background-position: center;
+    background-color: #bd93f9;
+	background-image: url(:/resources/icons/cil-x.png);
 }
 
 /* -------------
@@ -4083,6 +4099,12 @@ Parameters are the same for all.</string>
                         <width>0</width>
                         <height>0</height>
                        </size>
+                      </property>
+                      <property name="layoutDirection">
+                       <enum>Qt::LayoutDirection::LeftToRight</enum>
+                      </property>
+                      <property name="autoFillBackground">
+                       <bool>false</bool>
                       </property>
                       <property name="styleSheet">
                        <string notr="true"/>

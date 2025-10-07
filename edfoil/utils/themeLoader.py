@@ -8,7 +8,7 @@ class Theme():
         self.template = self.load_template()
 
     def load_template(self) -> str:
-        tpl_path = Path('resources/themes/template.qss')
+        tpl_path = Path(resource_path('resources/themes/template.qss'))
         return tpl_path.read_text(encoding="utf-8")
 
     def load_qss(self, path:str=None, sout:bool=False) -> str:
