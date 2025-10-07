@@ -1,6 +1,6 @@
 airfoil,chord,twist_angle,offset_x,offset_y,offset_z,multiplier_x,multiplier_y,multiplier_z,mirror_x,mirror_y
-circle,311.05,28.5,0,0,1200,1,1,1,False,True
-circle,311.05,27,0,0,1300,1,1,1,False,True
+circle,622.10,28.5,0,0,1200,1,1,1,False,True
+circle,622.10,27,0,0,1300,1,1,1,False,True
 NACA63430,1334,24.3,-474.26,255,1500,1,1.55,1,False,True
 NACA63430,1632,23,-576.98,280,1600,1,1.25,1,False,True
 NACA63430,1760.9,20.9,-616.39,270,1800,1,1.1,1,False,True
