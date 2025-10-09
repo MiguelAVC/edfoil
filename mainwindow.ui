@@ -597,8 +597,7 @@ QTabBar::tab:selected {
 	background-color: #fff;
 	border-radius: 5px;
 	border: 1px solid #e1e1e1;
-}
-</string>
+}</string>
    </property>
    <layout class="QGridLayout" name="appMargins">
     <property name="leftMargin">
@@ -1439,7 +1438,7 @@ QTabBar::tab:selected {
                           </sizepolicy>
                          </property>
                          <property name="text">
-                          <string>Version 0.3.0</string>
+                          <string>Version 0.3.1</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -2553,6 +2552,9 @@ QTabBar::tab:selected {
                             <widget class="QLabel" name="station_xy_current">
                              <property name="text">
                               <string/>
+                             </property>
+                             <property name="alignment">
+                              <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                              </property>
                             </widget>
                            </item>
@@ -4479,6 +4481,16 @@ Parameters are the same for all.</string>
                </property>
                <property name="text">
                 <string>Ready.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="warning_light">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
                </property>
               </widget>
              </item>

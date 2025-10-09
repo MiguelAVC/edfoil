@@ -6,6 +6,8 @@ Item {
     width: 800
     height: 600
 
+    signal mouseMoved(real xValue, real yValue)
+    signal mouseExited()
     // Bridge comes from Python (context property "graphBridge")
     // points passed as: [{x: <float>, y: <float>}, ...]
     function updateLine(points, name) {
@@ -130,6 +132,38 @@ Item {
             ctx.beginPath()
             ctx.rect(x,y,w,h)
             ctx.stroke()
+        }
+    }
+    MouseArea {
+        id: mouseLayer
+        anchors.fill: graph
+        hoverEnabled: true
+        preventStealing: true
+        propagateComposedEvents: true
+
+        property bool insidePlot: false
+        property real xVal: 0
+        property real yVal: 0
+
+        function updateValues(px, py) {
+            var pa = graph.plotArea
+            insidePlot = (px >= pa.x && px <= pa.x + pa.width &&
+                          py >= pa.y && py <= pa.y + pa.height)
+            if (!insidePlot) return
+            var xRatio = (px - pa.x) / pa.width
+            var yRatio = 1 - (py - pa.y) / pa.height   // invert Y
+            xVal = xAxis.min + xRatio * (xAxis.max - xAxis.min)
+            yVal = yAxis.min + yRatio * (yAxis.max - yAxis.min)
+        }
+
+        onPositionChanged: function(ev) {
+            updateValues(ev.x, ev.y)
+            if (insidePlot)
+                mainView.mouseMoved(xVal, yVal)
+        }
+        onExited: function() {
+            insidePlot = false
+            mainView.mouseExited()
         }
     }
 }

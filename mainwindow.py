@@ -3,13 +3,12 @@ from PySide6.QtWidgets import (
     QMainWindow, QFileDialog, QMessageBox, QLineEdit, QButtonGroup,
     QCheckBox, QComboBox, QTableWidgetItem, QDialog, QTableWidget, QHeaderView,
     QStyledItemDelegate)
-from PySide6.QtCharts import (QChart, QLineSeries, QValueAxis, QScatterSeries)
+from PySide6.QtCharts import (QChart, QLineSeries, QValueAxis)
 from PySide6.QtGui import (QFont, QColor, Qt, QIntValidator, QDoubleValidator,
                            QMouseEvent, QStandardItemModel, QStandardItem)
 from PySide6.QtCore import (QTimer, Qt, QUrl, Slot, QObject, Signal,
                             QItemSelectionModel)
 from PySide6.QtQuickWidgets import QQuickWidget
-from PySide6.QtQuick import QQuickItem
 
 from edfoil.classes.airfoil import Airfoil
 from edfoil.classes.station import Station
@@ -28,12 +27,14 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg, NavigationToolb
 from matplotlib.figure import Figure
 import pandas as pd
 from scipy.interpolate import splev
+from datetime import datetime
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app) -> None:
         super().__init__()
         self.app = app
         self.setupUi(self)
+        print(f'{ctime()} Starting EdFoil.')
         self.setWindowTitle('EdFoil')
         self._configure_tables()
         
@@ -42,17 +43,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_msg.setSingleShot(True)
         self.timer_msg.timeout.connect(self.show_def_msg)
         
-        # Project start
-        self.db = session() # Class db [not a dictionary]
-        self.edits = {}
-        self.handle_msgbar(message='New database created.')
-        
         # Settings dialog
         self.settings_dialog = SettingsDialog(self)
         self.settings_button.clicked.connect(self.open_settings)
         self.settings_dialog.themes_box.currentTextChanged.connect(self.apply_theme)
         self.load_themes()
         self.apply_theme()
+        
+        # Project start
+        self.db = session() # Class db [not a dictionary]
+        self.edits = {}
+        self.handle_msgbar(message='New database created.')
         
         # Station QML Bridge
         self.graphBridge = GraphBridge()
@@ -61,6 +62,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ctx = self.station_chartview.rootContext()
         ctx.setContextProperty("graphBridge", self.graphBridge)
         self.station_chartview.setSource(QUrl.fromLocalFile(qml_path))
+        root = self.station_chartview.rootObject()
+        root.mouseMoved.connect(self.station_mouse_moved)
+        root.mouseExited.connect(self.station_mouse_exited)
         
         # OLP STA QML Bridge
         self.olpstaBridge = OverlapBridge()
@@ -299,7 +303,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Signals
         self.export_toggles.buttonToggled.connect(self.changeExportType)
-        
+    
+    @Slot(float, float)
+    def station_mouse_moved(self, x, y):
+        # print(f"Mouse axis coords: {x:.5f}, {y:.5f}")
+        if hasattr(self, "station_xy_current"):
+            self.station_xy_current.setText(f"(x, y) = ({x:.3f}, {y:.3f})")
+
+    @Slot()
+    def station_mouse_exited(self):
+        # print("Mouse left plot")
+        if hasattr(self, "station_xy_current"):
+            self.station_xy_current.clear()
+    
     ### AIRFOIL METHODS (Page 1)
     def update_parameters(self):
         naca_series = self.airfoil_nacaseries_input.currentText()
@@ -332,10 +348,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Check if airfoil already exists
         if f'NACA{airfoil_name}' in self.db.airfoils.keys():
-            self.handle_msgbar(f'Airfoil NACA {airfoil_name} already exists.')
+            self.handle_msgbar(f'Airfoil NACA {airfoil_name} already exists.', wcolor='yellow')
             raise ValueError('Airfoil already exists.')
         
-        print(f'Creating airfoil: {airfoil_name}')
+        print(f'{ctime()} Creating airfoil: {airfoil_name}')
         
         airfoil = Airfoil(airfoil_name)
         name_input = Airfoil.nameinput(airfoil_name)
@@ -359,7 +375,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             airfoil = self.edits['__airfoil__']
         except KeyError:
-            self.handle_msgbar('No airfoil to save.')
+            self.handle_msgbar('No airfoil to save.', wcolor='yellow')
             return
         
         # self.db.airfoils[airfoil.name] = airfoil
@@ -374,7 +390,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.airfoil_listairfoils_widget.item(index).setText(new_text)
         
         # Print message
-        self.handle_msgbar(f'Airfoil {airfoil.name} saved.')
+        self.handle_msgbar(f'Airfoil {airfoil.name} saved.', wcolor='green')
         # print(self.db.airfoils.keys())
                 
     def update_naca_chart(self):
@@ -394,49 +410,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             airfoil = self.edits['__airfoil__']
         else:
             airfoil = self.db.airfoils[airfoil_name.replace(' ','')]
-        
-        # # Clear the current series data and update with new values
-        # series = QLineSeries()
-        # for i in airfoil.xy:
-        #     series.append(float(i[0]),float(i[1]))
-        
-        # # Create new chart
-        # chart = QChart()
-        # chart.setAnimationOptions(QChart.SeriesAnimations)
-        # # chart.legend().hide()
-        # chart.addSeries(series)
-        
-        # xy_range = np.array(airfoil.xy)
-        
-        # x_min = np.min(xy_range[:,0])
-        # x_max = np.max(xy_range[:,0])
-        # y_min = np.min(xy_range[:,1])
-        # y_max = np.max(xy_range[:,1])
-        
-        # # Chord line
-        # cl = QLineSeries()
-        # cl.append(x_min, 0)
-        # cl.append(x_max, 0)
-        # chart.addSeries(cl)
-        
-        # # Legend
-        # series.setName(airfoil_name)
-        # cl.setName('Chord line')
-        # cl.setColor(QColor(150,150,150))
-        # cl.setPen(QPen(QBrush(QColor(150,150,150)), 2, Qt.DashLine))
-        # chart.legend().setVisible(True)
-        # chart.legend().setAlignment(Qt.AlignBottom)
-        
-        # chart.createDefaultAxes()
-        # x_axis = chart.axes(Qt.Horizontal)[0]
-        # y_axis = chart.axes(Qt.Vertical)[0]
-        # x_axis.setTitleText('x/c [-]')
-        # y_axis.setTitleText('y/c [-]')
-        # x_axis.setTitleFont(QFont('Helvetica',14))
-        # y_axis.setTitleFont(QFont('Helvetica',14))
-        
-        # self.airfoil_chartview.setChart(chart)
-        # self.equal_axes(chart, [[x_min, x_max], [y_min, y_max]])
         
         self.airfoil_ax.clear()
         x, y = zip(*airfoil.xy)
@@ -462,12 +435,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         airfoil_id = airfoil_name.replace(' ','')
         
         if '*' in airfoil_id:
-            self.handle_msgbar('Airfoil not saved yet.')
+            self.handle_msgbar('Airfoil not saved yet.', wcolor='yellow')
             return
         
         if airfoil_id in self.db.airfoils.keys():
             del self.db.airfoils[airfoil_id]
-            self.handle_msgbar(f'Airfoil {airfoil_name} deleted.')
+            self.handle_msgbar(f'Airfoil {airfoil_name} deleted.', wcolor='green')
             
             # Update airfoil list
             items = [self.airfoil_listairfoils_widget.item(i).text() 
@@ -479,7 +452,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # empty_chart = self.graph_template()
             # self.airfoil_chartview.setChart(empty_chart)
         else:
-            self.handle_msgbar('Airfoil not found in database.')
+            self.handle_msgbar('Airfoil not found in database.', wcolor='red')
     
     ### STATION METHODS (Page 2a)
     def update_station_params(self):
@@ -553,7 +526,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.edits['__station__'] = station
             
         except ValueError:
-            self.handle_msgbar('Station: Wrong input')
+            self.handle_msgbar('Station: Wrong input', wcolor='red')
     
     def push_station_to_qml(self, station):
         """
@@ -619,7 +592,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         x_tick = _nice_step(x_span / 5.)
         y_tick = _nice_step(y_span / 5.)
         
-        print(f'Scale factor (station graph): x_tick = {x_tick}, y_tick = {y_tick}')
+        print(f'{ctime()} Scale factor (station graph): x_tick = {x_tick}, y_tick = {y_tick}')
         
         self.graphBridge.updateAxesRequested.emit(
             x_min, x_max, x_tick,
@@ -631,7 +604,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         station_name  = 'sta_' + str(int(station.parameters['offset'][2]))
         # self.db.stations[station_name] = station
         self.db.stations.add(station_name, station)
-        self.handle_msgbar(f'Station {station_name} saved.')
+        self.handle_msgbar(f'Station {station_name} saved.', wcolor='green')
         # n_stations = len(self.db.stations.keys())
         # sorted_stations = sorted(list(self.db.stations.keys()), key=len)
         # self.handle_msgbar(f'Number of stations: {n_stations}')
@@ -644,14 +617,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         station_name = self.station_liststation_box.currentText()
         
         if not station_name:
-            return self.handle_msgbar('No station to delete.')
+            return self.handle_msgbar('No station to delete.', wcolor='yellow')
         
         self.db.stations.remove(station_name)
         self.update_station_params()
         # self.update_station_chart()
         
-        print(f'Station "{station_name}" deleted.')
-        return self.handle_msgbar(f'Station "{station_name}" deleted.')
+        print(f'{ctime()} Station "{station_name}" deleted.')
+        return self.handle_msgbar(f'Station "{station_name}" deleted.', wcolor='green')
     
     ### ADVANCED TAB METHODS (Page 2b)
     
@@ -714,7 +687,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             df = pd.read_csv(filepath, header=0)
         except Exception as e:
-            self.handle_msgbar(f"Failed to read file: {e}")
+            self.handle_msgbar(f"Failed to read file: {e}", wcolor='red')
             return
         
         # Clean station table and stations in session
@@ -738,7 +711,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         t.setSortingEnabled(True)
         self.station_nStationsAdv_input.setValue(len(df))
-        self.handle_msgbar(f'File imported succesfully: {filepath}.')
+        self.handle_msgbar(f'File imported succesfully: {filepath}.', wcolor='green')
     
     def update_stations_table(self, value):
         # n_rows = self.station_tableStations_input.rowCount()
@@ -1010,7 +983,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 k2 = int(self.blade_skinolplen_selected.currentText())
             except ValueError: # Because the box is not populated at the same time.
                 k2 = 1
-                print(f'Interpolation selected: k1 = {k1}, k2 = {k2}')
+                print(f'{ctime()} Interpolation selected: k1 = {k1}, k2 = {k2}')
         else:
             k2 = 1
         
@@ -1072,7 +1045,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Joined scatter points (for both OLP_STA and OLP_LEN)
         pts_sta = self.edits['__olp_sta_pts__'][k1-1]
         pts_len = self.edits['__olp_len_pts__'][k2-1]
-        print(f'OLP_points selected (first value): {pts_sta[0]}')
+        print(f'{ctime()} OLP_points selected (first value): {pts_sta[0]}')
         self.olplenBridge.updateScatter.emit(pts_sta + pts_len)
         
         # --- Bot Graph
@@ -1110,7 +1083,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # xy_sta = [[list(t) for t in inner] for inner in xy_line]
         # print(f'LE points: {le_list}')
         # print(f'TE points: {te_list}')
-        print(f'OLP_STA points first value: {xy_sta[0][0]}')
+        print(f'{ctime()} OLP_STA points first value: {xy_sta[0][0]}')
         
         # Send to QML
         self.olpstaBridge.updateSeries.emit(xy_sta, xy_len, le_list, te_list)
@@ -1128,7 +1101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.db.blade['olp_len']['value'] *= chord
         # print(self.db.blade['olp_len'])
         
-        self.handle_msgbar(f'Parameters saved.')
+        self.handle_msgbar(f'Parameters saved.', wcolor='green')
     
     ### SKIN METHODS
     
@@ -1142,7 +1115,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             df = self.db.blade['overlap']
         except KeyError:
-            self.handle_msgbar('Error: Blade interpolation was not saved.')
+            self.handle_msgbar('Warning: Blade interpolation was not saved.', wcolor='yellow')
             return
             
         n_station = float(self.skin_liststations.currentText()[4:])
@@ -1150,7 +1123,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         try:
             olp_target = df.loc[df['z'] == n_station, 'olp_sta'].item()
-            print(f'olp_target (new): {olp_target:.2f}')
+            print(f'{ctime()} olp_target (new): {olp_target:.2f}')
             
             # olp_sta = np.array(self.db.blade['olp_sta'])
             # norm_olp_tgt = float(olp_sta[np.where(olp_sta[:,0]==n_station)[0],1][0])
@@ -1159,7 +1132,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.skin_overlaptarget_input.setText(f'{olp_target:.2f}')
             
         except ValueError:
-            self.handle_msgbar('Error: Overlap target could not be interpolated.')
+            self.handle_msgbar('Error: Overlap target could not be interpolated.', wcolor='red')
     
     def build_section(self):
         if self.stackedWidget.currentIndex() == 4:
@@ -1174,12 +1147,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 try:
                     df_olp = self.db.blade['ovp_text']
                 except KeyError:
-                    self.handle_msgbar('Error: Blade interpolation was not saved.')
+                    self.handle_msgbar('Error: Blade interpolation was not saved.', wcolor='red')
                     return
                 
                 olp_txt = df_olp.loc[df_olp['text'] == self.skin_overlaptarget_input.text(), 'value'].item()
                 olp_tgt = float(olp_txt) if olp_txt else 10
-                print(f'olp_tgt: {olp_tgt}')
+                print(f'{ctime()} olp_tgt: {olp_tgt}')
                 section = Section(
                     station = station,
                     n_plies = n_plies,
@@ -1192,7 +1165,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 
                 # Jiggle method
                 if section.parameters['isCircle']:
-                    self.handle_msgbar(f'Jiggle method is not implemented on circular shapes.')
+                    self.handle_msgbar(f'Jiggle method is not implemented on circular shapes.', wcolor='yellow')
                 
                 if self.skin_jiggle_toggle.isChecked() and not section.parameters['isCircle']:
                     
@@ -1200,11 +1173,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     try:
                         df_len = self.db.blade['olp_len']
                     except KeyError:
-                        self.handle_msgbar('Error: Blade interpolation was not saved.')
+                        self.handle_msgbar('Error: Blade interpolation was not saved.', wcolor='red')
                         return
                     
                     z_sta = float(self.skin_liststations.currentText()[4:])
-                    print(f'name_sta: {z_sta}')
+                    print(f'{ctime()} name_sta: {z_sta}')
                     print(df_len)
                     olp_len = df_len.loc[df_len['station'] == z_sta]['value'].item()
                     
@@ -1300,12 +1273,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.handle_msgbar(f'Number of curves: {len(section.splines.keys())}')
             
             except NameError:
-                print('Skin section: Error - Wrong input.')
+                print(f'{ctime()} Skin section: Error - Wrong input.')
                 
     def saveSection(self):
         section_name = f'sec_{int(self.edits['__section__'].parameters['z'])}'
         self.db.sections[section_name] = self.edits['__section__']
-        self.handle_msgbar(f'Section "{section_name}" saved.')
+        self.handle_msgbar(f'Section "{section_name}" saved.', wcolor='green')
     
     def saveAllSections(self):
         n = self.skin_liststations.count()
@@ -1324,7 +1297,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             try:
                 df = self.db.blade['overlap']
             except KeyError:
-                self.handle_msgbar('Error: Blade interpolation was not saved.')
+                self.handle_msgbar('Error: Blade interpolation was not saved.', wcolor='red')
                 return
             
             z = station.parameters['offset'][2]
@@ -1347,7 +1320,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 try:
                     df_len = self.db.blade['olp_len']
                 except KeyError:
-                    self.handle_msgbar('Error: Blade interpolation was not saved.')
+                    self.handle_msgbar('Error: Blade interpolation was not saved.', wcolor='red')
                     return
                 
                 z_sta = float(self.skin_liststations.currentText()[4:])
@@ -1364,9 +1337,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Update progress bar
             progress = int((i + 1) / n * 100)
             self.progressBar.setValue(progress)
-            
-        self.handle_msgbar(f'{i+1} stations saved.')
-    
+
+        self.handle_msgbar(f'{i+1} stations saved.', wcolor='green')
+
     ### EXPORT METHODS
     
     def update_sectionList(self):
@@ -1380,7 +1353,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if len(self.export_sectionsList.selectedItems()) > 0:
             items = self.export_sectionsList.selectedItems()
         else:
-            self.handle_msgbar('No sections selected.')
+            self.handle_msgbar('No sections selected.', wcolor='red')
             return
             
         # JSON option
@@ -1392,7 +1365,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             filename = f'{self.export_expFileName_input.text()}'
             skinPart(sections=dict_sections, path= self.main_path, filename=filename)
               
-            self.handle_msgbar(f'File "{filename}.json" exported succesfully.')
+            self.handle_msgbar(f'File "{filename}.json" exported succesfully.', wcolor='green')
         
         elif self.export_csv_toggle.isChecked():
             
@@ -1431,9 +1404,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                 index=False,
                                 header=False,
                             )
-            
-            self.handle_msgbar(f'Folder "{foldername}" exported succesfully.')
-        
+
+            self.handle_msgbar(f'Folder "{foldername}" exported succesfully.', wcolor='green')
+
         else:
             return
             
@@ -1559,10 +1532,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # print(list(self.db.airfoils.keys()))
         
         # Select first by default
-        print(f'Number of default airfoils uploaded: {len(self.db.airfoils)}.')
+        print(f'{ctime()} Number of default airfoils uploaded: {len(self.db.airfoils)}.')
         if len(self.db.airfoils) > 0:
             self.airfoil_listairfoils_widget.setCurrentRow(0, QItemSelectionModel.ClearAndSelect)
-            print(f'Current index selected in Airfoil Creator: {self.airfoil_listairfoils_widget.currentItem().text()}')
+            print(f'{ctime()} Current index selected in Airfoil Creator: {self.airfoil_listairfoils_widget.currentItem().text()}')
             self.update_naca_chart()
         # names = [f'{x.family} {x.profile}' for x in self.db.airfoils.values()]
         # self.airfoil_listairfoils_widget.clear()
@@ -1746,7 +1719,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for i, file in enumerate(fileNames):
             try:
                 temp = Airfoil()
-                print(f'Importing: {file}')
+                print(f'{ctime()} Importing: {file}')
                 temp.importCoords(path = file)
                 self.db.airfoils.add(temp.name, temp)
                 # airfoil_names[temp.name] = temp.name
@@ -1754,7 +1727,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except:
                 self.handle_msgbar(f'File ({i} of {len(airfoil_files)}): {file} could not be imported.')
         
-        self.handle_msgbar(f'Number of files imported: {i}.')
+        self.handle_msgbar(f'Number of files imported: {i}.', wcolor='green')
         
         # Add new files to the QComboBox
         # n_items_current = self.station_listairfoils_box.count()
@@ -1831,7 +1804,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             # Revert to previous theme if cancelled
             self.settings_dialog.themes_box.setCurrentText(current_theme)
-            self.handle_msgbar("Settings cancelled.")
+            self.handle_msgbar("Settings cancelled.", wcolor='red')
             
     def load_themes(self):
         themes = [
@@ -1841,35 +1814,56 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.themes = {}
         for theme in themes:
             t = Theme(theme)
-            self.themes[theme] = t.load_qss(Path(resource_path(f'resources/themes/{theme}.qss')), sout=True)
-        
+            t.load_qss(Path(resource_path(f'resources/themes/{theme}.qss')), sout=False)
+            self.themes[theme] = t
+
         self.settings_dialog.themes_box.blockSignals(True)
         self.settings_dialog.themes_box.addItems(themes)
         self.settings_dialog.themes_box.setCurrentText('edfoil-light')
         self.settings_dialog.themes_box.blockSignals(False)
         
-        print(f'Themes loaded.')
+        print(f'{ctime()} Themes loaded.')
         
     def apply_theme(self):
         theme_name = self.settings_dialog.themes_box.currentText()
         if theme_name in self.themes:
-            self.stylesheet.setStyleSheet(self.themes[theme_name])
-            self.handle_msgbar(f'Theme "{theme_name}" applied.')
+            self.stylesheet.setStyleSheet(self.themes[theme_name].qss)
+            self.handle_msgbar(f'Theme "{theme_name}" applied.', wcolor='green')
         else:
-            self.handle_msgbar(f'Error: Theme "{theme_name}" not found.')
-    
+            self.handle_msgbar(f'Error: Theme "{theme_name}" not found.', wcolor='red')
+
     ### MESSAGE BAR METHODS
     
-    def handle_msgbar(self, message:str, time:int=4000):
+    def warning_color(self, color:str='red'):
+        current_theme = self.settings_dialog.themes_box.currentText()
+        # print(f'{ctime()} Current theme: {current_theme}.')
+        palette = self.themes[current_theme].palette
+        # print(f'{ctime()} Palette: {palette}')
+        if color == 'red':
+            color_selected = palette['DANGER']
+        elif color == 'yellow':
+            color_selected = palette['WARNING']
+        elif color == 'green':
+            color_selected = palette['SUCCESS']
+        else:
+            return
+
+        ss = f'#warning_light:indicator {{\n border-radius: 8px;\n background-color: {color_selected};\n margin-left: 5px;\n}}'
+        self.warning_light.setStyleSheet(ss)
+
+    def handle_msgbar(self, message:str, wcolor:str | None = None, time:int=4000):
         if message:
             self.timer_msg.start(time)
             self.def_msgbar.hide()
             self.msgbar.setText(message)
+            self.warning_color(wcolor)
+            self.warning_light.show()
             self.msgbar.show()
-            
+    
     def show_def_msg(self):
             self.def_msgbar.show()
             self.msgbar.hide()
+            self.warning_light.hide()
         
 ## CLASSES
 # Main database in every session.       
@@ -2101,3 +2095,7 @@ class SettingsDialog(QDialog, Ui_settingsDialog):
     def apply_settings(self):
         # TODO: read widgets and store in your session / config
         pass
+    
+# Time getter
+def ctime() -> str:
+    return f'[{datetime.now().strftime('%H:%M:%S')}] -'

@@ -11,12 +11,14 @@ All notable changes to this project will be documented in this file.
 - Icons for future use in the "icons" folder.
 - Completely redesigned the UI.
 - More safeguards displayed in the message bar.
+- Warning light now visible [0.3.1]
 
 ### Fixed
 - QSS priorities changed to increase style consistency.
 - Stations table was only creating one new row even if the input was greater.
 - Interpolation dictionaries were created based on the number of stations rather than the number of interpolations.
 - Path in "themeLoader" module being undefined.
+- Mouse coordinates in Station plot would not show [0.3.1]
 
 ### Changed
 - Charts code transitioned from python to qml. Improvement in performance.

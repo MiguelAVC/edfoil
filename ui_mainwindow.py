@@ -106,8 +106,21 @@ class Ui_MainWindow(object):
 "	color: rgb(255, 255, 255);\n"
 "}\n"
 "\n"
+"#sideBar #settings_button {\n"
+"	padding-left: 25px;\n"
+"	border-left: 8px solid transparent;\n"
+"	background-image: url(:/resources/icons/cil-settings.png);\n"
+"}\n"
+"\n"
+"#sideBar #home_page_button {\n"
+"	padding-left: 25px;\n"
+"	border-left: 15px solid transparent;\n"
+"	background-image: url(:/resources/icons/cil-home.png);\n"
+"}\n"
+"\n"
 "/* TOP BAR */\n"
-"#page_title_label {	font: 700 14pt}\n"
+"#page_title_label {	font: 700 "
+                        "14pt}\n"
 "\n"
 "#startbar_frame{	\n"
 "	background-color: #ffffff;\n"
@@ -123,8 +136,7 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "#workpath_lineedit {\n"
-"	border"
-                        ": 1px solid #e1e1e1;\n"
+"	border: 1px solid #e1e1e1;\n"
 "	border-radius: 5px;\n"
 "}\n"
 "\n"
@@ -159,7 +171,8 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "#mainFrame QPushButton:pressed {	\n"
-"	background-color: #546391;\n"
+"	back"
+                        "ground-color: #546391;\n"
 "	border: 2px solid #ff79c6;\n"
 "}\n"
 "\n"
@@ -175,8 +188,7 @@ class Ui_MainWindow(object):
 "	border-radius: 5px;\n"
 "	border: 1px solid #6272a4;\n"
 "    color: #333;\n"
-"	padding-l"
-                        "eft: 4px;\n"
+"	padding-left: 4px;\n"
 "	padding-right: 4px;\n"
 "}\n"
 "QComboBox:hover{\n"
@@ -203,7 +215,8 @@ class Ui_MainWindow(object):
 "QComboBox::drop-down:pressed {\n"
 "	background-color: #ff79c6;\n"
 "}\n"
-"\n"
+""
+                        "\n"
 "QComboBox QAbstractItemView {\n"
 "	color: #f8f8f2;	\n"
 "	background-color: #7082b6;\n"
@@ -219,8 +232,7 @@ class Ui_MainWindow(object):
 "\n"
 "/* -------------\n"
 "	SpinBox\n"
-"---------"
-                        "---- */\n"
+"------------- */\n"
 "\n"
 "QSpinBox {\n"
 "	background-color: #ffffff;\n"
@@ -247,7 +259,8 @@ class Ui_MainWindow(object):
 "	background-position: center;\n"
 "}\n"
 "\n"
-"QSpinBox::up-button:hover {\n"
+"QSpinBox::up-butto"
+                        "n:hover {\n"
 "	background-color: #bd93f9;\n"
 "}\n"
 "\n"
@@ -262,8 +275,7 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QSpinBox::down-button:pressed {\n"
-"	background-color: #f"
-                        "f79c6;\n"
+"	background-color: #ff79c6;\n"
 "}\n"
 "\n"
 "/* -------------\n"
@@ -289,14 +301,19 @@ class Ui_MainWindow(object):
 "	CheckBox\n"
 "------------- */\n"
 "QCheckBox::indicator {\n"
-"    border: 1px solid #6272a4;\n"
+"    border: 2px solid #6272a4;\n"
 "	width: 15px;\n"
 "	height: 15px;\n"
-"    background: #6272a4;\n"
+"    background: #f8f8f2;\n"
+"}\n"
+"\n"
+"QCheckBox::indicator:hover"
+                        " {\n"
+"	background: #7082b6;\n"
 "}\n"
 "\n"
 "QCheckBox::indicator:checked {\n"
-"    background: 1px solid #bd93f9;\n"
+"    background: #bd93f9;\n"
 "	background-image: url(:/resources/icons/cil-check-alt.png);\n"
 "}\n"
 "\n"
@@ -304,20 +321,19 @@ class Ui_MainWindow(object):
 "	RadioButton\n"
 "------------- */\n"
 "QRadioButton::indicator {\n"
-"    border: 1px solid #6272a4;\n"
-"	width: 16px;\n"
-"	height: 16px;\n"
-"	border-radius:8px;\n"
+"	width:  18px;\n"
+"	height: 18px;\n"
+"	border: 2px solid transparent;\n"
+"	border-radius: 10px;\n"
 "    background: #6272a4;\n"
 "}\n"
-""
-                        "QRadioButton::indicator:hover {\n"
-"    border: 1px solid rgb(119, 136, 187);\n"
+"QRadioButton::indicator:hover {\n"
+"    border: 2px solid #ff79c6;\n"
 "}\n"
 "QRadioButton::indicator:checked {\n"
-"    background: 1px solid #bd93f9;\n"
-"	background-image: url(:/resources/icons/cil-x-circle.png);\n"
-"	border: 1px solid #bd93f9;	\n"
+"	background-position: center;\n"
+"    background-color: #bd93f9;\n"
+"	background-image: url(:/resources/icons/cil-x.png);\n"
 "}\n"
 "\n"
 "/* -------------\n"
@@ -336,7 +352,8 @@ class Ui_MainWindow(object):
 "	padding-right: 5px;\n"
 "	gridline-color: #9faeda;\n"
 "}\n"
-"QTableWidget::item:selected{\n"
+"QTableWid"
+                        "get::item:selected{\n"
 "	background-color: rgb(189, 147, 249);\n"
 "    color: #f8f8f2;\n"
 "}\n"
@@ -352,8 +369,7 @@ class Ui_MainWindow(object):
 "{\n"
 "    border: 1px solid #6272a4;\n"
 "	background-color: #6272a4;\n"
-""
-                        "	padding: 3px;\n"
+"	padding: 3px;\n"
 "    color: #f8f8f2;\n"
 "}\n"
 "QHeaderView::section:vertical\n"
@@ -383,7 +399,8 @@ class Ui_MainWindow(object):
 "	background-color: rgb(189, 147, 249);\n"
 "    color: #f8f8f2;\n"
 "}\n"
-"QHeaderView::section {\n"
+""
+                        "QHeaderView::section {\n"
 "	background-color: #6272a4;\n"
 "	border: none;\n"
 "	border-style: none;\n"
@@ -401,8 +418,7 @@ class Ui_MainWindow(object):
 "	padding: 6px;\n"
 "	border: 2px solid #6272a4;\n"
 "	outline: none;\n"
-"	border-radius"
-                        ": 5px;\n"
+"	border-radius: 5px;\n"
 "	show-decoration-selected: 1;\n"
 "}\n"
 "\n"
@@ -433,7 +449,8 @@ class Ui_MainWindow(object):
 "\n"
 "QProgressBar {\n"
 "	border: 2px solid #6272a4;\n"
-"	border-radius: 5px;\n"
+"	border-radius:"
+                        " 5px;\n"
 "	font: 700 10pt;\n"
 "}\n"
 "\n"
@@ -454,8 +471,7 @@ class Ui_MainWindow(object):
 "\n"
 "QTabBar::tab {\n"
 "	min-width: 10ex;\n"
-"    padding: 2px 10px"
-                        ";\n"
+"    padding: 2px 10px;\n"
 "	border: 1px solid #6272a4;\n"
 "	border-bottom: none;\n"
 "	border-top-left-radius: 5px;\n"
@@ -483,7 +499,8 @@ class Ui_MainWindow(object):
 "\n"
 "#descriptionMsg {\n"
 "	background-color: #fff;\n"
-"	border-radius: 5px;\n"
+"	"
+                        "border-radius: 5px;\n"
 "	border: 1px solid #e1e1e1;\n"
 "}\n"
 "\n"
@@ -503,8 +520,7 @@ class Ui_MainWindow(object):
 "	border: 1px solid #e1e1e1;\n"
 "}\n"
 "\n"
-"/* S"
-                        "TATION PAGE */\n"
+"/* STATION PAGE */\n"
 "\n"
 "#label_15 {font: 700 12pt}\n"
 "#label_18 {font: 700 12pt}\n"
@@ -537,7 +553,8 @@ class Ui_MainWindow(object):
 "	background-color: #fff;\n"
 "	border-radius: 5px;\n"
 "	border: 1px solid #e1e1e1;\n"
-"}\n"
+""
+                        "}\n"
 "\n"
 "#frame_9 {\n"
 "	background-color: #fff;\n"
@@ -558,8 +575,7 @@ class Ui_MainWindow(object):
 "\n"
 "#frame_skin_len {\n"
 "	background-color: #fff;\n"
-"	"
-                        "border-radius: 5px;\n"
+"	border-radius: 5px;\n"
 "	border: 1px solid #e1e1e1;\n"
 "}\n"
 "\n"
@@ -591,7 +607,8 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "#skin_maingraph_frame {\n"
-"	background-color: #fff;\n"
+"	backgrou"
+                        "nd-color: #fff;\n"
 "	border-radius: 5px;\n"
 "	border: 1px solid #e1e1e1;\n"
 "}\n"
@@ -603,8 +620,7 @@ class Ui_MainWindow(object):
 "	background-color: #fff;\n"
 "	border-radius: 5px;\n"
 "	border: 1px solid #e1e1e1;\n"
-"}\n"
-"")
+"}")
         self.appMargins = QGridLayout(self.stylesheet)
         self.appMargins.setObjectName(u"appMargins")
         self.appMargins.setHorizontalSpacing(0)
@@ -1463,6 +1479,7 @@ class Ui_MainWindow(object):
 
         self.station_xy_current = QLabel(self.frame_6)
         self.station_xy_current.setObjectName(u"station_xy_current")
+        self.station_xy_current.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.horizontalLayout_7.addWidget(self.station_xy_current)
 
@@ -2253,6 +2270,8 @@ class Ui_MainWindow(object):
         self.skin_zoomedgraph_frame = QFrame(self.frame_11)
         self.skin_zoomedgraph_frame.setObjectName(u"skin_zoomedgraph_frame")
         self.skin_zoomedgraph_frame.setMinimumSize(QSize(0, 0))
+        self.skin_zoomedgraph_frame.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.skin_zoomedgraph_frame.setAutoFillBackground(False)
         self.skin_zoomedgraph_frame.setStyleSheet(u"")
         self.verticalLayout_22 = QVBoxLayout(self.skin_zoomedgraph_frame)
         self.verticalLayout_22.setObjectName(u"verticalLayout_22")
@@ -2444,6 +2463,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.def_msgbar)
 
+        self.warning_light = QCheckBox(self.statusBar)
+        self.warning_light.setObjectName(u"warning_light")
+        self.warning_light.setCheckable(False)
+
+        self.horizontalLayout.addWidget(self.warning_light)
+
         self.msgbar = QLabel(self.statusBar)
         self.msgbar.setObjectName(u"msgbar")
         sizePolicy3.setHeightForWidth(self.msgbar.sizePolicy().hasHeightForWidth())
@@ -2554,7 +2579,7 @@ class Ui_MainWindow(object):
         self.loadproject_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">Coming Soon.</span></p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.loadproject_button.setText(QCoreApplication.translate("MainWindow", u"Load Project...", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"Version 0.3.0", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"Version 0.3.1", None))
         self.descriptionMsg.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Welcome to EdFoil!<span style=\" font-size:10pt;\"><br/></span></p><p><span style=\" font-size:10pt; font-weight:400;\">This is a contained design tool to generate guide curves for a 3D model of wind and tidal turbine blades.</span></p><p><span style=\" font-size:10pt; font-weight:400;\">The workflow to get the curves is the following:</span></p><ol><li><span style=\" font-size:10pt; font-weight:400;\">Generate or upload NACA airfoils to the current session (&quot;Airfoil Creator&quot; tab)</span></li><li><span style=\" font-size:10pt; font-weight:400;\"> Assign parameters (e.g., twist angle, chord length) to airfoils at key stations along the span of the blade. (&quot;Station Generator&quot; tab)</span></li><li><span style=\" font-size:10pt; font-weight:400;\"> Determine blade parameters (&quot;Blade Parameters&quot; tab) such as:</span></li><ul><li><span style=\" font-size:10pt; font-weight:400;\">Where the skin is split in top and bottom surfaces.</span></li><li><span style=\" font-siz"
                         "e:10pt; font-weight:400;\">The overlap distance of the top and bottom skin surfaces.</span></li><li><span style=\" font-size:10pt; font-weight:400;\">The thickness of the adhesive.</span></li><li><span style=\" font-size:10pt; font-weight:400;\">The trailing edge trim distance.</span></li></ul><li><span style=\" font-size:10pt; font-weight:400;\">Determine ply parameters for the skin (&quot;Skin&quot; tab) such as number of plies, and ply thickness.</span></li><li><span style=\" font-size:10pt; font-weight:400;\">Export the point cloud to be imported to CAD softwares (e.g., SolidWorks, Abaqus CAE)</span></ol></body></html>", None))
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
@@ -2728,6 +2753,7 @@ class Ui_MainWindow(object):
         self.label_47.setText(QCoreApplication.translate("MainWindow", u".json", None))
         self.export_export_button.setText(QCoreApplication.translate("MainWindow", u"Export Sections", None))
         self.def_msgbar.setText(QCoreApplication.translate("MainWindow", u"Ready.", None))
+        self.warning_light.setText("")
         self.msgbar.setText("")
         self.progressBar.setFormat(QCoreApplication.translate("MainWindow", u"%p%", None))
     # retranslateUi

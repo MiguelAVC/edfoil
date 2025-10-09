@@ -33,7 +33,8 @@ class Theme():
         # Simple placeholder replacement {{TOKEN}}
         for key, val in theme.items():
             text = text.replace(f"{{{{{key}}}}}", val)
-            
+        
+        self.palette = theme  
         self.qss = text
         
         if sout:
