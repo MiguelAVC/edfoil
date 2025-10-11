@@ -66,16 +66,16 @@ def reorder_coordinates(
 class Section:
     def __init__(
         self,
-        station:Station,
-        n_plies:int,
-        ply_thickness:float,
-        overlap_target:float,
-        te_thickness:float = 8,
-        bond_thickness:float = 1,
-        genFig:bool = True,
-        saveFig:bool = False,
-        tolerance:int = 6, # Tolerance for decimal places ACIS in LE
-        ini_u0:int = 21, # Initial guess for splineIntersection starting from TE
+        station:Station,            # Station instance
+        n_plies:int,                # Number of plies
+        ply_thickness:float,        # Thickness of each ply
+        overlap_target:float,       # Target overlap
+        te_thickness:float = 8,     # Trailing edge thickness
+        bond_thickness:float = 1,   # Bond thickness
+        genFig:bool = True,         # Generate figures
+        saveFig:bool = False,       # Save figures
+        tolerance:int = 6,          # Tolerance for decimal places ACIS in LE
+        ini_u0:int = 21,            # Initial guess for splineIntersection starting from TE
     ) -> None:
         
         # Parameters

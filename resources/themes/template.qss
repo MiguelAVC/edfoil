@@ -80,6 +80,12 @@ QToolTip {
 	background-image: url(:/resources/icons/cil-settings.png);
 }
 
+#sideBar #doc_button {
+	padding-left: 25px;
+	border-left: 10px solid transparent;
+	background-image: url(:/resources/icons/cil-find-in-page.png);
+}
+
 #sideBar #info_button {
 	padding-left: 25px;
 	border-left: 10px solid transparent;
@@ -137,8 +143,8 @@ QProgressBar{
 }
 
 #mainFrame QPushButton:hover {
-	background-color: {{PRIMARY_HOVER}};
-	border: 2px solid {{PRIMARY_HOVER}};
+	background-color: {{ACCENT2}};
+	border: 2px solid {{ACCENT2}};
 }
 
 #mainFrame QPushButton:pressed {	
@@ -162,8 +168,14 @@ QComboBox{
 	padding-right: 4px;
 }
 QComboBox:hover{
-	border: 1px solid {{PRIMARY_HOVER}};
+	border: 1px solid {{ACCENT1}};
 }
+
+QComboBox:on {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
 QComboBox::drop-down {
 	subcontrol-origin: padding;
 	subcontrol-position: top right;
@@ -187,26 +199,28 @@ QComboBox::drop-down:pressed {
 }
 
 QComboBox QAbstractItemView {
+	background: {{PRIMARY}};
 	color: {{TEXT_INV}};	
-	background-color: {{PRIMARY_HOVER}};
-	selection-background-color: {{PRIMARY}};
+	selection-background-color: {{PRIMARY_HOVER}};
 	padding: 5px 0px;
 	outline: none;
+	/* border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px; */
 }
 
 QComboBox QAbstractItemView::item:hover {
-	background-color: {{ACCENT1}};
+	background-color: {{TEXT}};
 	outline: none;
 }
 
 QComboBox QAbstractItemView::item:selected {
-    background: {{PRIMARY}};
+    background: {{PRIMARY_HOVER}};
     color: {{TEXT_INV}};
 	border-left: 5px solid {{ACCENT1}};
 }
 
 QComboBox QAbstractItemView::item:selected:!active {
-    background: {{PRIMARY}};
+    background: {{ACCENT2}};
     color: {{TEXT_INV}};
 	border-left: 5px solid {{ACCENT1}};
 }
@@ -227,6 +241,10 @@ QSpinBox {
     color: {{TEXT}};
 	padding-left: 1px;
 	padding-right: 20px;
+}
+
+QSpinBox:hover {
+	border: 1px solid {{ACCENT1}};
 }
 
 QSpinBox::up-button {
@@ -276,7 +294,7 @@ QLineEdit {
     color: {{TEXT}};
 }
 QLineEdit:hover {
-	border: 2px solid {{PRIMARY_HOVER}};
+	border: 1px solid {{ACCENT1}};
 }
 QLineEdit:focus {
 	border: 2px solid {{ACCENT2}};
@@ -293,7 +311,7 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:hover {
-	background: {{PRIMARY_HOVER}};
+	background: {{ACCENT1}};
 }
 
 QCheckBox::indicator:checked {
@@ -332,27 +350,30 @@ QTableWidget {
 	gridline-color: {{GRID_LINE}};
     outline: none;
 }
-QTableWidget::item{
+QTableWidget::viewport {
+    background: {{PANEL_BG}};
+    border-radius: 5px;
+}
+QTableWidget::item {
 	border-color: {{GRID_LINE}};
 	padding-left: 5px;
 	padding-right: 5px;
 	gridline-color: {{GRID_LINE}};
 }
-QTableWidget::item:selected{
+QTableWidget::item:selected {
 	background-color: {{SELECTION_BG}};
     color: {{TEXT_INV}};
 }
-QTableWidget QHeaderView::section{
-	background-color: {{PRIMARY}};
+QTableWidget QHeaderView {
+	background: transparent;
 	border: none;
 	border-style: none;
 }
 
-QTableWidget QHeaderView::section:horizontal
-{
+QTableWidget QHeaderView::section:horizontal {
 	background-color: {{PRIMARY}};
-	padding: 3px;
     color: {{TEXT_INV}};
+	padding: 3px;
     border-right: 1px solid {{BORDER_LIGHT}};
 }
 
@@ -360,11 +381,20 @@ QTableWidget QHeaderView::section:horizontal:last {
 	border-right: none;
 }
 
-QTableWidget QHeaderView::section:vertical
-{
-    border: 1px solid {{PRIMARY}};
+QTableWidget QHeaderView::section:vertical {
+	background-color: {{PRIMARY}};
+    border-bottom: 1px solid {{PRIMARY}};
     color: {{TEXT_INV}};
 	padding-left: 5px;
+}
+
+QTableWidget QHeaderView::section:vertical:last {
+    border-bottom: none;
+}
+
+QTableCornerButton::section {
+    background: transparent;
+    border: none;
 }
 
 /* -------------

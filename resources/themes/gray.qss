@@ -8,10 +8,10 @@
 "PANEL_BORDER":     "#23272E",
 "BORDER_LIGHT":     "#e1e1e1",
 "BORDER_MED":       "#3D4451",
-"TEXT":             "#e1e1e1",
-"TEXT_INV":         "#E5C07B",
+"TEXT":             "#ece7dc",
+"TEXT_INV":         '#3D4451',
 "SELECTION_BG":     "#E06B74",
-"GRID_LINE":        "#62AEEF",
+"GRID_LINE":        "#ece7dc",
 "SUCCESS":          "#3cbf3c",
 "WARNING":          "#ffca5c",
 "DANGER":           "#ff79c6"

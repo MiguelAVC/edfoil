@@ -765,6 +765,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.settings_button)
 
+        self.doc_button = QPushButton(self.sideBar)
+        self.doc_button.setObjectName(u"doc_button")
+
+        self.verticalLayout.addWidget(self.doc_button)
+
         self.info_button = QPushButton(self.sideBar)
         self.info_button.setObjectName(u"info_button")
         sizePolicy1.setHeightForWidth(self.info_button.sizePolicy().hasHeightForWidth())
@@ -1953,14 +1958,30 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addWidget(self.frame_16)
 
-        self.blade_interpolate_button = QPushButton(self.frame_ilp_order)
+        self.frame_20 = QFrame(self.frame_ilp_order)
+        self.frame_20.setObjectName(u"frame_20")
+        self.frame_20.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_20.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_16 = QHBoxLayout(self.frame_20)
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.blade_interpolate_button = QPushButton(self.frame_20)
         self.blade_interpolate_button.setObjectName(u"blade_interpolate_button")
         sizePolicy1.setHeightForWidth(self.blade_interpolate_button.sizePolicy().hasHeightForWidth())
         self.blade_interpolate_button.setSizePolicy(sizePolicy1)
         self.blade_interpolate_button.setStyleSheet(u"")
         self.blade_interpolate_button.setCheckable(False)
 
-        self.verticalLayout_6.addWidget(self.blade_interpolate_button)
+        self.horizontalLayout_16.addWidget(self.blade_interpolate_button)
+
+        self.blade_saveparams_button = QPushButton(self.frame_20)
+        self.blade_saveparams_button.setObjectName(u"blade_saveparams_button")
+        sizePolicy1.setHeightForWidth(self.blade_saveparams_button.sizePolicy().hasHeightForWidth())
+        self.blade_saveparams_button.setSizePolicy(sizePolicy1)
+
+        self.horizontalLayout_16.addWidget(self.blade_saveparams_button)
+
+
+        self.verticalLayout_6.addWidget(self.frame_20)
 
         self.line_3 = QFrame(self.frame_ilp_order)
         self.line_3.setObjectName(u"line_3")
@@ -2010,13 +2031,6 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_6.addWidget(self.frame_19)
-
-        self.blade_saveparams_button = QPushButton(self.frame_ilp_order)
-        self.blade_saveparams_button.setObjectName(u"blade_saveparams_button")
-        sizePolicy1.setHeightForWidth(self.blade_saveparams_button.sizePolicy().hasHeightForWidth())
-        self.blade_saveparams_button.setSizePolicy(sizePolicy1)
-
-        self.verticalLayout_6.addWidget(self.blade_saveparams_button)
 
         self.verticalSpacer_16 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -2285,7 +2299,7 @@ class Ui_MainWindow(object):
         self.label_53.setObjectName(u"label_53")
         sizePolicy1.setHeightForWidth(self.label_53.sizePolicy().hasHeightForWidth())
         self.label_53.setSizePolicy(sizePolicy1)
-        self.label_53.setMaximumSize(QSize(250, 250))
+        self.label_53.setMaximumSize(QSize(297, 208))
         self.label_53.setStyleSheet(u"")
         self.label_53.setPixmap(QPixmap(u":/resources/images/skin_help.png"))
         self.label_53.setScaledContents(True)
@@ -2550,6 +2564,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.stackedWidget.setCurrentIndex(0)
+        self.airfoil_nacaseries_input.setCurrentIndex(2)
         self.station_tab_widget.setCurrentIndex(0)
 
 
@@ -2567,6 +2582,7 @@ class Ui_MainWindow(object):
         self.skin_page_button.setText(QCoreApplication.translate("MainWindow", u"Skin Sections", None))
         self.export_page_button.setText(QCoreApplication.translate("MainWindow", u"Blade Export", None))
         self.settings_button.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.doc_button.setText(QCoreApplication.translate("MainWindow", u"Documentation", None))
         self.info_button.setText(QCoreApplication.translate("MainWindow", u"Info", None))
         self.quit_button.setText(QCoreApplication.translate("MainWindow", u"Quit", None))
         self.page_title_label.setText(QCoreApplication.translate("MainWindow", u"Home", None))
@@ -2708,30 +2724,46 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.blade_order_input.setSuffix("")
         self.blade_interpolate_button.setText(QCoreApplication.translate("MainWindow", u"Calculate", None))
+        self.blade_saveparams_button.setText(QCoreApplication.translate("MainWindow", u"Save Parameters", None))
         self.label_40.setText(QCoreApplication.translate("MainWindow", u"Choose skin interpolation order:", None))
         self.label_38.setText(QCoreApplication.translate("MainWindow", u"Location", None))
         self.label_39.setText(QCoreApplication.translate("MainWindow", u"Length", None))
-        self.blade_saveparams_button.setText(QCoreApplication.translate("MainWindow", u"Save Parameters", None))
         self.label_52.setText(QCoreApplication.translate("MainWindow", u"Interpolation values at each station:", None))
         self.label_49.setText(QCoreApplication.translate("MainWindow", u"Interpolation Factors", None))
         self.label_48.setText(QCoreApplication.translate("MainWindow", u"Blade Top View", None))
         self.label_29.setText(QCoreApplication.translate("MainWindow", u"Parameters", None))
         self.label_30.setText(QCoreApplication.translate("MainWindow", u"Available stations:", None))
         self.label_31.setText(QCoreApplication.translate("MainWindow", u"Number of plies:", None))
+#if QT_CONFIG(tooltip)
+        self.skin_nplies_input.setToolTip(QCoreApplication.translate("MainWindow", u"Minimum: 1", None))
+#endif // QT_CONFIG(tooltip)
         self.skin_nplies_input.setText(QCoreApplication.translate("MainWindow", u"8", None))
         self.label_32.setText(QCoreApplication.translate("MainWindow", u"Ply thickness:", None))
+#if QT_CONFIG(tooltip)
+        self.skin_plythickness_input.setToolTip(QCoreApplication.translate("MainWindow", u"Minimum: 0.1", None))
+#endif // QT_CONFIG(tooltip)
         self.skin_plythickness_input.setText(QCoreApplication.translate("MainWindow", u"1", None))
         self.label_33.setText(QCoreApplication.translate("MainWindow", u"Skin top/bottom split:", None))
 #if QT_CONFIG(tooltip)
         self.skin_overlaptarget_input.setToolTip(QCoreApplication.translate("MainWindow", u"Calculated (Non-editable)", None))
 #endif // QT_CONFIG(tooltip)
         self.label_34.setText(QCoreApplication.translate("MainWindow", u"Trailing edge thickness:", None))
+#if QT_CONFIG(tooltip)
+        self.skin_tethickness_input.setToolTip(QCoreApplication.translate("MainWindow", u"Minimum: 0.1", None))
+#endif // QT_CONFIG(tooltip)
         self.skin_tethickness_input.setText(QCoreApplication.translate("MainWindow", u"8", None))
         self.label_54.setText(QCoreApplication.translate("MainWindow", u"Bond thickness:", None))
+#if QT_CONFIG(tooltip)
+        self.skin_bond_input.setToolTip(QCoreApplication.translate("MainWindow", u"Minimum: 0.1", None))
+#endif // QT_CONFIG(tooltip)
         self.skin_bond_input.setText(QCoreApplication.translate("MainWindow", u"1", None))
         self.label_59.setText(QCoreApplication.translate("MainWindow", u"Generate overlap:", None))
         self.skin_jiggle_toggle.setText("")
         self.label_36.setText(QCoreApplication.translate("MainWindow", u"Save figures:", None))
+#if QT_CONFIG(tooltip)
+        self.skin_savefig_input.setToolTip(QCoreApplication.translate("MainWindow", u"Saved in the current\n"
+"work directory.", None))
+#endif // QT_CONFIG(tooltip)
         self.skin_savefig_input.setText("")
         self.skin_delSection_button.setText(QCoreApplication.translate("MainWindow", u"Delete Section", None))
         self.skin_saveSection_button.setText(QCoreApplication.translate("MainWindow", u"Save Section", None))

@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 
 ---
+## [0.3.1] - 2025-10-10
+### Added
+- Warning light now visible.
+- Extra parameters for Section instance creation in the "Settings" window.
+- Toggle to open the destination folder after exporting section.
+
+### Fixed
+- Mouse coordinates in Station plot would not show.
+- Icon path changed to resource_path method.
+
+### Changed
+- DPI font commented out because it may cause small fonts in high resolutions.
+- Eliminated two themes.
 
 ## [0.3.0] - 2025-10-07
 ### Added
@@ -11,14 +24,12 @@ All notable changes to this project will be documented in this file.
 - Icons for future use in the "icons" folder.
 - Completely redesigned the UI.
 - More safeguards displayed in the message bar.
-- Warning light now visible [0.3.1]
 
 ### Fixed
 - QSS priorities changed to increase style consistency.
 - Stations table was only creating one new row even if the input was greater.
 - Interpolation dictionaries were created based on the number of stations rather than the number of interpolations.
 - Path in "themeLoader" module being undefined.
-- Mouse coordinates in Station plot would not show [0.3.1]
 
 ### Changed
 - Charts code transitioned from python to qml. Improvement in performance.

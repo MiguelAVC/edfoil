@@ -4,8 +4,9 @@ from PySide6.QtWidgets import (
     QCheckBox, QComboBox, QTableWidgetItem, QDialog, QTableWidget, QHeaderView,
     QStyledItemDelegate)
 from PySide6.QtCharts import (QChart, QLineSeries, QValueAxis)
-from PySide6.QtGui import (QFont, QColor, Qt, QIntValidator, QDoubleValidator,
-                           QMouseEvent, QStandardItemModel, QStandardItem)
+from PySide6.QtGui import (QColor, Qt, QIntValidator, QDoubleValidator,
+                           QMouseEvent, QStandardItemModel, QStandardItem,
+                           QDesktopServices)
 from PySide6.QtCore import (QTimer, Qt, QUrl, Slot, QObject, Signal,
                             QItemSelectionModel)
 from PySide6.QtQuickWidgets import QQuickWidget
@@ -32,9 +33,9 @@ from datetime import datetime
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app) -> None:
         super().__init__()
+        print(f'{ctime()} Starting EdFoil...')
         self.app = app
         self.setupUi(self)
-        print(f'{ctime()} Starting EdFoil.')
         self.setWindowTitle('EdFoil')
         self._configure_tables()
         
@@ -43,16 +44,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.timer_msg.setSingleShot(True)
         self.timer_msg.timeout.connect(self.show_def_msg)
         
+        # Project start
+        self.db = session() # Class db [not a dictionary]
+        self.edits = {}
+        
         # Settings dialog
         self.settings_dialog = SettingsDialog(self)
         self.settings_button.clicked.connect(self.open_settings)
         self.settings_dialog.themes_box.currentTextChanged.connect(self.apply_theme)
         self.load_themes()
         self.apply_theme()
-        
-        # Project start
-        self.db = session() # Class db [not a dictionary]
-        self.edits = {}
+        self.save_settings() # Save default settings
         self.handle_msgbar(message='New database created.')
         
         # Station QML Bridge
@@ -96,6 +98,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.export_page_button.clicked.connect(self.switch_to_exportPage)
         
         # Lower sidebar buttons
+        self.doc_button.clicked.connect(self.open_doc)
         self.info_button.clicked.connect(self.info_message)
         self.quit_button.clicked.connect(self.quit_message_box)
         
@@ -130,6 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # List of airfoils
         self.load_default_airfoils()
+        self.update_parameters()
         
         # Signals
         self.airfoil_nacaseries_input.currentTextChanged.connect(self.update_parameters)
@@ -349,7 +353,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Check if airfoil already exists
         if f'NACA{airfoil_name}' in self.db.airfoils.keys():
             self.handle_msgbar(f'Airfoil NACA {airfoil_name} already exists.', wcolor='yellow')
-            raise ValueError('Airfoil already exists.')
+            return
         
         print(f'{ctime()} Creating airfoil: {airfoil_name}')
         
@@ -813,8 +817,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Shared controls: show if EITHER side uses a table
         show_order_controls = loc_uses_table or len_uses_table
-        self.blade_order_input.setVisible(show_order_controls)
-        self.label_41.setVisible(show_order_controls)
+        self.frame_16.setVisible(show_order_controls)
+        self.frame_19.setVisible(show_order_controls)
+        # self.blade_order_input.setVisible(show_order_controls)
+        # self.label_41.setVisible(show_order_controls)
         self.label_40.setVisible(show_order_controls)
     
     
@@ -1161,6 +1167,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     te_thickness = te_thkn,
                     bond_thickness= bond_th,
                     saveFig = saveFig,
+                    tolerance = self.db.settings['sec_le_tolerance'],
+                    ini_u0 = self.db.settings['sec_initial_i0'],
                 )
                 
                 # Jiggle method
@@ -1366,6 +1374,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             skinPart(sections=dict_sections, path= self.main_path, filename=filename)
               
             self.handle_msgbar(f'File "{filename}.json" exported succesfully.', wcolor='green')
+            if self.db.settings['exp_open_folder']:
+                QDesktopServices.openUrl(QUrl.fromLocalFile(self.main_path))
         
         elif self.export_csv_toggle.isChecked():
             
@@ -1406,6 +1416,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             )
 
             self.handle_msgbar(f'Folder "{foldername}" exported succesfully.', wcolor='green')
+            if self.db.settings['exp_open_folder']:
+                QDesktopServices.openUrl(QUrl.fromLocalFile(self.main_path))
 
         else:
             return
@@ -1786,7 +1798,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         msgBox = QMessageBox()
         about_text = 'This open source software, has been developed in ' \
         'the School of Engineering, in the University of Edinburgh.\n\n' \
-        'The current version is version 0.3.0.'
+        'The current version is version 0.3.1.'
         
         msgBox.about(self, 'About EdFoil', about_text)
         
@@ -1794,8 +1806,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Store current theme
         current_theme = self.settings_dialog.themes_box.currentText()
         
+        # Store current section parameters
+        current_le_tol = self.settings_dialog.le_tolerance.text()
+        current_i0 = self.settings_dialog.initial_i0.text()
+        
+        # Store export folder option
+        current_exp_folder = self.settings_dialog.export_folder.isChecked()
+        
         if self.settings_dialog.exec():
             self.settings_dialog.apply_settings()
+            self.save_settings()
             # Apply theme
             # theme = self.settings_dialog.themes_box.currentText()
             # theme_qss = self.themes.get(theme, "")
@@ -1804,6 +1824,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             # Revert to previous theme if cancelled
             self.settings_dialog.themes_box.setCurrentText(current_theme)
+            self.settings_dialog.le_tolerance.setText(current_le_tol)
+            self.settings_dialog.initial_i0.setText(current_i0)
+            self.settings_dialog.export_folder.setChecked(current_exp_folder)
             self.handle_msgbar("Settings cancelled.", wcolor='red')
             
     def load_themes(self):
@@ -1828,9 +1851,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         theme_name = self.settings_dialog.themes_box.currentText()
         if theme_name in self.themes:
             self.stylesheet.setStyleSheet(self.themes[theme_name].qss)
+            # self.settings_dialog.frame.setStyleSheet(self.themes[theme_name].qss)  
             self.handle_msgbar(f'Theme "{theme_name}" applied.', wcolor='green')
         else:
             self.handle_msgbar(f'Error: Theme "{theme_name}" not found.', wcolor='red')
+
+
+    def save_settings(self):
+        le_tolerance = int(self.settings_dialog.le_tolerance.text())
+        spl_initial_guess = float(self.settings_dialog.initial_i0.text())
+        exp_folder = self.settings_dialog.export_folder.isChecked()
+        
+        self.db.settings['sec_le_tolerance'] = le_tolerance
+        self.db.settings['sec_initial_i0'] = spl_initial_guess
+        self.db.settings['exp_open_folder'] = exp_folder
+
+        print(f'{ctime()} Section parameters saved:')
+        print(f'           Leading edge tolerance: {le_tolerance}')
+        print(f'           Initial guess i0: {spl_initial_guess}')
+        print(f'           Open export folder: {exp_folder}')
 
     ### MESSAGE BAR METHODS
     
@@ -1864,7 +1903,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.def_msgbar.show()
             self.msgbar.hide()
             self.warning_light.hide()
+            
+    def open_doc(self):
         
+        # Find pdf file in resources
+        pdf_path = resource_path('resources/EdFoil User Guide.pdf')
+        QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
+
 ## CLASSES
 # Main database in every session.       
 class session(QObject):
@@ -1875,6 +1920,7 @@ class session(QObject):
         self.sections = {}
         self.skin = {}
         self.blade = {}
+        self.settings = {}
     
     # def cleanStations(self):
     #     self.stations.clear()
@@ -2091,6 +2137,9 @@ class SettingsDialog(QDialog, Ui_settingsDialog):
         if hasattr(self, "buttonBox"):
             self.buttonBox.accepted.connect(self.accept)
             self.buttonBox.rejected.connect(self.reject)
+            
+        self.le_tolerance.setValidator(QIntValidator(0, 14, self))
+        self.initial_i0.setValidator(QDoubleValidator(0.0, 100.0, 2, self))
 
     def apply_settings(self):
         # TODO: read widgets and store in your session / config
