@@ -7,14 +7,17 @@ All notable changes to this project will be documented in this file.
 - Warning light now visible.
 - Extra parameters for Section instance creation in the "Settings" window.
 - Toggle to open the destination folder after exporting section.
+- Save and load session capabilities.
 
 ### Fixed
 - Mouse coordinates in Station plot would not show.
 - Icon path changed to resource_path method.
+- update coordinates in airfoil instance would leave upper and lower attributes empty.
 
 ### Changed
 - DPI font commented out because it may cause small fonts in high resolutions.
 - Eliminated two themes.
+- File extension changed to "*.edf".
 
 ## [0.3.0] - 2025-10-07
 ### Added

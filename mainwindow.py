@@ -14,10 +14,12 @@ from PySide6.QtQuickWidgets import QQuickWidget
 from edfoil.classes.airfoil import Airfoil
 from edfoil.classes.station import Station
 from edfoil.classes.section import Section
+from edfoil.classes.session import session
 from edfoil.utils.bladeparams import norm_olp
 from edfoil.utils.abaqusExp import *
 from edfoil.utils.dev import resource_path
 from edfoil.utils.themeLoader import Theme
+from edfoil.utils.sessionIO import save_session_to_edf, load_session_from_edf
 from resources.uis.ui_settingsDialog import Ui_settingsDialog
 
 import os
@@ -1099,9 +1101,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         idx_olp_sta = self.blade_skinolpsta_selected.currentIndex()
         idx_olp_len = self.blade_skinolplen_selected.currentIndex()
         
-        self.db.blade['olp_sta'] = self.edits['__olp_sta__'][idx_olp_sta]
-        # print(self.db.blade['olp_sta'])
-        self.db.blade['olp_len'] = self.edits['__olp_len__'][idx_olp_len]
+        try:
+            self.db.blade['olp_sta'] = self.edits['__olp_sta__'][idx_olp_sta]
+            # print(self.db.blade['olp_sta'])
+            self.db.blade['olp_len'] = self.edits['__olp_len__'][idx_olp_len]
+        except KeyError:
+            self.handle_msgbar('Error: Overlap interpolation was not performed.', wcolor='red')
+            return
+        
         if self.skin_len_radio1.isChecked():
             chord = [sta.parameters['chord'] for sta in self.db.stations.values()]
             self.db.blade['olp_len']['value'] *= chord
@@ -1659,11 +1666,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def load_db(self) -> None:
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFile)
-        dialog.setNameFilter(self.tr('Tblade (*.tbd *.json)'))
+        dialog.setNameFilter(self.tr('EdFoil (*.edf)'))
         dialog.setViewMode(QFileDialog.Detail)
-        if dialog.exec():
-            filepath = dialog.selectedFiles() # [0]
-            # TODO: decode tbd or json file into db class dictionary.
+        if not dialog.exec():
+            return
+        
+        filepath = dialog.selectedFiles()[0]
+        
+        # try:
+        new_db = load_session_from_edf(filepath)
+        # except Exception as e:
+        #     self.handle_msgbar(f'Error loading session: {e}', wcolor='red')
+        #     return
+        
+        # Replace db and update UI
+        self.db = new_db
+        self._sync_airfoil_widgets()
+        self._sync_station_widgets()
+        self.update_sectionList()
+        self.update_stabox()
+        self.handle_msgbar(f'Session loaded from: {filepath}', wcolor='green')
+        
+        
             
     def new_db(self) -> None:
         self.db = session()
@@ -1782,18 +1806,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def save_project(self):
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.AnyFile)
-        dialog.setNameFilter(self.tr('TBlade (*.tbd)'))
+        dialog.setNameFilter(self.tr('EdFoil (*.edf)'))
         dialog.setViewMode(QFileDialog.List)
-        dialog.setDefaultSuffix('tbd')
+        dialog.setDefaultSuffix('edf')
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, self.tr('Save File'),
+            self.main_path, 
+            'EdFoil Files (*.edf);;All Files (*)', 
+            options=QFileDialog.Options()
+        )
         
-        file_path, _ = QFileDialog.getSaveFileName(self, self.tr('Save File'),
-            self.main_path, 'TBlade Files (*.tbd);;All Files (*)', 
-            options=QFileDialog.Options())
+        if not file_path:
+            # self.database_file(file_path,'Hello')
+            return self.handle_msgbar('Save cancelled.', wcolor='red')
         
-        # TODO: encode db class dictionary into tbd file.
-        if file_path:
-            self.database_file(file_path,'Hello')
-            
+        try:
+            save_session_to_edf(self.db, file_path)
+            self.handle_msgbar(f'Project saved successfully: {file_path}', wcolor='green')
+
+        except Exception as e:
+            self.handle_msgbar(f'Error saving project: {str(e)}', wcolor='red')
+
     def info_message(self):
         msgBox = QMessageBox()
         about_text = 'This open source software, has been developed in ' \
@@ -1911,139 +1945,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
 
 ## CLASSES
-# Main database in every session.       
-class session(QObject):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.airfoils = AirfoilDB(self)
-        self.stations = StationDB(self)
-        self.sections = {}
-        self.skin = {}
-        self.blade = {}
-        self.settings = {}
-    
-    # def cleanStations(self):
-    #     self.stations.clear()
-
-# QObject for emitting signals
-class AirfoilDB(QObject):
-    airfoilsChanged = Signal(object)    # whole dict changed
-    airfoilAdded    = Signal(str)          # key
-    airfoilRemoved  = Signal(str)        # key
-    airfoilUpdated  = Signal(str)        # key
-    
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._airfoils: dict[str,object] = {}  # {name: Airfoil}
-    
-    def all(self):
-        return dict(self._airfoils)
-
-    def keys(self):
-        return list(self._airfoils.keys())
-
-    def add(self, name:str, airfoil: object):
-        self._airfoils[name] = airfoil
-        self.airfoilAdded.emit(name)
-        self.airfoilsChanged.emit(self._airfoils.copy())
-
-    def remove(self, name:str):
-        if name in self._airfoils:
-            del self._airfoils[name]
-            self.airfoilRemoved.emit(name)
-            self.airfoilsChanged.emit(self._airfoils.copy())
-
-    def update(self, name:str, airfoil:object):
-        self._airfoils[name] = airfoil
-        self.airfoilUpdated.emit(name)
-        self.airfoilsChanged.emit(self._airfoils.copy())
-        
-    def values(self):
-        return self._airfoils.values()
-
-    def items(self):
-        return self._airfoils.items()
-
-    def get(self, key, default=None):
-        return self._airfoils.get(key, default)
-
-    def __contains__(self, key):
-        return key in self._airfoils
-
-    def __len__(self):
-        return len(self._airfoils)
-
-    def __iter__(self):
-        return iter(self._airfoils)
-
-    def __getitem__(self, key):
-        return self._airfoils[key]
-
-class StationDB(QObject):
-    stationsChanged = Signal(object)     # whole dict changed
-    stationAdded    = Signal(str)        # key
-    stationRemoved  = Signal(str)        # key
-    stationUpdated  = Signal(str)        # key
-    
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._stations: dict[str,object] = {}  # {name: Station}
-    
-    def all(self):
-        return dict(self._stations)
-
-    def keys(self):
-        return list(self._stations.keys())
-
-    def add(self, name:str, station: object):
-        self._stations[name] = station
-        self.stationAdded.emit(name)
-        self.stationsChanged.emit(self._stations.copy())
-
-    def remove(self, name:str):
-        if name in self._stations:
-            del self._stations[name]
-            self.stationRemoved.emit(name)
-            self.stationsChanged.emit(self._stations.copy())
-
-    def update(self, name:str, station:object):
-        self._stations[name] = station
-        self.stationUpdated.emit(name)
-        self.stationsChanged.emit(self._stations.copy())
-        
-    def values(self):
-        return self._stations.values()
-
-    def items(self):
-        return self._stations.items()
-
-    def get(self, key, default=None):
-        return self._stations.get(key, default)
-    
-    def clear(self, emit_individual: bool = False):
-        if not self._stations:
-            return
-        
-        names = list(self._stations.keys())
-        self._stations.clear()
-
-        if emit_individual:
-            for name in names:
-                self.stationRemoved.emit(name)
-
-        self.stationsChanged.emit({})
-
-    def __contains__(self, key):
-        return key in self._stations
-
-    def __len__(self):
-        return len(self._stations)
-
-    def __iter__(self):
-        return iter(self._stations)
-
-    def __getitem__(self, key):
-        return self._stations[key]
 
 # For turning string inputs to floats inside QTableWidget instances
 class NumericItem(QTableWidgetItem):
