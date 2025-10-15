@@ -2591,9 +2591,7 @@ class Ui_MainWindow(object):
         self.changedir_button.setText(QCoreApplication.translate("MainWindow", u"Change...", None))
         self.newproject_button.setText(QCoreApplication.translate("MainWindow", u"New Project...", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Welcome to EdFoil", None))
-#if QT_CONFIG(tooltip)
-        self.loadproject_button.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:400;\">Coming Soon.</span></p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
+
         self.loadproject_button.setText(QCoreApplication.translate("MainWindow", u"Load Project...", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Version 0.3.1", None))
         self.descriptionMsg.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Welcome to EdFoil!<span style=\" font-size:10pt;\"><br/></span></p><p><span style=\" font-size:10pt; font-weight:400;\">This is a contained design tool to generate guide curves for a 3D model of wind and tidal turbine blades.</span></p><p><span style=\" font-size:10pt; font-weight:400;\">The workflow to get the curves is the following:</span></p><ol><li><span style=\" font-size:10pt; font-weight:400;\">Generate or upload NACA airfoils to the current session (&quot;Airfoil Creator&quot; tab)</span></li><li><span style=\" font-size:10pt; font-weight:400;\"> Assign parameters (e.g., twist angle, chord length) to airfoils at key stations along the span of the blade. (&quot;Station Generator&quot; tab)</span></li><li><span style=\" font-size:10pt; font-weight:400;\"> Determine blade parameters (&quot;Blade Parameters&quot; tab) such as:</span></li><ul><li><span style=\" font-size:10pt; font-weight:400;\">Where the skin is split in top and bottom surfaces.</span></li><li><span style=\" font-siz"
