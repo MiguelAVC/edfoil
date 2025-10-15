@@ -1673,11 +1673,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         filepath = dialog.selectedFiles()[0]
         
-        # try:
-        new_db = load_session_from_edf(filepath)
-        # except Exception as e:
-        #     self.handle_msgbar(f'Error loading session: {e}', wcolor='red')
-        #     return
+        try:
+            new_db = load_session_from_edf(filepath)
+        except Exception as e:
+            self.handle_msgbar(f'Error loading session: {e}', wcolor='red')
+            return
         
         # Replace db and update UI
         self.db = new_db
