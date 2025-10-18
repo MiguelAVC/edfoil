@@ -1,6 +1,14 @@
 # EdFoil
 
+[![Version](https://img.shields.io/github/v/release/miguelavc/edfoil)](https://github.com/miguelavc/edfoil/releases)
+[![Release Date](https://img.shields.io/github/release-date/miguelavc/edfoil)](https://github.com/miguelavc/edfoil/releases)
+![Commits](https://img.shields.io/github/commit-activity/t/miguelavc/edfoil)
+
 Repository for the future EdFoil software (codename: edfoil) for tidal turbine blade structural modelling. To run the application follow the next steps depending on your OS. For now this is a .py file but a .exe will be delivered eventually.
+
+> [!NOTE]  
+> This has only been tested on Windows 10/11.
+> Compatibility is expected for Windows 7/8.
 
 ## Install on Windows
 
@@ -40,3 +48,10 @@ pip install -r requirements.txt
 ```bat
 python main.py
 ```
+
+## Bugs
+
+> [!NOTE]  
+> Submitting a bug report starts a collaboration. To help us help you, please:  
+> - Stay available to answer questions or provide clarifications if needed  
+> - Test and confirm fixes in your own environment when a pull request (PR) is created for your issue 
