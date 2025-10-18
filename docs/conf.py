@@ -10,9 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -26,10 +26,11 @@ author = "Miguel A. Valdivia Camacho"
 # -- General configuration
 
 extensions = [
-    "sphinx.ext.duration",
-    "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.duration",
+    "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
 ]
 
@@ -39,6 +40,16 @@ intersphinx_mapping = {
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
 }
 intersphinx_disabled_domains = ["std"]
+
+autosummary_generate = True
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,      # include items without docstrings
+    "private-members": True,    # include _private methods/attrs
+    "special-members": "__init__",  # or True to include all dunders
+    "inherited-members": True,
+    "show-inheritance": True,
+}
 
 templates_path = ["_templates"]
 
@@ -60,4 +71,4 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+# html_static_path = ["_static"]

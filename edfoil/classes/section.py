@@ -1,12 +1,12 @@
 # %% Definitions
 
 ''' Main assumptions:
-- First point is the trailing edge
-- Direction of the splines are bot curve and then top curve
-- Same number of points for bot and top curve when imported from Station
-- Number of points is 50 or bigger (Need to get rid of this one eventually)
-- SplineIntersection to find t-parameter of LE is hardcoded to 21, meaning that
-  station instances need at least 42+1 number of points.
+    - First point is the trailing edge
+    - Direction of the splines are bot curve and then top curve
+    - Same number of points for bot and top curve when imported from Station
+    - Number of points is 50 or bigger (Need to get rid of this one eventually)
+    - SplineIntersection to find t-parameter of LE is hardcoded to 21, meaning that
+    station instances need at least 42+1 number of points.
 '''
 
 # Import libraries
@@ -64,6 +64,33 @@ def reorder_coordinates(
 # Main Class
 @progressTime
 class Section:
+    '''Section class for airfoil design.
+    
+    Attributes
+    ----------
+    parameters : dict
+        Dictionary containing section parameters
+    splines : dict
+        Dictionary containing spline representations of curves
+    points : dict
+        Dictionary containing points for each ply
+    guides : dict
+        Dictionary containing guide lines (chord line, overlap line, TE line)
+    indexes : dict
+        Dictionary containing indexes for each ply
+    t : dict
+        Dictionary containing t-parameters for each ply
+    figs : dict
+        Dictionary containing figures for each ply
+    name : str
+        Name of the section
+    Methods
+    -------
+    __init__(station, n_plies, ply_thickness, overlap_target, te_thickness=8,
+        bond_thickness=1, genFig=True, saveFig=False, tolerance=6, ini_u0=21)
+        Initializes the Section class with the given parameters.
+
+    '''
     def __init__(
         self,
         station:Station,            # Station instance

@@ -21,3 +21,7 @@ EdFoil.spec
 
 # Ignore tests
 tests/
+
+# Ignore Sphinx documentation build files
+docs/_build/
+docs/generated/
