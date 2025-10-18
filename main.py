@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QStyleFactory
 from PySide6.QtGui import QIcon
-from mainwindow import MainWindow
+from resources.uis.mainwindow import MainWindow
 from edfoil.utils.dev import resource_path
 # os.environ["QT_FONT_DPI"] = "96"
 

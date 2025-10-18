@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "Basic Sphinx Example Project"
-copyright = "2022, Read the Docs core team"
-author = "Read the Docs core team"
+project = "EdFoil Software"
+copyright = "2024, University of Edinburgh"
+author = "Miguel A. Valdivia Camacho"
 
 
 # -- General configuration ---------------------------------------------------

@@ -9,7 +9,7 @@ from edfoil.classes.airfoil import Airfoil
 from edfoil.classes.station import Station
 from edfoil.classes.section import Section
 from edfoil.classes.session import session
-from mainwindow import session
+from resources.uis.mainwindow import session
 
 def _to_float(x):
     try:

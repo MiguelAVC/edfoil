@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QAbstract
     QSpacerItem, QSpinBox, QStackedWidget, QTabWidget,
     QTableView, QTableWidget, QTableWidgetItem, QVBoxLayout,
     QWidget)
-import resources_rc
+import resources.uis.resources_rc as resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

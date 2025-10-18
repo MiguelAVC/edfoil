@@ -1,4 +1,4 @@
-from ui_mainwindow import Ui_MainWindow
+from resources.uis.ui_mainwindow import Ui_MainWindow
 from PySide6.QtWidgets import (
     QMainWindow, QFileDialog, QMessageBox, QLineEdit, QButtonGroup,
     QCheckBox, QComboBox, QTableWidgetItem, QDialog, QTableWidget, QHeaderView,
