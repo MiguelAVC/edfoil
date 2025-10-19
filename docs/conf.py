@@ -51,8 +51,9 @@ autodoc_default_options = {
     "show-inheritance": True,
 }
 
-# autodoc_mock_imports = [
-#     "PySide6", "numpy", "pandas", "scipy", "matplotlib", "shapely"]
+autodoc_mock_imports = [
+    "PySide6", "numpy", "pandas", "scipy", "matplotlib.pyplot", "shapely"]
+autodoc_typehints = "description"
 
 templates_path = ["_templates"]
 
