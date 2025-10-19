@@ -44,10 +44,10 @@ intersphinx_disabled_domains = ["std"]
 autosummary_generate = True
 autodoc_default_options = {
     "members": True,
-    "undoc-members": True,      # include items without docstrings
-    "private-members": True,    # include _private methods/attrs
+    "undoc-members": False,      # include items without docstrings
+    "private-members": False,    # include _private methods/attrs
     # "special-members": "__init__",  # or True to include all dunders
-    "inherited-members": True,
+    "inherited-members": False,
     "show-inheritance": True,
 }
 

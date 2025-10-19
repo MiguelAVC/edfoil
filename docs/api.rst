@@ -8,4 +8,9 @@ The following documentation provides a comprehensive overview of the EdFoil libr
    :recursive:
 
    edfoil.classes
+
+.. autosummary::
+   :toctree: generated
+   :recursive:
+   
    edfoil.utils
