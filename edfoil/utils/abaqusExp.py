@@ -1,3 +1,9 @@
+'''
+Export cloud points to a JSON format.
+
+:Note: This module needs further improvement and testing as it is only working for skin plies.
+'''
+
 # %% Definitions
 
 # Import libraries
@@ -6,6 +12,16 @@ from edfoil.classes.section import Section
 
 # Bot Sketches
 def skinBot(section:Section) -> dict:
+
+    '''
+    Extract bottom skin ply points from a Section object.
+    
+    :param section: Section object containing skin ply data.
+    :type section: Section
+    
+    :returns: Dictionary of bottom skin ply points.
+    :rtype: dict
+    '''
 
     bot = {}
 
@@ -34,6 +50,16 @@ def skinBot(section:Section) -> dict:
 
 # Top Sketches
 def skinTop(section:Section) -> dict:
+
+    '''
+    Extract top skin ply points from a Section object.
+    
+    :param section: Section object containing skin ply data.
+    :type section: Section
+    
+    :returns: Dictionary of top skin ply points.
+    :rtype: dict
+    '''
 
     top = {}
 
@@ -64,12 +90,38 @@ def skinTop(section:Section) -> dict:
 
 def skinSection(section:Section) -> dict:
     
+    '''
+    Join top and bottom skin ply points into a section dictionary.
+    
+    :param section: Section object containing skin ply data.
+    :type section: Section
+    
+    :returns: Dictionary with top and bottom skin ply points.
+    :rtype: dict
+    '''
+    
     sec = {'top':skinTop(section=section), 'bot':skinBot(section=section)}
     return sec
 
 # Skin Part
 
 def skinPart(sections:dict, path:str, filename:str='skin') -> None:
+    
+    '''
+    Writes skin section data to a JSON file.
+    
+    :param sections: Dictionary containing section data.
+    :type sections: dict
+    
+    :param path: Path to save the JSON file.
+    :type path: str
+    
+    :param filename: Name of the JSON file without extension. Defaults to 'skin'.
+    :type filename: str, optional
+    
+    :returns: None.
+    :rtype: None
+    '''
     
     # Save to a JSON file
     with open(f'{path}/{filename}.json', 'w') as file:

@@ -1,3 +1,7 @@
+'''
+Serialisation and deserialisation of session data to/from .edf files.
+'''
+
 from __future__ import annotations
 import json
 from datetime import datetime
@@ -9,9 +13,19 @@ from edfoil.classes.airfoil import Airfoil
 from edfoil.classes.station import Station
 from edfoil.classes.section import Section
 from edfoil.classes.session import session
-from resources.uis.mainwindow import session
 
 def _to_float(x):
+    
+    '''
+    Convert a value to float or int if possible.
+    
+    :param x: Value to convert.
+    :type x: any
+    
+    :returns: Converted float or int value, or original value if conversion fails.
+    :rtype: float, int, or original type
+    '''
+    
     try:
         if isinstance(x, (np.floating,)):
             return float(x)
@@ -22,6 +36,17 @@ def _to_float(x):
     return x
 
 def _to_list_xy(xy):
+    
+    '''
+    Convert a list of (x,y) pairs to a list of [float, float] lists.
+    
+    :param xy: List of (x,y) pairs.
+    :type xy: list[tuple[float,float],...] 
+    
+    :returns: List of [float, float] lists.
+    :rtype: list[list[float,float],...]
+    '''
+    
     # list[(x,y),...] -> [[float,float],...]
     out = []
     for p in xy:
@@ -30,6 +55,17 @@ def _to_list_xy(xy):
     return out
 
 def serialise_airfoil(a) -> dict:
+    
+    '''
+    Serialise an Airfoil object to a dictionary.
+    
+    :param a: Airfoil object to serialise.
+    :type a: Airfoil
+    
+    :returns: Dictionary representation of the Airfoil.
+    :rtype: dict
+    '''
+    
     # Expect attributes: name, family, profile, xy (iterable of (x,y))
     return {
         "name": getattr(a, "name", None),
@@ -39,6 +75,17 @@ def serialise_airfoil(a) -> dict:
     }
 
 def serialise_station(s) -> dict:
+    
+    '''
+    Serialise a Station object to a dictionary.
+    
+    :param s: Station object to serialise.
+    :type s: Station
+    
+    :returns: Dictionary representation of the Station.
+    :rtype: dict
+    '''
+    
     # Store by airfoil name + parameters (primitives only)
     airfoil_name = getattr(s, "airfoil", None)
     if hasattr(airfoil_name, "name"):
@@ -56,6 +103,18 @@ def serialise_station(s) -> dict:
     }
 
 def _df_to_records(df: pd.DataFrame | None):
+
+    '''
+    Convert a DataFrame to a list of records (dictionaries).
+    Each record corresponds to a row in the DataFrame.
+    
+    :param df: Pandas DataFrame to convert.
+    :type df: pd.DataFrame | None
+    
+    :returns: List of records with native Python types.
+    :rtype: list[dict] | None
+    '''
+
     if df is None:
         return None
     if not isinstance(df, pd.DataFrame):
@@ -67,6 +126,17 @@ def _df_to_records(df: pd.DataFrame | None):
     return recs
 
 def serialise_section(sec) -> dict:
+    
+    '''
+    Serialise a Section object to a dictionary.
+    
+    :param sec: Section object to serialise.
+    :type sec: Section
+    
+    :returns: Dictionary representation of the Section.
+    :rtype: dict
+    '''
+    
     # Minimal: keep parameters (you can add points if needed)
     params = dict(getattr(sec, "parameters", {}))
     for k, v in params.items():
@@ -80,7 +150,17 @@ def serialise_section(sec) -> dict:
     return {"parameters": params}
 
 def serialise_session(db) -> dict:
-    # db: your session() instance
+
+    '''
+    Serialise a session object to a dictionary.
+    
+    :param db: Current session() instance.
+    :type db: session
+    
+    :returns: Dictionary representation of the session.
+    :rtype: dict
+    '''
+
     airfoils = {}
     for name, a in getattr(db.airfoils, "items")():
         airfoils[name] = serialise_airfoil(a)
@@ -113,15 +193,51 @@ def serialise_session(db) -> dict:
     }
 
 def save_session_to_edf(db, file_path: str) -> None:
+    
+    '''
+    Save the current session object to a .edf file.
+    
+    :param db: Current session() instance.
+    :type db: session
+    
+    :param file_path: Path to save the .edf file.
+    :type file_path: str
+    
+    :returns: None.
+    :rtype: None
+    '''
+    
     payload = serialise_session(db)
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
         
 # Load Functions
 def _list_of_pairs_to_tuples(lst):
+    
+    '''
+    Convert a list of [x, y] lists to a list of (float, float) tuples.
+    
+    :param lst: List of [x, y] lists.
+    :type lst: list[list[float, float], ...]
+    
+    :returns: List of (float, float) tuples.
+    :rtype: list[tuple[float, float], ...]
+    '''
+    
     return [(float(x), float(y)) for x, y in lst or []]
 
 def load_session_from_edf(file_path: str) -> session:
+    
+    '''
+    Load a session object from a .edf file.
+    
+    :param file_path: Path to the .edf file.
+    :type file_path: str
+    
+    :returns: Loaded session() instance.
+    :rtype: session
+    '''
+    
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 

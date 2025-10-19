@@ -46,10 +46,13 @@ autodoc_default_options = {
     "members": True,
     "undoc-members": True,      # include items without docstrings
     "private-members": True,    # include _private methods/attrs
-    "special-members": "__init__",  # or True to include all dunders
+    # "special-members": "__init__",  # or True to include all dunders
     "inherited-members": True,
     "show-inheritance": True,
 }
+
+# autodoc_mock_imports = [
+#     "PySide6", "numpy", "pandas", "scipy", "matplotlib", "shapely"]
 
 templates_path = ["_templates"]
 

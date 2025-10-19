@@ -1,9 +1,67 @@
+
+'''
+Class for defining a blade station by transforming an airfoil.
+'''
+
 import numpy as np
 import os
 import matplotlib.pyplot as plt
 from edfoil.classes.airfoil import Airfoil
 
 class Station:
+    
+    '''
+    Class for defining a blade station by transforming an airfoil.
+    
+    :param airfoil: Airfoil object.
+    :type airfoil: Airfoil
+    
+    :param chord: Chord length.
+    :type chord: float
+    
+    :param twist_angle: Twist angle in degrees.
+    :type twist_angle: float
+    
+    :param x_offset: x offset from origin. Defaults to 0.0.
+    :type x_offset: float, optional
+    
+    :param y_offset: y offset from origin. Defaults to 0.0.
+    :type y_offset: float, optional
+    
+    :param z_offset: z offset from origin. Defaults to 0.0.
+    :type z_offset: float, optional
+    
+    :param x_multiplier: x coordinate multiplier, increases length of airfoil. Defaults to 1.0.
+    :type x_multiplier: float, optional
+    
+    :param y_multiplier: y coordinate multiplier, increases airfoil. Defaults to 1.0.
+    :type y_multiplier: float, optional
+
+    :param z_multiplier: z coordinate multiplier, increases station distance. Defaults to 1.0.
+    :type z_multiplier: float, optional
+    
+    :param x_mirror: To flip airfoil in the y axis. Defaults to False.
+    :type x_mirror: bool, optional
+    
+    :param y_mirror: To flip airfoil in the x axis. Defaults to True.
+    :type y_mirror: bool, optional
+    
+    :param path: Full path to the .txt file containing airfoil data [Deprecated].
+    :type path: str, optional
+
+    :ivar parameters: Dictionary containing station parameters (chord, twist_angle, offset, multiplier, mirror, isCircle).
+    :vartype parameters: dict
+    
+    :ivar airfoil: Name of the airfoil instance used for the station.
+    :vartype airfoil: str
+    
+    :ivar xy: Numpy array containing the station coordinates.
+    :vartype xy: np.ndarray
+    
+    :returns: Station instance.
+    :rtype: Station
+    '''
+    
     def __init__(
         self,
         airfoil: Airfoil, 
@@ -116,6 +174,17 @@ class Station:
         self.xy : np.ndarray = coordinates_station
         
     def plot(self, name) -> None:
+        
+        '''
+        Plots the station coordinates.
+        
+        :param name: Name for the plot title.
+        :type name: str
+        
+        :returns: None
+        :rtype: None
+        '''
+        
         fig, ax = plt.subplots(figsize=(10,6))
 
         x = self.xy[:,0]
@@ -136,6 +205,14 @@ class Station:
         plt.show()
         
     def xyRange(self) -> list[list[float]]:
+        
+        '''
+        Returns the range of x and y coordinates of the station.
+        
+        :returns: List containing [ [x_min, x_max], [y_min, y_max] ].
+        :rtype: list[list[float]]
+        '''
+        
         range_list = [
             [float(np.min(self.xy[:,col])),float(np.max(self.xy[:,col]))] 
             for col in range(2)

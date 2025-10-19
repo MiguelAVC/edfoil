@@ -1,12 +1,14 @@
 # %% Definitions
 
-''' Main assumptions:
+''' 
+Class for section design from station objects.
+
+Main assumptions:
     - First point is the trailing edge
     - Direction of the splines are bot curve and then top curve
     - Same number of points for bot and top curve when imported from Station
     - Number of points is 50 or bigger (Need to get rid of this one eventually)
-    - SplineIntersection to find t-parameter of LE is hardcoded to 21, meaning that
-    station instances need at least 42+1 number of points.
+    - SplineIntersection to find t-parameter of LE is hardcoded to 21, meaning that station instances need at least 42+1 number of points.
 '''
 
 # Import libraries
@@ -30,6 +32,25 @@ def figProperties(
     legend:bool = True,
 ) -> None:
     
+    '''
+    Default figure properties.
+    
+    :param ax: Matplotlib Axes object to format.
+    :type ax: matplotlib.axes.Axes
+    :param title: Title of the plot.
+    :type title: str
+    :param xlabel: Label for the x-axis. Default is 'x [-]'.
+    :type xlabel: str
+    :param ylabel: Label for the y-axis. Default is 'y [-]'.
+    :type ylabel: str
+    :param labelsize: Size of the axis labels. Default is 'large'.
+    :type labelsize: str
+    :param legend: Whether to display the legend. Default is True.
+    :type legend: bool
+    
+    :return: None
+    '''
+
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.minorticks_on()
@@ -47,6 +68,19 @@ def reorder_coordinates(
     reference_point:list[float,float]
 ):
     
+    '''
+    Reorder the coordinates of a polygon so that the point closest to the reference point is first.
+
+    :param polygon: Shapely Polygon object
+    :type polygon: Polygon
+    
+    :param reference_point: Reference point as [x, y]
+    :type reference_point: list[float, float]
+
+    :return: Reordered list of coordinates
+    :rtype: list[float, float]
+    '''
+
     coords = list(polygon.exterior.coords)
     
     # Find the closest point in the buffer to the reference point
@@ -64,33 +98,54 @@ def reorder_coordinates(
 # Main Class
 @progressTime
 class Section:
-    '''Section class for airfoil design.
     
-    Attributes
-    ----------
-    parameters : dict
-        Dictionary containing section parameters
-    splines : dict
-        Dictionary containing spline representations of curves
-    points : dict
-        Dictionary containing points for each ply
-    guides : dict
-        Dictionary containing guide lines (chord line, overlap line, TE line)
-    indexes : dict
-        Dictionary containing indexes for each ply
-    t : dict
-        Dictionary containing t-parameters for each ply
-    figs : dict
-        Dictionary containing figures for each ply
-    name : str
-        Name of the section
-    Methods
-    -------
-    __init__(station, n_plies, ply_thickness, overlap_target, te_thickness=8,
-        bond_thickness=1, genFig=True, saveFig=False, tolerance=6, ini_u0=21)
-        Initializes the Section class with the given parameters.
-
     '''
+    Class for airfoil skin section design.
+    
+    :param station: Station instance
+    :type station: Station
+    
+    :param n_plies: Number of plies
+    :type n_plies: int
+    
+    :param ply_thickness: Thickness of each ply
+    :type ply_thickness: float
+    
+    :param overlap_target: Target overlap
+    :type overlap_target: float
+    
+    :param te_thickness: Trailing edge thickness, defaults to 8
+    :type te_thickness: float, optional
+    
+    :param bond_thickness: Bond thickness, defaults to 1
+    :type bond_thickness: float, optional
+    
+    :param genFig: Generate figures, defaults to True
+    :type genFig: bool, optional
+    
+    :param saveFig: Save figures, defaults to False
+    :type saveFig: bool, optional
+    
+    :param tolerance: Tolerance for decimal places ACIS in LE, defaults to 6
+    :type tolerance: int, optional
+    
+    :param ini_u0: Initial guess for splineIntersection starting from TE, defaults to 21
+    :type ini_u0: int, optional
+    
+    :ivar dict parameters: Session parameters (n_plies, ply_thickness, etc.).
+    :ivar dict points: Generated geometry points grouped by part.
+    :ivar dict guides: Construction guides (lines, etc.).
+    :ivar dict indexes: Key t-parameters per curve/ply.
+    :ivar dict t: t-parameter lists for each segment.
+    :ivar dict figs: Matplotlib figures by name.
+    :ivar str  name: Section name.
+    :ivar dict splines: Spline objects for offsets.
+    
+    :return: None
+    :rtype: None
+    '''
+
+
     def __init__(
         self,
         station:Station,            # Station instance
@@ -653,7 +708,14 @@ class Section:
         self.points['top_1'] = pts_top_1
         
     def plotSection(self) -> None:
+
+        '''
+        Plot the airfoil section and adds it to the instance.
         
+        :return: None
+        :rtype: None
+        '''
+
         fig, ax = plt.subplots(figsize = (10,6))
         
         n_plies = self.parameters['n_plies']
@@ -689,6 +751,19 @@ class Section:
             
     def jiggle(self, overlap_dist:float, bond_thickness:float=2.0) -> None:
         
+        '''Adjust the overlap end guide based on the specified overlap distance.
+        
+        :param overlap_dist: Target overlap distance.
+        :type overlap_dist: float
+        
+        :param bond_thickness: Thickness of the bonding layer, defaults to 2.0.
+        :type bond_thickness: float, optional
+        
+        :return: None
+        :rtype: None
+        '''
+
+
         # Error handling for circular airfoil
         if self.parameters['isCircle']:
             return print(f'Method is not implemented for circular airfoils.')
@@ -1030,6 +1105,25 @@ class Section:
     def teSpar(self, te_distance:float, thickness:float, flange_distance:float, n_tePlies:float,
         ) -> None:
         
+        '''
+        Create the trailing edge spar guides and calculate the t-parameters and points for each ply and part.
+        
+        :param te_distance: Distance from the trailing edge to the spar start.
+        :type te_distance: float
+        
+        :param thickness: Thickness of each ply in the spar.
+        :type thickness: float
+        
+        :param flange_distance: Distance from the spar end to the flange end.
+        :type flange_distance: float
+        
+        :param n_tePlies: Number of plies in the trailing edge spar.
+        :type n_tePlies: int
+        
+        :return: None
+        :rtype: None
+        '''
+        
         # Variables
         n_plies = self.parameters['n_plies']
         u0_ini = self.parameters['u0_initial']
@@ -1308,7 +1402,10 @@ class Section:
         plt.close(fig)
         
     def info(self) -> None:
-        
+
+        '''
+        Output information about the station instance.
+        '''
         output  = f'Station instance name: {self.name}\n'
         output += f'Parameters: {list(self.parameters.keys())}\n'
         output += f'Guides: {list(self.guides.keys())}\n'

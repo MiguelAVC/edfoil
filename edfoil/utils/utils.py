@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+# Created on Thu Jul 11 12:07:16 2024
+# @author: s1982685
 """
-Created on Thu Jul 11 12:07:16 2024
+General utility functions for all classes and modules.
 
-@author: s1982685
+Has 2 functions that require Abaqus.
 """
-# Has 2 functions that require Abaqus.
 
 #%% Import libraries
 
@@ -112,6 +113,15 @@ def lineConstructor(p0, p1 = None, ang = None):
 ## To find whether a curve is above or below the chord length
     
 def curveLocatorY(line, point):
+    """Evaluates if a point is above or below the chord length.
+
+    Args:
+        line (dict): line object.
+        point (pair of floats): x,y coordinates of curve.
+
+    Returns:
+        Boolean: True if point is above and False if point is below.
+    """
     
     # handling vertical lines
     if np.abs(line['tan']) == np.pi:
@@ -160,6 +170,13 @@ def curveLocatorX(line, point):
 
 def splineYMax(spline):
     
+    '''
+    Find the maximum y-value on a spline object. (Abaqus API)
+    
+    :note: This function requires Abaqus environment.
+    :note: This function is deprecated and will be removed in future versions.
+    '''
+    
     y_values = [spline.getPointAtDistance(point=spline.getVertices()[0].coords,
                 distance=x,percentage=True)[1] for x in range(101)]
     
@@ -173,6 +190,27 @@ def splineYMax(spline):
 ## This is inside a sketch between 2 construction lines using curveLocatorX
 
 def sortSplines(g,line1,line2,chord=False):
+    
+    '''
+    Sort splines between two lines based on their length.
+    
+    :note: This function requires Abaqus environment.
+    
+    :param g: Dictionary of geometry objects.
+    :type g: dict
+    
+    :param line1: First construction line object.
+    :type line1: dict
+    
+    :param line2: Second construction line object.
+    :type line2: dict
+    
+    :param chord: If True, uses Y locator (for chord lines). Defaults to False.
+    :type chord: bool, optional
+    
+    :returns: List of sorted spline objects.
+    :rtype: list
+    '''
     
     # identify splines between the two lines
     if not chord:
@@ -200,6 +238,29 @@ def sortSplines(g,line1,line2,chord=False):
 ## Needed as functions takes more than 10mins.
 
 def progressBar(unit,id,iter,total):
+
+    '''
+    Display a progress bar in the console.
+    
+    :note: Tested in the Abaqus console.
+    
+    :param unit: Unit of the progress (e.g., "Station").
+    :type unit: str
+    
+    :param id: Identifier of the current item.
+    :type id: int
+    
+    :param iter: Current iteration number.
+    :type iter: int
+    
+    :param total: Total number of iterations.
+    :type total: int
+    
+    :returns: None.
+    :rtype: None
+    
+    '''
+
     padding = len(str(total))
     percentage = (iter+1)*100 / total
     sys.stdout.write('{} {:>{}}: [{}{}] {:.2f}%\n'.
@@ -212,6 +273,17 @@ def progressBar(unit,id,iter,total):
 # ---------------
 
 class npEncoder(json.JSONEncoder):
+    
+    '''
+    JSON encoder for numpy data types.
+    
+    :param obj: Object to encode.
+    :type obj: object
+    
+    :returns: Encoded object.
+    :rtype: object
+    '''
+    
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -229,6 +301,20 @@ class npEncoder(json.JSONEncoder):
 # ------------------
 
 def saveDB(db):
+    
+    '''
+    Save the database to a JSON file.
+    
+    :note: This function was tested in Abaqus environment.
+    :note: This function will be deprecated in future versions.
+    
+    :param db: Database dictionary.
+    :type db: dict
+    
+    :returns: None.
+    :rtype: None
+    '''
+    
     # Save json file for back up
     filename = 'db_'+time.strftime('%Y-%m-%d_%H-%M', time.localtime()) +'.json'
     file = os.path.join(db['path']['data'], filename)
@@ -238,25 +324,67 @@ def saveDB(db):
 # ------------------
 # 9) Progress decorator
 # ------------------
+from functools import wraps
 
-def progressTime(func):
-    def wrapper(*args,**kwargs):
+def progressTime(obj):
+    
+    '''
+    Decorator to measure execution time of functions or class initialisations.
+    
+    :param obj: Function or class to decorate.
+    :type obj: function or class
+    
+    :returns: Decorated function or class.
+    :rtype: function or class
+    '''
+    
+    # Don’t alter objects during doc builds
+    if os.environ.get("READTHEDOCS") == "True":
+        return obj
+    
+        # Class decorator: wrap __init__, keep the class type intact
+    if isinstance(obj, type):
+        orig_init = obj.__init__
+
+        @wraps(orig_init)
+        def __init__(self, *args, **kwargs):
+            t0 = time.perf_counter()
+            try:
+                return orig_init(self, *args, **kwargs)
+            finally:
+                dt = (time.perf_counter() - t0) * 1000
+                print(f"{obj.__name__} calculated in {dt:.1f} ms.")
+        obj.__init__ = __init__
+        return obj
+
+    # Function decorator
+    @wraps(obj)
+    def wrapper(*args, **kwargs):
+        t0 = time.perf_counter()
+        try:
+            return obj(*args, **kwargs)
+        finally:
+            dt = (time.perf_counter() - t0) * 1000
+            print(f"{obj.__name__} function executed in {dt:.1f} ms.")
+    return wrapper
+    
+    # def wrapper(*args,**kwargs):
         
-        # record the start time
-        start_time = time.time()
+    #     # record the start time
+    #     start_time = time.time()
         
-        # execute the function
-        result = func(*args, **kwargs)
+    #     # execute the function
+    #     result = obj(*args, **kwargs)
         
-        # calculate time elapsed
-        elapsed_time = time.time() - start_time
-        print('- Completed in {:.3f}s.\n'.format(elapsed_time))
+    #     # calculate time elapsed
+    #     elapsed_time = time.time() - start_time
+    #     print('- Completed in {:.3f}s.\n'.format(elapsed_time))
         
-        # save changes to database
-        # if result is not None:
-        #     saveDB(db=kwargs['db'])
+    #     # save changes to database
+    #     # if result is not None:
+    #     #     saveDB(db=kwargs['db'])
         
-        return result
+    #     return result
     return wrapper
 
 # ------------------------------
@@ -323,6 +451,30 @@ def connectedGeometry(objects, ref_coord):
 
 def skinOverlapLocator(d_target,p0,twist_ang,spline,u0):
     
+    '''
+    Locate the skin overlap for a given point and twist angle on a spline.
+    
+    :note: This function is the backbone of the section class.
+    
+    :param d_target: Target overlap distance.
+    :type d_target: float
+    
+    :param p0: Tuple of floats with x,y coordinates of the point.
+    :type p0: tuple
+    
+    :param twist_ang: Twist angle in degrees.
+    :type twist_ang: float
+    
+    :param spline: Spline object.
+    :type spline: dict
+    
+    :param u0: Minimum parameter value to start searching.
+    :type u0: float
+    
+    :returns: Parameter value on the spline where the overlap occurs.
+    :rtype: float
+    '''
+    
     x0, y0 = p0
     u = spline['u']
     
@@ -361,6 +513,19 @@ def skinOverlapLocator(d_target,p0,twist_ang,spline,u0):
 # Iterate on u until the sign changes, then find roots for intersection.
 
 def trailingEdgeThickness(d_target,spline):
+    
+    '''
+    Locate the trailing edge thickness for a given distance on a spline.
+    
+    :param d_target: Target trailing edge distance.
+    :type d_target: float
+    
+    :param spline: Spline object.
+    :type spline: dict
+    
+    :returns: t-value on the spline where the trailing edge thickness occurs.
+    :rtype: float
+    '''
     
     # Define variables
     distance_target = d_target
@@ -438,7 +603,23 @@ def trailingEdgeThickness(d_target,spline):
 # -----------------------------------
 
 def splineIntersection(spline,line,u0=0):
+
+    """
+    Find the intersection point between a spline and a line.
+
+    :param spline: Spline object.
+    :type spline: dict
     
+    :param line: Line object defined by slope and intercept.
+    :type line: dict
+    
+    :param u0: Minimum parameter value to start searching. Defaults to 0.
+    :type u0: float, optional
+    
+    :returns: t-value on the spline where the intersection occurs.
+    :rtype: float
+    """
+
     # Define variables
     u = spline['u']
     
@@ -473,6 +654,23 @@ def splineIntersection(spline,line,u0=0):
 # -----------------------------------
 
 # Cosine spacing for better point distribution
-def cosSpacing(xmin, xmax, n):
+def cosSpacing(xmin, xmax, n) -> np.ndarray:
+    
+    '''
+    Generate cosine-spaced values for airfoils between xmin and xmax.
+    
+    :param xmin: Minimum x value.
+    :type xmin: float
+    
+    :param xmax: Maximum x value.
+    :type xmax: float
+    
+    :param n: Number of points to generate.
+    :type n: int
+    
+    :returns: Numpy array of cosine-spaced x values.
+    :rtype: np.ndarray
+    '''
+    
     beta = np.linspace(0, np.pi, n)
     return 0.5 * (xmin + xmax) + 0.5 * (xmax - xmin) * np.cos(beta)

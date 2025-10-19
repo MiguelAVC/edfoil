@@ -1,7 +1,40 @@
+'''
+Class for managing session data including airfoils and stations.
+
+This is the main database class that holds airfoils, stations, sections, skin, blade parameters, and settings for a session in the software instance.
+'''
+
+
 from PySide6.QtCore import QObject, Signal
 
 # Main database in every session.       
 class session(QObject):
+    
+    '''
+    QObject class for managing session data including airfoils and stations.
+    
+    :ivar airfoils: AirfoilDB instance containing airfoils in the session.
+    :vartype airfoils: AirfoilDB
+    
+    :ivar stations: StationDB instance containing stations in the session.
+    :vartype stations: StationDB
+    
+    :ivar sections: Dictionary containing sections in the session.
+    :vartype sections: dict
+    
+    :ivar skin: Dictionary containing skin data in the session.
+    :vartype skin: dict
+    
+    :ivar blade: Dictionary containing blade parameters in the session.
+    :vartype blade: dict
+    
+    :ivar settings: Dictionary containing session settings.
+    :vartype settings: dict
+    
+    :returns: session instance.
+    :rtype: session
+    '''
+    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.airfoils = AirfoilDB(self)
@@ -16,6 +49,18 @@ class session(QObject):
 
 # QObject for emitting signals
 class AirfoilDB(QObject):
+    
+    '''
+    QObject class for managing airfoils in the session.
+    
+    :ivar airfoils: Dictionary containing airfoils in the session.
+    :vartype airfoils: dict
+    
+    :returns: AirfoilDB instance.
+    :rtype: AirfoilDB
+    '''
+    
+    
     airfoilsChanged = Signal(object)    # whole dict changed
     airfoilAdded    = Signal(str)          # key
     airfoilRemoved  = Signal(str)        # key
@@ -69,6 +114,14 @@ class AirfoilDB(QObject):
         return self._airfoils[key]
 
 class StationDB(QObject):
+    
+    '''
+    QObject class for managing stations in the session.
+    
+    :ivar stations: Dictionary containing stations in the session.
+    :vartype stations: dict
+    '''
+    
     stationsChanged = Signal(object)     # whole dict changed
     stationAdded    = Signal(str)        # key
     stationRemoved  = Signal(str)        # key

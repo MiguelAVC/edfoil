@@ -1,3 +1,7 @@
+'''
+Class for normalised airfoil shapes.
+'''
+
 import json, subprocess, tempfile, re
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -9,6 +13,18 @@ from edfoil.utils.utils import cosSpacing
 
 # Name stripping regex
 def strip_name(name:str) -> tuple[str,str]:
+    
+    '''
+    Strip airfoil name into family and profile.
+    
+    E.g. 'NACA63A206' -> ('NACA', '63A206')
+    
+    :param name: Airfoil name string.
+    :type name: str
+    
+    :return: (family, profile) tuple.
+    :rtype: tuple[str, str]
+    '''
 
     m = re.match(r'^\s*([A-Za-z]+)', name)
     prefix = m.group(1) if m else ''
@@ -30,6 +46,47 @@ def strip_name(name:str) -> tuple[str,str]:
 
 # --- Airfoil Class ---
 class Airfoil:
+    
+    '''
+    Airfoil class for normalised airfoil shapes.
+    
+    :param name: Airfoil name. Defaults to '__edit__'.
+    :type name: str
+    
+    :ivar path: Path to imported airfoil file.
+    :vartype path: str | None
+    
+    :ivar name: Airfoil name.
+    :vartype name: str
+    
+    :ivar xy: List of (x,y) tuples for the airfoil shape.
+    :vartype xy: list
+    
+    :ivar upper: List of (x,y) tuples for the upper surface.
+    :vartype upper: list
+    
+    :ivar lower: List of (x,y) tuples for the lower surface.
+    :vartype lower: list
+    
+    :ivar n_points: Number of points in the airfoil.
+    :vartype n_points: int
+    
+    :ivar family: Airfoil family (e.g. 'NACA').
+    :vartype family: str | None
+    
+    :ivar profile: Airfoil profile (e.g. '63-206').
+    :vartype profile: str | None
+    
+    :ivar imported: Flag indicating if the airfoil was imported from a file.
+    :vartype imported: bool
+    
+    :ivar report: Contents of naca.out if using Fortran backend.
+    :vartype report: str | None
+    
+    :return: Airfoil object.
+    :rtype: Airfoil
+    '''
+    
     def __init__(self, name:str = '__edit__') -> None:
         self.path = None
         self.name = name
@@ -48,6 +105,17 @@ class Airfoil:
     # --- Methods ---
     
     def importCoords(self, path:str) -> None:
+        
+        '''
+        Import airfoil coordinates from a .dat or .txt file.
+        
+        :param path: Path to the airfoil coordinate file.
+        :type path: str
+        
+        :return: None
+        :rtype: None
+        '''
+        
         filename = Path(path).stem
         self.path = path
         self.family, self.profile = strip_name(filename)
@@ -123,6 +191,17 @@ class Airfoil:
             self.n_points = len(coords)
         
     def update(self,coords:list) -> None:
+        
+        '''
+        Update airfoil coordinates from a list of (x,y) tuples.
+        
+        :param coords: List of (x,y) tuples for the airfoil shape.
+        :type coords: list
+        
+        :return: None
+        :rtype: None
+        '''
+        
         # self.xy = coords
         # self.n_points = len(coords)
         # Split at min x (leading edge)
@@ -146,9 +225,31 @@ class Airfoil:
         
     
     def changeName(self, name:str) -> None:
+        
+        '''
+        Change the airfoil name.
+        
+        :param name: New airfoil name.
+        :type name: str
+        
+        :return: None
+        :rtype: None
+        '''
+        
         self.name = name
         
     def exportAirfoil(self, path:str) -> None:
+        
+        '''
+        Export the airfoil coordinates to a text file.
+
+        :param path: Path to the output file.
+        :type path: str
+
+        :return: None
+        :rtype: None
+        '''
+        
         filepath = path + self.name + '.txt'
         with open(filepath, 'w') as file:
             for x, y in self.xy:
@@ -156,6 +257,17 @@ class Airfoil:
                 file.write(line + '\n')
     
     def plotAirfoil(self, display:bool=True) -> Figure | None:
+        
+        '''
+        Generate the airfoil shape.
+
+        :param display: Whether to display the plot.
+        :type display: bool
+
+        :return: matplotlib Figure object if display is False, else None.
+        :rtype: Figure | None
+        '''
+
         font_size = 'x-large'
         x, y = zip(*self.xy)
         
@@ -183,11 +295,25 @@ class Airfoil:
         else: return fig
     
     # NACA 6 series implementation (Deprecated)
-    def naca6(self, profile:str, path:str, n_points:int) -> dict:
+    def naca6(self, profile:str, path:str, n_points:int) -> None:
         """
         Loads NACA 6-series airfoil tabulated data, fits splines, and returns a
         list of x and y points with the desired number of points.
-        Returns: [x, y] points.
+        Returns: [x, y] points. 
+        
+        :note: **Deprecated: use naca456 method instead.**
+        
+        :param profile: NACA 6-series profile code (e.g. '63-206').
+        :type profile: str
+
+        :param path: Path to the JSON file containing NACA 6-series data.
+        :type path: str
+        
+        :param n_points: Number of points to generate along the airfoil surface.
+        :type n_points: int
+        
+        :return: None
+        :rtype: None
         """
         
         self.path = path
@@ -228,6 +354,15 @@ class Airfoil:
         Run bundled Fortran 'naca456.exe' (at edfoil/naca456/naca456.exe),
         feed a namelist on stdin, and parse 'naca.gnu' (+ 'naca.out') into 
         the Airfoil object.
+        
+        :param namelist_text: Text of the NACA456 namelist.
+        :type namelist_text: str
+
+        :param keep_files: Whether to keep the temporary files in the current directory.
+        :type keep_files: bool
+        
+        :return: None
+        :rtype: None
         """
 
         # --- fixed location (bundled with the app) ---
@@ -334,8 +469,25 @@ class Airfoil:
         dencode: int = 2) -> str:
         """
         Build a NACA456 namelist from a short code:
-        - 4-digit: "2412", "0012", ...
-        - 6-series: "63-206", "63206", "64-415", "65A-410", ...
+        
+            - 4-digit: "2412", "0012", ...
+            - 6-series: "63-206", "63206", "64-415", "65A-410", ...
+        
+        :param profile_code: NACA profile code.
+        :type profile_code: str
+        
+        :param name: Airfoil name. If None, a default name is generated.
+        :type name: str | None
+        
+        :param chord: Chord length. Defaults to 1.0.
+        :type chord: float
+        
+        :param dencode: Dencode option for NACA456. Defaults to 2.
+        :type dencode: int
+        
+        :return: NACA456 namelist text.
+        :rtype: str
+        
         """
         code = profile_code.strip().upper().replace(" ", "")
 

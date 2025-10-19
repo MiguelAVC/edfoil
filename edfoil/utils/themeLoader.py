@@ -1,17 +1,65 @@
+'''
+Theme class for loading and applying QSS themes.
+'''
+
 from pathlib import Path
 from edfoil.utils.dev import resource_path
 import re
 
 class Theme():
+    
+    '''
+    Class for loading and applying QSS themes.
+    
+    :param name: Name of the theme. Defaults to "default".
+    :type name: str, optional
+    
+    :ivar name: Name of the theme.
+    :vartype name: str
+    
+    :ivar template: QSS template string.
+    :vartype template: str
+    
+    :ivar palette: Dictionary of theme variables.
+    :vartype palette: dict
+    
+    :ivar qss: Final QSS string with applied theme.
+    :vartype qss: str
+    
+    :returns: Theme instance.
+    :rtype: Theme
+    '''
+    
     def __init__(self, name="default"):
         self.name = name
         self.template = self.load_template()
 
     def load_template(self) -> str:
+        
+        '''
+        Load the QSS template file.
+        
+        :returns: QSS template string.
+        :rtype: str
+        '''
+        
         tpl_path = Path(resource_path('resources/themes/template.qss'))
         return tpl_path.read_text(encoding="utf-8")
 
-    def load_qss(self, path:str=None, sout:bool=False) -> str:
+    def load_qss(self, path:str=None, sout:bool=False) -> None | str:
+        
+        '''
+        Load and apply the theme from a QSS file.
+        
+        :param path: Path to the theme QSS file. If None, uses default theme. Defaults to None.
+        :type path: str, optional 
+        
+        :param sout: If True, returns the final QSS string. Defaults to False.
+        :type sout: bool, optional
+        
+        :returns: Final QSS string with applied theme if sout is True.
+        :rtype: None | str
+        '''
 
         # Locate theme file
         path = Path(path)

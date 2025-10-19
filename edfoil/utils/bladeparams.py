@@ -1,9 +1,28 @@
+'''
+Functions for normalising overlap parameters using spline interpolation.
+'''
+
 from scipy.interpolate import splrep, splev
 
 def norm_olp(coords:tuple[tuple[float,float],...],
              x_target:list[float,],
              order:int,
              ) -> list[list,list]:
+    
+    '''Normalise overlap parameters using spline interpolation.
+    
+    :param coords: Tuple of tuples containing (x, y) coordinates of measurements.
+    :type coords: tuple[tuple[float,float],...]
+    
+    :param x_target: List of x values to extrapolate.
+    :type x_target: list[float,]
+    
+    :param order: Order of the spline interpolation (1 for linear, 2 for quadratic).
+    :type order: int
+    
+    :returns: List containing extrapolated y values for each spline order and the spline objects.
+    :rtype: list[list,list]
+    '''
     
     # Unzip coordinates of measurements
     x, y = zip(*coords)
